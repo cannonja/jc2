@@ -1,0 +1,23 @@
+import imp
+import os
+
+##Import module in module object
+
+##Home machine import
+module = imp.load_source('mnist_load',
+                         'C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\mnist_load.py')
+##tlab machine import
+#module = imp.load_source('mnist_load', '/u/jc2/dev/jc2/Image_Class/image_class.py')
+
+##Built list of files to iterate through
+files = os.listdir()
+file_list = []
+for i in files:    
+    if (i.find("idx") != -1):
+        file_list.append(i)
+    
+##Check print_meta function
+for name in (file_list):
+    module.print_meta(name)
+
+
