@@ -20,4 +20,9 @@ for i in files:
 for name in (file_list):
     module.print_meta(name)
 
+##Check save_images
+output_path = "C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\Images\\test_image_"
+module.save_images(file_list[0], output_path, 1, 9)
+
+
 
