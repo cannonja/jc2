@@ -1,5 +1,7 @@
 import imp
 import os
+from PIL import Image
+import numpy as np
 
 ##Import module in module object
 
@@ -16,13 +18,22 @@ for i in files:
     if (i.find("idx") != -1):
         file_list.append(i)
     
+'''
 ##Check print_meta function
 for name in (file_list):
     module.print_meta(name)
+'''
 
 ##Check save_images
 output_path = "C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\Images\\test_image_"
-module.save_images(file_list[0], output_path, 1, 9)
+image_data = module.load_images(file_list[0], 10)
+im = Image.fromarray(image_data[1], mode='L')
+im.show()
+
+
+
+
+#module.save_images(image_data, output_path)
 
 
 
