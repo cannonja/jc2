@@ -32,7 +32,7 @@ def print_meta(file_name):
     in_file.close()
 
 
-def save_images(file_name, output_path, num_images, start=0):
+def load_images(file_name, num_images, start=0):
     array = np.empty((28,28), 'uint8') #Array to hold one image's data
     images = [] #Empty list to hold multiple arrays (images)
 
@@ -48,8 +48,16 @@ def save_images(file_name, output_path, num_images, start=0):
             row_data = struct.unpack('>28B', row_data)
             array[j] = row_data
         images.append(array)
-        im = Image.fromarray(images[i], mode='L')
-        fp = output_path + str(i + (start + 1)) + ".png"
-        im.save(fp)
 
     in_file.close()
+    return images
+
+
+def save_images(image_list, output_path):
+    for i in range(0, len(image_list)):
+        im = Image.fromarray(image_list[i], mode='L')
+        fp = output_path + str(i + 1) + ".png"
+        #fp = output_path + str(i + (start + 1)) + ".png"
+        im.save(fp)
+
+    
