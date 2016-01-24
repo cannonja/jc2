@@ -19,28 +19,16 @@ for i in files:
     if (i.find("idx") != -1):
         file_list.append(i)
     
-'''
+
 ##Check print_meta function
 for name in (file_list):
     module.print_meta(name)
-'''
 
-##Check save_images
+
+##Check load_images and save_images
 output_path = "C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\Images\\test_image_"
-image_data = module.load_images(file_list[0], 10)
-print ("Instead, the function returns this:\n")
-for i in range(len(image_data)):
-    print ("images[", i, "]: ", image_data[i][15][:15])
-    
-
-
-#im = Image.fromarray(image_data[1], mode='L')
-#im.show()
-
-
-
-
-#module.save_images(image_data, output_path)
+image_data = module.load_images(file_list[0], 5, 5)
+module.save_images(image_data, output_path)
 
 
 
