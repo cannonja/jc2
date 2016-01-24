@@ -35,26 +35,39 @@ def print_meta(file_name):
 def load_images(file_name, num_images, start=0):
     array = np.empty((28,28), 'uint8') #Array to hold one image's data
     images = [] #Empty list to hold multiple arrays (images)
+    in_file = open(file_name, 'r+b') #input stream variable
 
-    in_file = open(file_name, 'r+b')
+    print ("########## Called function with num_images = ", num_images, "################")
+    print ("len(images) at initialization: ", len(images), "\n")   
 
     #Start at appropirate offset - 16 bytes for meta data
     #Each image is (28 * 28) bytes
     in_file.seek(16 + (start * 28 * 28)) 
 
-    for i in range(0, num_images):
-        for j in range(0, 28):
+    print ("Printing a slice of each element of images as it's constructed in the loop.")
+    print ("The function should return the following:\n")
+    
+    #Build image list element-wise where each element
+    #is a 2-D array of image data
+    for i in range(num_images):
+        for j in range(28):
             row_data = in_file.read(28)
             row_data = struct.unpack('>28B', row_data)
             array[j] = row_data
         images.append(array)
+        
+        #Debugging - print slice of each image
+        print ("images[", i, "]: ", images[i][15][:15])
 
-    in_file.close()
+    print ("\nlen(images) after loop: ", len(images))
+    print ("\n########## Exit function ############################\n\n")
+
+    in_file.close()        
     return images
 
 
 def save_images(image_list, output_path):
-    for i in range(0, len(image_list)):
+    for i in range(len(image_list)):
         im = Image.fromarray(image_list[i], mode='L')
         fp = output_path + str(i + 1) + ".png"
         #fp = output_path + str(i + (start + 1)) + ".png"
