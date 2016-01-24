@@ -12,6 +12,7 @@ module = imp.load_source('mnist_load',
 #module = imp.load_source('mnist_load', '/u/jc2/dev/jc2/Image_Class/image_class.py')
 
 ##Built list of files to iterate through
+os.chdir("C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load")
 files = os.listdir()
 file_list = []
 for i in files:    
@@ -27,8 +28,14 @@ for name in (file_list):
 ##Check save_images
 output_path = "C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\Images\\test_image_"
 image_data = module.load_images(file_list[0], 10)
-im = Image.fromarray(image_data[1], mode='L')
-im.show()
+print ("Instead, the function returns this:\n")
+for i in range(len(image_data)):
+    print ("images[", i, "]: ", image_data[i][15][:15])
+    
+
+
+#im = Image.fromarray(image_data[1], mode='L')
+#im.show()
 
 
 
