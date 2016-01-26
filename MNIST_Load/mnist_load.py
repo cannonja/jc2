@@ -3,12 +3,11 @@ import struct
 from PIL import Image
 import numpy as np
 
-os.chdir("C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load")
-#files = os.listdir()[2:]
+#Big laptop
+#os.chdir("C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load")
 
-#file_name = files[0]
-#output_path = "C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load\\Images\\test_image_"
-
+#Little laptop
+os.chdir("C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load")
 
 
 
@@ -58,7 +57,6 @@ def save_images(image_list, output_path):
     for i in range(len(image_list)):
         im = Image.fromarray(image_list[i], mode='L')
         fp = output_path + str(i + 1) + ".png"
-        #fp = output_path + str(i + (start + 1)) + ".png"
         im.save(fp)
 
     
