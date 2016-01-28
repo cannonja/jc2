@@ -1,10 +1,9 @@
-from __future__ import print_function
 import os
 import struct
 from PIL import Image
 import numpy as np
 
-#os.chdir("C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load")
+os.chdir("C:\\Users\\Jack2\\Google Drive\\Grad School\\URMP\\jc2\\MNIST_Load")
 #files = os.listdir()[2:]
 
 #file_name = files[0]
@@ -15,7 +14,7 @@ import numpy as np
 
 def print_meta(file_name):
     in_file = open(file_name, 'r+b')
-
+    
     if (file_name.find("image") != -1):
         meta_data = in_file.read(16)
         meta_data = struct.unpack('>4i', meta_data)
@@ -23,11 +22,11 @@ def print_meta(file_name):
     else:
         meta_data = in_file.read(8)
         meta_data = struct.unpack('>2i', meta_data)
-        meta_labels = ("Magic number", "Number of items")
+        meta_labels = ("Magic number", "Number of items")        
 
     print ("File name:", in_file.name)
     for (i,j) in zip(meta_labels, meta_data):
-        print (i, ": ", j, sep = '')
+        print (i, ": ", j, sep="")
     print ("\n")
 
     in_file.close()
