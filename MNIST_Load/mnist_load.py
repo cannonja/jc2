@@ -4,9 +4,9 @@ from PIL import Image
 import numpy as np
 
 #Big laptop
-os.chdir("C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load")
+#os.chdir("C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load")
 #Little laptop
-#os.chdir("C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load")
+os.chdir("C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load")
 
 
 

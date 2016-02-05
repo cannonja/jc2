@@ -41,12 +41,18 @@ def build_dictionary(im_data):
 
     return dictionary
         
+#Function takes a 2-D numpy array (dictionary subset) and a 1-D numpy array (signal)
+#It returns a 2-tuple containing the coefficient vector and the index vector
+def least_squares(X, y):
+    X_t = np.transpose(X)
+    X_t_X = np.dot(X_t, X)
+    beta = np.dot(np.linalg.inv(X_t_X), X_t, y)
+
+    return beta
+
     
+
     
-    
-    
-    
-        
     
     
     
