@@ -30,9 +30,18 @@ def denormalize(norm, dmax, dmin):
 '''
 
 #Function takes list of 2-D numpy arrays representing images
-#Then flattens each image (converts to atom), then adds to dictionary
+#Then flattens each image (converts to atom) and adds to dictionary
 #Function returns a dictionary where each atom is an image
 def build_dictionary(im_data):
+    rows, cols = im_data[0].shape
+    dictionary = np.zeros(((rows * cols), len(im_data)))
+    
+    for i in range(len(im_data)):
+        dictionary[:, i] = im_data[i].flatten()
+
+    return dictionary
+        
+    
     
     
     
