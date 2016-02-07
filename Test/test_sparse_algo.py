@@ -5,9 +5,9 @@ from PIL import Image
 import numpy as np
 
 ##Big laptop
-#sys.path.append('C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load')
+sys.path.append('C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load')
 ##Little laptop
-sys.path.append('C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load')
+#sys.path.append('C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load')
 import mnist_load as mnist
 import sparse_algo as sp
 
@@ -33,7 +33,7 @@ print (D.shape)
 
 
 #least_squares
-y = np.array([2,2,2])
+y = np.array([1,2,3])
 beta = sp.least_squares(image_data[0], y)
 print (beta)
 
