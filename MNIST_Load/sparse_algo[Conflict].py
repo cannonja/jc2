@@ -49,34 +49,17 @@ def least_squares(X, y):
     X_t_X = np.dot(X_t, X)  #Calculate Xt * X
     X_t_X.astype(float)
     inv_XtX = np.linalg.inv(X_t_X)
-    '''
     print ("X: ", X, X.shape)
     print ("y: ", y, y.shape)
     print ("X_t: ", X_t)
     print ("X_t_X: ", X_t_X)
     print ("inv(X_t_X): ", inv_XtX)
     print ("inv(X_t_X) * X_t: ", np.dot(inv_XtX, X_t))
-    '''
     beta = ft.reduce(np.dot, [inv_XtX, X_t, y]) #Calculate solution
     #beta = np.linalg.inv(X_t_X).dot(X_t).dot(y)
 
     return beta
 
-#Function takes full dictionary (2-D numpy array), a tuple of indices,
-#and signal to approximate (1-D numpy array)
-def choose_atoms(D, y, index = None):
-    dmin = None #Initialize minimum variable
-    beta = None #Initialize coefficient vector
-    dif = None #Initialize difference vector
-    
-    if index is None:
-        for i in D:
-            beta = least_squares(i, y)
-            dif = np.dot(i, beta) - y
-            np.sum(np.square(dif))
-            
-    X = D[index]
-    
     
 
     

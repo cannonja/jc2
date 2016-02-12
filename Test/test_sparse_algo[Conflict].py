@@ -13,7 +13,7 @@ import sparse_algo as sp
 
 
 ##############################Test normalize and build_dictionary############################################################################
-'''
+
 image_data = []
 image_data.append(np.array([[0,1,2],[3,4,5],[6,7,8]], dtype = 'int32'))
 image_data.append(np.array([[9,10,11],[12,13,14],[15,16,17]], dtype = 'int32'))
@@ -31,14 +31,11 @@ D = sp.build_dictionary(image_data)
 print (D)
 print (D.shape)
 
+
 #least_squares
 y = np.array([1,2,3])
 beta = sp.least_squares(image_data[0], y)
 print (beta)
-'''
-
-##############################
-D = sp.build_dictionary(
 
 ##############################Built list of files to iterate through####################################################
 '''
