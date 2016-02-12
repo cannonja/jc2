@@ -13,11 +13,18 @@ import sparse_algo as sp
 
 
 ##############################Test normalize and build_dictionary############################################################################
-'''
-image_data = []
-image_data.append(np.array([[0,1,2],[3,4,5],[6,7,8]], dtype = 'int32'))
-image_data.append(np.array([[9,10,11],[12,13,14],[15,16,17]], dtype = 'int32'))
 
+image_data = []
+image_data.append(np.arange(9).reshape(3,3))
+image_data.append(np.arange(9, 18).reshape(3,3))
+image_data.append(np.arange(18, 27).reshape(3,3))
+image_data.append(np.arange(27, 36).reshape(3,3))
+image_data.append(np.arange(36, 45).reshape(3,3))
+image_data.append(np.arange(45, 54).reshape(3,3))
+image_data.append(np.arange(54, 63).reshape(3,3))
+#image_data.append(np.array([[0,1,2],[3,4,5],[6,7,8]], dtype = 'int32'))
+#image_data.append(np.array([[9,10,11],[12,13,14],[15,16,17]], dtype = 'int32'))
+'''
 #normalize
 print(type(image_data))
 print (image_data[0])
@@ -31,14 +38,28 @@ D = sp.build_dictionary(image_data)
 print (D)
 print (D.shape)
 
+
 #least_squares
 y = np.array([1,2,3])
-beta = sp.least_squares(image_data[0], y)
+D = image_data[0][:,1]
+print (D.ndim)
+print (D)
+beta = sp.least_squares(D, y)
 print (beta)
 '''
 
+
 ##############################
-D = sp.build_dictionary(
+
+D = sp.build_dictionary(image_data)
+y = np.random.randint(1, 71, size = 10)
+#print (D)
+#print (y)
+beta, indices = sp.choose_atoms(D, y)
+print (beta)
+print (indices)
+
+
 
 ##############################Built list of files to iterate through####################################################
 '''
