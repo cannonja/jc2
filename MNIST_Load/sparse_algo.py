@@ -66,16 +66,33 @@ def least_squares(X, y):
 #and signal to approximate (1-D numpy array)
 def choose_atoms(D, y, index = None):
     dmin = None #Initialize minimum variable
-    beta = None #Initialize coefficient vector
-    dif = None #Initialize difference vector
     
     if index is None:
-        for i in D:
-            beta = least_squares(i, y)
-            dif = np.dot(i, beta) - y
-            np.sum(np.square(dif))
-            
-    X = D[index]
+        for i in range(D.shape[1]):
+            beta = least_squares(D[:,i], y)
+            #Calc RMSE
+            error = np.dot(D[:,i], beta) - y
+            MSE = np.mean(np.square(error))
+            RMSE = np.sqrt(MSE)
+
+            if (dmin is None) or (RMSE < dmin):
+                dmin = RMSE
+                min_index = i
+    else:
+        for i range(D.shape[1]):
+            if i not in index:
+                mod_index = index + (i,)
+                beta = least_squares(D[:,mod_index], y)
+                #Calc RMSE
+                error = np.dot(D[:,mod_index], beta) - y
+                MSE = np.mean(np.square(error))
+                RMSE = np.sqrt(MSE)
+
+                if (dmin is None) or (RMSE < dmin):
+                    dmin = RMSE
+                    min_index = i
+
+    return (beta, min_index)
     
     
 
