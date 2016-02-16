@@ -4,6 +4,7 @@ import sys
 from PIL import Image
 import numpy as np
 import functools as ft
+import scipy.optimize as opt
 
 ##Big laptop
 sys.path.append('C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load')
@@ -77,9 +78,20 @@ def choose_atoms(D, y, index = None):
     if index is None:
         for i in range(D.shape[1]):
             #print (D[:,i])
-            beta = least_squares(D[:,i], y)
+            #beta = least_squares(D[:,i], y)
+
+
+            ##Using nnls - constrained betas
+            A = np.transpose(np.matrix(D[:, i]))
+            y = np.transpose(y)
+            print(A.shape, y.shape, type(y))
+            beta = opt.nnls(A, y)[0]
+            error = np.dot(A, beta) - y
+            
+
+
             #Calc RMSE
-            error = np.dot(D[:,i], beta) - y
+            #error = np.dot(D[:,i], beta) - y
             MSE = np.mean(np.square(error))
             RMSE = np.sqrt(MSE)
 
@@ -91,9 +103,19 @@ def choose_atoms(D, y, index = None):
             print (i not in index)
             if i not in index:
                 mod_index = index + [i]
-                beta = least_squares(D[:,mod_index], y)
+                #beta = least_squares(D[:,mod_index], y)
+
+
+                ##Using nnls - constrained betas
+                A = np.transpose(np.matrix(D[:, i]))
+                y = np.transpose(y)
+                print(A.shape, y.shape, type(y))
+                beta = opt.nnls(A, y)[0]
+                error = np.dot(A, beta) - y
+
+
                 #Calc RMSE
-                error = np.dot(D[:,mod_index], beta) - y
+                #error = np.dot(D[:,mod_index], beta) - y
                 MSE = np.mean(np.square(error))
                 RMSE = np.sqrt(MSE)
 
