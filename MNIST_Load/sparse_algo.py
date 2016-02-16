@@ -69,14 +69,14 @@ def least_squares(X, y):
 
     return beta
 
-#Function takes full dictionary (2-D numpy array), a tuple of indices,
+#Function takes full dictionary (2-D numpy array), a list of indices,
 #and signal to approximate (1-D numpy array)
 def choose_atoms(D, y, index = None):
     dmin = None #Initialize minimum variable
     
     if index is None:
         for i in range(D.shape[1]):
-            print (D[:,i])
+            #print (D[:,i])
             beta = least_squares(D[:,i], y)
             #Calc RMSE
             error = np.dot(D[:,i], beta) - y
@@ -85,11 +85,12 @@ def choose_atoms(D, y, index = None):
 
             if (dmin is None) or (RMSE < dmin):
                 dmin = RMSE
-                min_index = i
+                min_index = [i]
     else:
         for i in range(D.shape[1]):
+            print (i not in index)
             if i not in index:
-                mod_index = index + (i,)
+                mod_index = index + [i]
                 beta = least_squares(D[:,mod_index], y)
                 #Calc RMSE
                 error = np.dot(D[:,mod_index], beta) - y
@@ -98,9 +99,12 @@ def choose_atoms(D, y, index = None):
 
                 if (dmin is None) or (RMSE < dmin):
                     dmin = RMSE
-                    min_index = i
+                    min_index = mod_index
 
-    return (beta, min_index)
+    if (beta is None) or (min_index is None):
+        return (None, None)
+    else:
+        return (beta, min_index)
     
     
 
