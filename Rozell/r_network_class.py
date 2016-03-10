@@ -27,30 +27,30 @@ class r_network:
 
     def return_sparse(self, lamb, tau, delta, u_stop, t_type):
         u = np.zeros(self.b.shape)
-        self.a = np.ones(u.shape)  #Initialize a by setting equal to u
+        self.a = u.copy()  #Initialize a by setting equal to u
         inhibit = np.dot(np.transpose(self.dictionary), self.dictionary) - np.eye(self.dictionary.shape[1])
         loop_flag = True
-
         
-        #Compute initial a vector with u equal to zero vector
-        print(self.a)
-        for i in range(len(self.a)):
-            self.a[i] = self.thresh(u[i], lamb, t_type)
-        
-        #Generate a vector
-        print(self.b)
+        #Generate vector self.a
+        #print(self.b)
+        debug = []
         while (loop_flag):
-            print(u)
-            print(self.a)
+            #print(u)
+            #print(self.a)
             u_dot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
-            print(u_dot)
+            #print(u_dot)
             u = u + (u_dot * delta)
             #Update a vector
+            #print(self.a)
             for i in range(len(self.a)):
                 self.a[i] = self.thresh(u[i], lamb, t_type)
             if ((u_dot < u_stop).all()):
                 loop_flag = False
+            debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
+        df = pandas.DataFrame(debug)
+        print df.to_string()
+ 
         return self.a
             
 

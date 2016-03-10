@@ -57,7 +57,8 @@ for i in files:
 
 #Load MNIST dictionary and signal
 signal_data = mnist.load_images(file_list[0], 1)
-dict_data = mnist.load_images(file_list[0], 20, 10)
+im = Image.fromarray(signal_data[0])
+dict_data = mnist.load_images(file_list[0], 10, 20)
 
 signal = signal_data[0].flatten()
 D = sp.build_dictionary(dict_data)
@@ -66,7 +67,7 @@ D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_stimulus(signal)
 code = network.return_sparse(lamb, tau, delta, u_stop, 'H')
-#print (code, type(code[0]))
+print (code, type(code[0]))
 
 
 
