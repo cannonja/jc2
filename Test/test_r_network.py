@@ -6,26 +6,82 @@ import numpy as np
 
 #Big laptop
 sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
+os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+
+'''
 #Little laptop
-#sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
+os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+'''
 import mnist_load as mnist
 import sparse_algo as sp
+import r_network_class as lca
 
-
-
-##############################Built list of files to iterate through####################################################
+#############################Test thresh################################################################################
 '''
-##Big laptop
-#os.chdir("C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load")
-##Little laptop
-os.chdir("C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load")
+u = np.zeros((5,1))
+for i in range (5):
+    u[i] = i
+    
+print (u)
+network = lca.r_network(1)
+for i in range(len(u)):
+    u[i] = network.thresh(u[i], 2.5, 'H')
+print (u)
+'''
+
+
+##############################Test return_sparse##########################################################################################
+
+lamb = 1
+tau = 10
+delta = 0.05
+u_stop = 0.002756
+
+#Match spreadsheet dictionary (single node case, lamb = 0)
+'''
+D = np.array([[3],[4]])
+signal = np.array([[100],[15]])
+'''
+
+#Build list of files to iterate through - choose first file (t10k-images.idx3-ubyte)
 
 files = os.listdir()
 file_list = []
 for i in files:    
     if (i.find("idx") != -1):
         file_list.append(i)
-'''
+
+
+#Load MNIST dictionary and signal
+signal_data = mnist.load_images(file_list[0], 1)
+dict_data = mnist.load_images(file_list[0], 20, 10)
+
+signal = signal_data[0].flatten()
+D = sp.build_dictionary(dict_data)
+
+#Run Rozell and generate sparse code
+network = lca.r_network(D)
+network.set_stimulus(signal)
+code = network.return_sparse(lamb, tau, delta, u_stop, 'H')
+#print (code, type(code[0]))
+
+
+
+
+
+
+
+
+
+
+
+
+
+##############################Built list of files to iterate through####################################################
+
 
 ##############################Load MNIST images#########################################################################
 
