@@ -9,7 +9,7 @@ class r_network:
         self.b = None
         self.a = None
 
-    #Takes the stimuls signal, sets s, then computes b according to Rozell
+    #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(signal):
         self.s = np.asarray(signal)
         self.b = np.asarray(np.dot(np.transpose(D), self.s))
@@ -24,6 +24,25 @@ class r_network:
             return u
         if (t_type == 'S'):
             return u - lamb
+
+    def return_sparse(lamb, tau, delta, u_stop, t_type):
+        u = np.zeros(self.b.shape)
+        self.a = self.thresh(u, lamb, t_type)
+        inhibit = np.dot(np.transpose(dictionary), dictionary) - np.eye(dictionary.shape[1]))
+        loop_flag = True
+        
+        while (loop_flag):
+            u_dot = 1/tau * (self.b - u - np.dot(inhibit, self.a))
+            u = u + u * delta
+            self.a = self.thresh(u, lamb, t_type)
+            if (u_dot < u_stop):
+                loop_flag = False
+
+        return a
+            
+
+        
+        
 
     
 
