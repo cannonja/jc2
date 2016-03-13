@@ -13,6 +13,8 @@ class r_network:
     def set_stimulus(self, signal):
         self.s = signal
         self.b = np.dot(np.transpose(self.dictionary), self.s)
+        #print("set_stimulus\ns = ", self.s.shape, sum(self.s), "\nb = ",
+        #      self.b.shape, sum(self.b))
 
     #Takes u, lamb, and t_type then returns a according to Rozell
     #u is the internal state variable, lamb is lambda (threshold),
@@ -28,17 +30,21 @@ class r_network:
     def return_sparse(self, lamb, tau, delta, u_stop, t_type):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        inhibit = np.dot(np.transpose(self.dictionary), self.dictionary) - np.eye(self.dictionary.shape[1])
+        inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
+                        - np.eye(self.dictionary.shape[1])
         loop_flag = True
         
         #Generate vector self.a
         #print(self.b)
-        debug = []
+        #debug = []
         while (loop_flag):
-            #print(u)
-            #print(self.a)
+            print("loop start....\n")
+            print("u", u)
+            print("a", self.a)
             u_dot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
-            #print(u_dot)
+            print("b - u", (self.b - u))
+            print("inhibit * a", np.dot(inhibit, self.a))
+            print("udot", u_dot)
             u = u + (u_dot * delta)
             #Update a vector
             #print(self.a)
@@ -46,10 +52,12 @@ class r_network:
                 self.a[i] = self.thresh(u[i], lamb, t_type)
             if ((u_dot < u_stop).all()):
                 loop_flag = False
-            debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
-
+            print("\nloop end.....\n")
+            #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
+        '''
         df = pandas.DataFrame(debug)
         print df.to_string()
+        '''
  
         return self.a
             

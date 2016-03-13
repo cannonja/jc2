@@ -4,12 +4,12 @@ import sys
 from PIL import Image
 import numpy as np
 import functools as ft
-import scipy.optimize as opt
+#import scipy.optimize as opt
 
-##Big laptop
-sys.path.append('C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load')
-##Little laptop
-#sys.path.append('C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load')
+#Big laptop
+#os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+#Little laptop
+#os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
 import mnist_load as mnist
 
 #Function takes a 2-D numpy array and returns a tuple with a normalized 2-D numpy array
