@@ -39,7 +39,7 @@ lamb = 1
 tau = 10
 delta = 0.05
 u_stop = 0.002756
-t_type = 'H'
+t_type = 'S'
 
 #Match spreadsheet dictionary (single node case, lamb = 0)
 '''
