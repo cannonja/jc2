@@ -39,8 +39,8 @@ print (u)
 lamb = 1
 tau = 10
 delta = 0.05
-u_stop = 0.002756
-t_type = 'S'
+u_stop = 10000000
+t_type = 'H'
 
 #Match spreadsheet dictionary (single node case, lamb = 0)
 '''
@@ -49,14 +49,14 @@ signal = np.array([[100],[15]])
 '''
 
 #Match spreadsheet dictionary (Multiple node case, lamb = 1)
-
+'''
 signal = np.array(range(1,6))
 D = np.ones((5,3))
 D[:,0] = signal
 D[:,1] = (7,0,32,5,7)
 D[:,2] = (21,5,8,9,23)
-
 '''
+
 #Build list of files to iterate through - choose first file (t10k-images.idx3-ubyte)
 
 files = os.listdir()
@@ -69,11 +69,11 @@ for i in files:
 #Load MNIST dictionary and signal
 signal_data = mnist.load_images(file_list[0], 1)
 im = Image.fromarray(signal_data[0])
-dict_data = mnist.load_images(file_list[0], 20, 20)
+dict_data = mnist.load_images(file_list[0], 50, 20)
 
 signal = signal_data[0].flatten()
 D = sp.build_dictionary(dict_data)
-'''
+
 
 
 #Run Rozell and generate sparse code

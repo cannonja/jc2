@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class r_network:
     'Class to represent Rozell LCA network'
@@ -32,12 +33,18 @@ class r_network:
         self.a = u.copy()  #Initialize a by setting equal to u
         inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
                         - np.eye(self.dictionary.shape[1])
-        u_dot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
+        udot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
+
+        '''
+        print("b", self.b)
         print("u", u)
-        print("b - u", (self.b - u))
-        print("inhibit * a", np.dot(inhibit, self.a))
-        print("udot", u_dot)
         print("a", self.a)
+        #print("b - u", (self.b - u))
+        #print("inhibit * a", np.dot(inhibit, self.a))
+        print("udot", udot)
+        '''
+        
+        
         
         loop_flag = True
         
@@ -45,24 +52,25 @@ class r_network:
         #print(self.b)
         #debug = []
         while (loop_flag):
-            print("loop start....\n")
-            u = u + (u_dot * delta)
-            print("u", u)
-            print("b - u", (self.b - u))
-            print("inhibit * a", np.dot(inhibit, self.a))
+            #print("loop start....\n")
+            u = u + (udot * delta)
+            #print("u", u)
+            #print("b - u", (self.b - u))
 
             #Update a vector
             for i in range(len(self.a)):
                 self.a[i] = self.thresh(u[i], lamb, t_type)
-            print("a", self.a)
+            #print("a", self.a)
+            #print("inhibit * a", np.dot(inhibit, self.a))            
             
-            u_dot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))            
-            print("udot", u_dot)
-            
-            if ((u_dot < u_stop).all()):
+            udot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))            
+            #print("udot", udot)
+
+            udot_length = math.sqrt(np.dot(np.transpose(udot),udot))
+            if (udot_length < u_stop):
                 loop_flag = False
             
-            print("\nloop end.....\n")
+            #print("\nloop end.....\n")
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
         '''
         df = pandas.DataFrame(debug)
