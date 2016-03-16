@@ -1,6 +1,14 @@
 import numpy as np
 import math
 
+###To do######
+'''
+-Implement methods to:
+    -Save image, reconstruction, and components
+    -Calculate and plot error function E(t)
+        -Implement Rozell's E(t) and Walt's E(t)
+'''
+
 class r_network:
     'Class to represent Rozell LCA network'
 
