@@ -39,7 +39,7 @@ print (u)
 lamb = 0.01
 tau = 100
 delta = 0.02
-u_stop = 10000
+u_stop = 100000
 t_type = 'H'
 num_images = 1
 
@@ -87,6 +87,14 @@ for i in range(num_images):
     network.set_stimulus(signal)
     code = network.return_sparse(lamb, tau, delta, u_stop, t_type)
     print (code)
+
+orig = network.s.reshape((28,28))
+recon = np.dot(D, network.a).reshape((28,28))
+im_orig = Image.fromarray(orig)
+im_recon = Image.fromarray(recon)
+
+im_orig.show()
+im_recon.show()
 
 
 
