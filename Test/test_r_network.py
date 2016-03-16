@@ -46,7 +46,7 @@ print (u)
 
 lamb = 0.01
 tau = 100
-delta = 0.02
+delta = 0.001
 u_stop = 100000
 t_type = 'H'
 num_images = 1

@@ -20,7 +20,7 @@ class r_network:
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal):
-        self.s = signal
+        self.s = np.asarray(signal, dtype=float)
         self.b = np.dot(np.transpose(self.dictionary), self.s)
         #print("set_stimulus\ns = ", self.s.shape, sum(self.s), "\nb = ",
         #      self.b.shape, sum(self.b))
@@ -59,6 +59,7 @@ class r_network:
         #Generate vector self.a
         #print(self.b)
         #debug = []
+        num_iter = 0
         while (loop_flag):
             #print("loop start....\n")
             u = u + (udot * delta)
@@ -75,8 +76,11 @@ class r_network:
             #print("udot", udot)
 
             udot_length = math.sqrt(np.dot(np.transpose(udot),udot))
+            num_iter += 1
             if (udot_length < u_stop):
                 loop_flag = False
+                print(num_iter)
+            
             
             #print("\nloop end.....\n")
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
