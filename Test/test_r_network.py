@@ -44,10 +44,10 @@ print (u)
 
 ##############################Test return_sparse##########################################################################################
 
-lamb = 0.01
-tau = 100
+lamb = 0.1
+tau = 10
 delta = 0.001
-u_stop = 100000
+u_stop = 10
 t_type = 'H'
 num_images = 1
 
@@ -64,6 +64,13 @@ D = np.ones((5,3))
 D[:,0] = signal
 D[:,1] = (7,0,32,5,7)
 D[:,2] = (21,5,8,9,23)
+
+#Test scaling
+network = lca.r_network(D)
+network.set_stimulus(signal)
+network.set_scale(255)
+print(signal)
+print(network.dictionary)
 '''
 
 #Build list of files to iterate through - choose first file (t10k-images.idx3-ubyte)
@@ -87,6 +94,7 @@ D = sp.build_dictionary(dict_data)
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
+network.set_scale(255)
 
 for i in range(num_images):
     signal = signal_data[i].flatten()

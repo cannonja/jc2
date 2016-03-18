@@ -14,9 +14,14 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D
+        self.scale = None
         self.s = None
         self.b = None
         self.a = None
+
+    def set_scale(self, num):
+        self.scale = num       
+
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal):
@@ -37,53 +42,36 @@ class r_network:
             return u - lamb
 
     def return_sparse(self, lamb, tau, delta, u_stop, t_type):
+        self.dictionary /= self.scale
+        self.b /= self.scale     
+
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
         inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
                         - np.eye(self.dictionary.shape[1])
         udot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
-
-        '''
-        print("b", self.b)
-        print("u", u)
-        print("a", self.a)
-        #print("b - u", (self.b - u))
-        #print("inhibit * a", np.dot(inhibit, self.a))
-        print("udot", udot)
-        '''
-        
-        
-        
         loop_flag = True
         
         #Generate vector self.a
-        #print(self.b)
         #debug = []
-        num_iter = 0
+        len_u = len(u)
         while (loop_flag):
-            #print("loop start....\n")
             u = u + (udot * delta)
-            #print("u", u)
-            #print("b - u", (self.b - u))
-
             #Update a vector
             for i in range(len(self.a)):
-                self.a[i] = self.thresh(u[i], lamb, t_type)
-            #print("a", self.a)
-            #print("inhibit * a", np.dot(inhibit, self.a))            
+                self.a[i] = self.thresh(u[i], lamb, t_type)           
             
             udot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))            
-            #print("udot", udot)
-
             udot_length = math.sqrt(np.dot(np.transpose(udot),udot))
-            num_iter += 1
-            if (udot_length < u_stop):
+            if (udot_length < (u_stop / len_u)):
                 loop_flag = False
-                print(num_iter)
-            
-            
-            #print("\nloop end.....\n")
+
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
+
+        self.dictionary *= self.scale
+        self.b *= self.scale
+        #self.a *= self.scale
+
         '''
         df = pandas.DataFrame(debug)
         print df.to_string()
