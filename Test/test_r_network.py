@@ -44,11 +44,11 @@ print (u)
 
 ##############################Test return_sparse##########################################################################################
 
-lamb = 0.1
+lamb = 0.01
 tau = 10
-delta = 0.001
+delta = 0.0001
 u_stop = 10
-t_type = 'H'
+t_type = 'S'
 num_images = 1
 
 #Match spreadsheet dictionary (single node case, lamb = 0)
@@ -84,13 +84,8 @@ for i in files:
 
 #Load MNIST dictionary and signal
 signal_data = mnist.load_images(file_list[0], num_images)
-
-dict_data = mnist.load_images(file_list[0], 50, 20)
-
-
-D = sp.build_dictionary(dict_data)
-
-
+dict_data = mnist.load_images(file_list[0], 49, 20)
+D = np.append(signal_data[0].flatten().reshape(784,1), sp.build_dictionary(dict_data), axis = 1)
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
@@ -105,7 +100,7 @@ for i in range(num_images):
     print (code)
 
 orig = network.s.reshape((28,28))
-recon = np.dot(D, network.a).reshape((28,28))
+recon = np.dot(network.dictionary, network.a).reshape((28,28))
 im_orig = Image.fromarray(orig)
 im_recon = Image.fromarray(recon)
 

@@ -14,7 +14,7 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D
-        self.scale = None
+        self.scale = 1
         self.s = None
         self.b = None
         self.a = None
@@ -26,6 +26,8 @@ class r_network:
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal):
         self.s = np.asarray(signal, dtype=float)
+        self.s /= self.scale
+        self.dictionary /= self.scale
         self.b = np.dot(np.transpose(self.dictionary), self.s)
         #print("set_stimulus\ns = ", self.s.shape, sum(self.s), "\nb = ",
         #      self.b.shape, sum(self.b))
@@ -42,13 +44,10 @@ class r_network:
             return u - lamb
 
     def return_sparse(self, lamb, tau, delta, u_stop, t_type):
-        self.dictionary /= self.scale
-        self.b /= self.scale     
-
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
         inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                        - np.eye(self.dictionary.shape[1])
+                        - (np.eye(self.dictionary.shape[1]) / self.scale)
         udot = (1/tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
         
@@ -69,7 +68,8 @@ class r_network:
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
         self.dictionary *= self.scale
-        self.b *= self.scale
+        self.s *= self.scale
+        self.b = np.dot(np.transpose(self.dictionary), self.s)
         #self.a *= self.scale
 
         '''
