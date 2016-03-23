@@ -97,8 +97,22 @@ class r_network:
         stim = self.s
         recon = np.dot(self.dictionary, self.a)
         resid = stim - recon
+        a = 0.5 * math.sqrt(np.dot(resid, resid))
+        b = None
+        norm1 = sum(abs(self.a))
+        sparsity = 0
 
-        e = 0.5 * math.sqrt(np.dot(resid, resid)) + self.lamb * sum(abs(self.a))
+        if (self.t_type == 'S'):
+            sparsity = norm1
+        elif (norm1 > self.lamb):
+            sparsity = self.lamb / 2
+
+        b = self.lamb * sparsity
+        error = np.array([[(a + b), a, b]])
+
+        return error
+
+        
             
 
         

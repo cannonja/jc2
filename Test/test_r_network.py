@@ -4,6 +4,7 @@ import sys
 from PIL import Image
 import numpy as np
 import socket
+import pandas
 
 machine = socket.gethostname()
 if (machine == 'Jack-PC'):
@@ -95,6 +96,7 @@ D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_scale(255)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
+error_names = ['E(t)', 'Resid', 'Sparsity']
 
 for i in range(num_images):
     signal = signal_data[i].flatten()
@@ -102,8 +104,13 @@ for i in range(num_images):
     #im.show()
     network.set_stimulus(signal)
     code = network.return_sparse()
+    error = network.return_error()
+    
     print (code)
+    print (pandas.DataFrame(error, columns = error_names))
+    #print (resid + sparsity, resid, sparsity)
 
+'''
 orig = network.s.reshape((28,28))
 recon = np.dot(network.dictionary, network.a).reshape((28,28))
 im_orig = Image.fromarray(orig)
@@ -111,7 +118,7 @@ im_recon = Image.fromarray(recon)
 
 im_orig.show()
 im_recon.show()
-
+'''
 
 
 
