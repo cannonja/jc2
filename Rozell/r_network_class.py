@@ -93,6 +93,9 @@ class r_network:
  
         return self.a
 
+    #Returns 1-D numpy array containing E(t), the left-hand operand of E(t),
+    #and the right-hand operand of E(t).
+    #That is the operands of the right-hand side of the error equation
     def return_error(self):
         stim = self.s
         recon = np.dot(self.dictionary, self.a)
@@ -100,14 +103,14 @@ class r_network:
         a = 0.5 * math.sqrt(np.dot(resid, resid))
         b = None
         norm1 = sum(abs(self.a))
-        sparsity = 0
+        cost = 0
 
         if (self.t_type == 'S'):
-            sparsity = norm1
+            cost = norm1
         elif (norm1 > self.lamb):
-            sparsity = self.lamb / 2
+            cost = self.lamb / 2
 
-        b = self.lamb * sparsity
+        b = self.lamb * cost
         error = np.array([[(a + b), a, b]])
 
         return error
