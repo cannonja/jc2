@@ -93,7 +93,7 @@ class r_network:
  
         return self.a
 
-    def print_error(self):
+    def return_error(self):
         stim = self.s
         recon = np.dot(self.dictionary, self.a)
         resid = stim - recon
