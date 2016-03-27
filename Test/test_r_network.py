@@ -94,36 +94,25 @@ D = sp.build_dictionary(dict_data)
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
-network.set_scale(255)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
 
 for i in range(num_images):
-    error = []
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
-    df = pandas.DataFrame()
-    #df.columns = error_names
-    #for j in (0.1, 0.2):
-    #network.set_parameters(j, tau, delta, u_stop, t_type)
-    #network.set_stimulus(signal)
-    #print(j)
-    code = network.return_sparse()
-    print(1)
-    sparsity = len(code[code > 0]) / len(code)
-    print(2)
-    row = np.append(network.return_error(), sparsity).reshape(1, 4)
-    print(3)
-    row = pandas.DataFrame(row)
-    #print(row)
-    df = df.append(row)
-    print(5)
-    #print(row)
-    print(6)
+    df = pandas.DataFrame()    
+    for j in (0.1, 0.1):
+        network.set_lambda(j)
+        code = network.return_sparse()        
+        row = pandas.DataFrame(network.return_error())
+        df = df.append(row)
+        print (code)
+        code2 = np.append(code)
+    df.columns = error_names
 
 
-    #df = pandas.DataFrame(df, columns = error_names)
-    #print (code)
+
+    print(code2)    
     print (df)
     
     

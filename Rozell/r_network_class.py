@@ -8,6 +8,7 @@ import pandas
     -Save image, reconstruction, and components
     -Calculate and plot error function E(t)
         -Implement Rozell's E(t) and Walt's E(t)
+    -
 '''
 
 class r_network:
@@ -15,7 +16,6 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D
-        self.scale = 1
         self.s = None
         self.b = None
         self.a = None
@@ -25,25 +25,40 @@ class r_network:
         self.u_stop = None
         self.t_type = None
 
-    def set_scale(self, num):
-        self.scale = num       
+    def scale(self, num):
+        self.s *= num
+        self.dictionary *= num
+        self.b = np.dot(np.transpose(self.dictionary), self.s)
+        
 
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal):
         self.s = np.asarray(signal, dtype=float)
-        self.s /= self.scale
-        self.dictionary /= self.scale
         self.b = np.dot(np.transpose(self.dictionary), self.s)
-        #print("set_stimulus\ns = ", self.s.shape, sum(self.s), "\nb = ",
-        #      self.b.shape, sum(self.b))
+
+
+    def set_lambda(self, lamb):
+        self.lamb = lamb
+
+    def set_tau(self, tau):    
+        self.tau = tau
+
+    def set_delta(self, delta):
+        self.delta = delta
+
+    def set_ustop(self, u_stop):
+        self.u_stop = u_stop
+
+    def set_ttype(self, t_type):
+        self.t_type = t_type
 
     def set_parameters(self, lamb, tau, delta, u_stop, t_type):
-        self.lamb = lamb
-        self.tau = tau
-        self.delta = delta
-        self.u_stop = u_stop
-        self.t_type = t_type
+        self.set_lambda(lamb)
+        self.set_tau(tau)
+        self.set_delta(delta)
+        self.set_ustop(u_stop)
+        self.set_ttype(t_type)
 
 
     #Takes u then returns a according to Rozell
@@ -60,8 +75,9 @@ class r_network:
     def return_sparse(self):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
+        self.scale(1/255)
         inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                        - (np.eye(self.dictionary.shape[1]) / self.scale)
+                        - (np.eye(self.dictionary.shape[1]) / 255)
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
         
@@ -81,11 +97,7 @@ class r_network:
 
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
-        self.dictionary *= self.scale
-        self.s *= self.scale
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
-        #self.a *= self.scale
-
+        self.scale(255)
         '''
         df = pandas.DataFrame(debug)
         print df.to_string()
@@ -102,6 +114,7 @@ class r_network:
         resid = stim - recon
         a = 0.5 * math.sqrt(np.dot(resid, resid))
         b = None
+        sparsity = len(self.a[self.a > 0]) / len(self.a)
         norm1 = sum(abs(self.a))
         cost = 0
 
@@ -110,8 +123,8 @@ class r_network:
         elif (norm1 > self.lamb):
             cost = self.lamb / 2
 
-        b = self.lamb * cost
-        error = np.array([[(a + b), a, b]])
+        b = self.lamb * cost        
+        error = np.array([[(a + b), a, b, sparsity]])
 
         return error
 
