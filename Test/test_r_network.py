@@ -102,17 +102,28 @@ for i in range(num_images):
     error = []
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
+    df = pandas.DataFrame()
+    #df.columns = error_names
+    #for j in (0.1, 0.2):
+    #network.set_parameters(j, tau, delta, u_stop, t_type)
+    #network.set_stimulus(signal)
+    #print(j)
     code = network.return_sparse()
+    print(1)
     sparsity = len(code[code > 0]) / len(code)
-    temp = network.return_error()
-    #error.append({'E(t)': temp[0].copy(), 'Resid': temp[1].copy(), 'Cost': temp[2].copy(), 'Sparsity': sparsity})
-    fix = np.append(temp, sparsity)
-    print (type(temp), type(fix))
-    fix2 = np.transpose(fix)
-    print (fix.shape, fix2.shape)
-    
-    df = pandas.DataFrame(fix) #, columns = error_names)
-    print (code)
+    print(2)
+    row = np.append(network.return_error(), sparsity).reshape(1, 4)
+    print(3)
+    row = pandas.DataFrame(row)
+    #print(row)
+    df = df.append(row)
+    print(5)
+    #print(row)
+    print(6)
+
+
+    #df = pandas.DataFrame(df, columns = error_names)
+    #print (code)
     print (df)
     
     
