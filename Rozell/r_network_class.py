@@ -128,6 +128,16 @@ class r_network:
 
         return error
 
+    #This method returns two arrays:
+    #coefficients consists of the active coefficients
+    #rfileds consists of the respective dictionary elements
+    def get_rfields(self):
+        indices = np.where(self.a > 0)
+        rfields = self.dictionary[:, indices]
+        coefficients = self.a[indices]
+
+        return (coefficients, rfields)
+
         
             
 

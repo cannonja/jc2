@@ -96,7 +96,8 @@ D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 2.1, 0.1)
+#lambdas = np.arange(0.1, 2.1, 0.1)
+lambdas = (0.1, 0.1)
 
 for i in range(num_images):
     signal = signal_data[i].flatten()
@@ -105,15 +106,10 @@ for i in range(num_images):
     for j in lambdas:
         network.set_lambda(j)
         code = network.return_sparse()        
-        row = pandas.DataFrame(network.return_error(), index = None)
+        row = pandas.DataFrame(network.return_error())
         df = df.append(row)
-        #print (code)
-        #code2 = np.append(code)
     df.columns = error_names
 
-
-
-    #print(code2)    
     print (df)
     
     
