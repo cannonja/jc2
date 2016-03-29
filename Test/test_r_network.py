@@ -97,20 +97,31 @@ network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
 #lambdas = np.arange(0.1, 2.1, 0.1)
-lambdas = (0.1, 0.1)
+lambdas = [0.1]
 
+#For each image, run Rozell and generate sparse code
 for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
-    df = pandas.DataFrame()    
+    error = pandas.DataFrame() #DataFrame used for error table
+    display = []
+    #For each value of lambda, set lambda and run Rozell on the given image
     for j in lambdas:
+        display_row = []
         network.set_lambda(j)
-        code = network.return_sparse()        
+        network.generate_sparse()  #Calculate sparse code        
+        ##Add row of error data to error table
         row = pandas.DataFrame(network.return_error())
-        df = df.append(row)
-    df.columns = error_names
+        error = error.append(row)
+        ##Add list of dictionary elements scaled by coefficients to list
+        indices = np.where(network.a > 0)
+        coeff = network.a[indices]
+        rfields = network.dictionary[:, indices]
+        
 
-    print (df)
+
+    error.columns = error_names
+    print (error)
     
     
 

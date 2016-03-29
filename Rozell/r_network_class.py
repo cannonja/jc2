@@ -72,7 +72,7 @@ class r_network:
         if (self.t_type == 'S'):
             return u - self.lamb
 
-    def return_sparse(self):
+    def generate_sparse(self):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
         self.scale(1/255)
@@ -102,8 +102,6 @@ class r_network:
         df = pandas.DataFrame(debug)
         print df.to_string()
         '''
- 
-        return self.a
 
     #Returns 1-D numpy array containing E(t), the left-hand operand of E(t),
     #and the right-hand operand of E(t).
