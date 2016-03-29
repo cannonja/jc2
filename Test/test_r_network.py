@@ -96,18 +96,18 @@ D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
-#lambdas = np.arange(0.1, 2.1, 0.1)
-lambdas = [0.1]
+lambdas = np.arange(0.1, 2.1, 0.1)
+#lambdas = [0.1]
 
 #For each image, run Rozell and generate sparse code
 for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
     error = pandas.DataFrame() #DataFrame used for error table
-    display = []
+    display = []  #List to hold rows of image data for grid
     #For each value of lambda, set lambda and run Rozell on the given image
     for j in lambdas:
-        display_row = []
+        display_row = []   #List to hold one row of image data
         network.set_lambda(j)
         network.generate_sparse()  #Calculate sparse code        
         ##Add row of error data to error table
@@ -117,11 +117,25 @@ for i in range(num_images):
         indices = np.where(network.a > 0)
         coeff = network.a[indices]
         rfields = network.dictionary[:, indices]
+        for k in range(len(coeff)):
+            display_row.append(coeff[k] * rfields[k])
+        display.append(display_row)
         
 
 
     error.columns = error_names
     print (error)
+    
+    ##Get max number of components for display grid dimensions
+    biggest = 0
+    for j in display:
+        if (len(j) > biggest):
+            biggest = len(j)
+    print (biggest)
+
+    ##Allocate pixels for display grid
+    grid = np.zeros((28 * len(lambdas), 28 * (biggest + 2)))
+    print(grid.shape)
     
     
 
