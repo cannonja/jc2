@@ -88,7 +88,7 @@ class r_network:
             u = u + (udot * self.delta)
             #Update a vector
             for i in range(len(self.a)):
-                self.a[i] = self.thresh(u[i])           
+                self.a[i] = self.thresh(u[i])          
             
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))            
             udot_length = math.sqrt(np.dot(udot,udot))

@@ -84,12 +84,12 @@ for i in files:
 
 
 #Load MNIST dictionary and signal
-signal_data = mnist.load_images(file_list[0], num_images, 500)
+signal_data = mnist.load_images(file_list[0], num_images, 6000)
 #Insert stimulus in dictionary
 #dict_data = mnist.load_images(file_list[0], 49, 20)
 #D = np.append(signal_data[0].flatten().reshape(784,1), sp.build_dictionary(dict_data), axis = 1)
 ##Use regular dictionary
-dict_data = mnist.load_images(file_list[0], 50, 20)
+dict_data = mnist.load_images(file_list[0], 50)
 D = sp.build_dictionary(dict_data)
 
 #Run Rozell and generate sparse code
@@ -108,7 +108,8 @@ for i in range(num_images):
     display2 = [] #Unscaled rfields
     #For each value of lambda, set lambda and run Rozell on the given image
     for j in lambdas:
-        display_row = []   #List to hold one row of image data
+        display_row = []   #List to hold one row of image data (for display)
+        display_row2 = []  #For display2
         network.set_lambda(j)
         network.generate_sparse()  #Calculate sparse code        
         ##Add row of error data to error table
@@ -121,10 +122,12 @@ for i in range(num_images):
         rfields = network.dictionary[:, indices]
         reconstruction = np.dot(rfields, coeff).reshape((28,28))
         display_row.append(reconstruction)
+        display_row2.append(reconstruction)
         for k in range(len(coeff)):
-            #display_row.append((coeff[k] * rfields[:, k]).reshape((28,28)))
-            display_row.append(rfields[:, k].reshape((28,28)))
-        display.append(display_row)      
+            display_row.append((coeff[k] * rfields[:, k]).reshape((28,28)))
+            display_row2.append(rfields[:, k].reshape((28,28)))
+        display.append(display_row)
+        display2.append(display_row2)
 
 
     ##Add column names to error table
@@ -134,9 +137,9 @@ for i in range(num_images):
     for j in display:
         if (len(j) > biggest):
             biggest = len(j)
-    ##Allocate pixels for display grid
+    ##Allocate pixels for display grid and display grid2
     grid = np.full((28 * len(lambdas), 28 * (biggest + 1)), 255.)
-    #print(grid.shape)
+    grid2 = np.full((28 * len(lambdas), 28 * (biggest + 1)), 255.)
 
     ##Fill display grid with image data
     ##Iterate over row - for each row, add columns
@@ -144,31 +147,19 @@ for i in range(num_images):
         rows = slice(j*28, (j+1)*28)
         #Original image
         grid[rows, :28] = network.s.reshape((28,28))
+        grid2[rows, :28] = network.s.reshape((28,28))
         #Reconstruction and components
         for k in range(len(display[j])):
             cols = slice((k+1)*28, (k+2)*28)
             grid[rows, cols] = display[j][k]
+            grid2[rows, cols] = display2[j][k]
 
     print(error)
     im_grid = Image.fromarray(grid)
+    im_grid2 = Image.fromarray(grid2)
     im_grid.show()
+    im_grid2.show()
 
-
-
-    
-        
-    
-    
-
-'''
-orig = network.s.reshape((28,28))
-recon = np.dot(network.dictionary, network.a).reshape((28,28))
-im_orig = Image.fromarray(orig)
-im_recon = Image.fromarray(recon)
-
-im_orig.show()
-im_recon.show()
-'''
 
 
 
