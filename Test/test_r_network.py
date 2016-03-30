@@ -99,7 +99,7 @@ error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
 lambdas = np.arange(0.1, 2.1, 0.1)
 #lambdas = [0.1]
 
-#For each image, run Rozell and generate sparse code
+#For each image, run Rozell and generate sparse code, error table and image grid
 for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
@@ -114,28 +114,45 @@ for i in range(num_images):
         row = pandas.DataFrame(network.return_error())
         error = error.append(row)
         ##Add list of dictionary elements scaled by coefficients to list
+        ##Also adding recostruction to list
         indices = np.where(network.a > 0)
         coeff = network.a[indices]
         rfields = network.dictionary[:, indices]
+        reconstruction = np.dot(rfileds, coeff).reshape((28,28))
+        display_row.append(reconstruction)
         for k in range(len(coeff)):
-            display_row.append(coeff[k] * rfields[k])
-        display.append(display_row)
-        
+            display_row.append(coeff[k] * rfields[k]).reshape((28,28))
+        display.append(display_row)      
 
 
+    ##Add column names to error table
     error.columns = error_names
-    print (error)
-    
+    print (error)    
     ##Get max number of components for display grid dimensions
     biggest = 0
     for j in display:
         if (len(j) > biggest):
             biggest = len(j)
-    print (biggest)
-
     ##Allocate pixels for display grid
-    grid = np.zeros((28 * len(lambdas), 28 * (biggest + 2)))
-    print(grid.shape)
+    grid = np.zeros((28 * len(lambdas), 28 * (biggest + 1)))
+    #print(grid.shape)
+
+    ##Fill display grid with image data
+    ##Iterate over row - for each row, add columns
+    for j in range(len(lambdas)):
+        rows = range(j*29, (j+1)*29)
+        #Original image
+        grid[rows, :29] = network.s.reshape((28,28))
+        #Reconstruction and components
+        for k in range(len(display[j])):
+            cols = range((k+1)*29, (k+2)*29)
+            grid[rows, cols] = display[j][k]
+
+
+im_grid = Image.fromarray(grid)
+im_grid.show()
+    
+        
     
     
 
