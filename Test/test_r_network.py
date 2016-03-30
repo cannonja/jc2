@@ -104,7 +104,8 @@ for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
     error = pandas.DataFrame() #DataFrame used for error table
-    display = []  #List to hold rows of image data for grid
+    display = []  #List to hold rows of image data for grid (rfields scaled)
+    display2 = [] #Unscaled rfields
     #For each value of lambda, set lambda and run Rozell on the given image
     for j in lambdas:
         display_row = []   #List to hold one row of image data
@@ -115,42 +116,45 @@ for i in range(num_images):
         error = error.append(row)
         ##Add list of dictionary elements scaled by coefficients to list
         ##Also adding recostruction to list
-        indices = np.where(network.a > 0)
+        indices = np.flatnonzero(network.a)
         coeff = network.a[indices]
         rfields = network.dictionary[:, indices]
-        reconstruction = np.dot(rfileds, coeff).reshape((28,28))
+        reconstruction = np.dot(rfields, coeff).reshape((28,28))
         display_row.append(reconstruction)
         for k in range(len(coeff)):
-            display_row.append(coeff[k] * rfields[k]).reshape((28,28))
+            #display_row.append((coeff[k] * rfields[:, k]).reshape((28,28)))
+            display_row.append(rfields[:, k].reshape((28,28)))
         display.append(display_row)      
 
 
     ##Add column names to error table
     error.columns = error_names
-    print (error)    
     ##Get max number of components for display grid dimensions
     biggest = 0
     for j in display:
         if (len(j) > biggest):
             biggest = len(j)
     ##Allocate pixels for display grid
-    grid = np.zeros((28 * len(lambdas), 28 * (biggest + 1)))
+    grid = np.full((28 * len(lambdas), 28 * (biggest + 1)), 255.)
     #print(grid.shape)
 
     ##Fill display grid with image data
     ##Iterate over row - for each row, add columns
     for j in range(len(lambdas)):
-        rows = range(j*29, (j+1)*29)
+        rows = slice(j*28, (j+1)*28)
         #Original image
-        grid[rows, :29] = network.s.reshape((28,28))
+        grid[rows, :28] = network.s.reshape((28,28))
         #Reconstruction and components
         for k in range(len(display[j])):
-            cols = range((k+1)*29, (k+2)*29)
+            cols = slice((k+1)*28, (k+2)*28)
             grid[rows, cols] = display[j][k]
 
+    print(error)
+    im_grid = Image.fromarray(grid)
+    im_grid.show()
 
-im_grid = Image.fromarray(grid)
-im_grid.show()
+
+
     
         
     
