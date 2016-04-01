@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import socket
 import pandas
+import matplotlib.pyplot as plt
 
 machine = socket.gethostname()
 if (machine == 'Jack-PC'):
@@ -95,7 +96,8 @@ D = sp.build_dictionary(dict_data)
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
-error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
+#error_names = ['Lambda', 'E(t)', 'Resid', 'Cost', 'Sparsity']
+error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
 lambdas = np.arange(0.1, 2.1, 0.1)
 #lambdas = [0.1]
 
@@ -132,6 +134,7 @@ for i in range(num_images):
 
     ##Add column names to error table
     error.columns = error_names
+    error.set_index(lambdas)
     ##Get max number of components for display grid dimensions
     biggest = 0
     for j in display:
@@ -155,10 +158,26 @@ for i in range(num_images):
             grid2[rows, cols] = display2[j][k]
 
     print(error)
+    error.plot()
+    
+
+    
+
+    '''
+    a = plt.plot(error['Lambda'], error['E(t)'], 'r')
+    b = plt.plot(error['Lambda'], error['Resid'], 'b')
+    ax2 = plt.twinx()
+    plt.plot(error['Lambda'], error['Sparsity'], 'c')    
+    plt.show()
+    '''
+
+    
+    '''
     im_grid = Image.fromarray(grid)
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
     im_grid2.show()
+    '''
 
 
 

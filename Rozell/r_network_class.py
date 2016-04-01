@@ -122,7 +122,8 @@ class r_network:
             cost = self.lamb / 2
 
         b = self.lamb * cost        
-        error = np.array([[self.lamb, (a + b), a, b, sparsity]])
+        #error = np.array([[self.lamb, (a + b), a, b, sparsity]])
+        error = np.array([[(a + b), a, b, sparsity]])
 
         return error
 
