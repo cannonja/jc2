@@ -101,10 +101,13 @@ error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
 lambdas = np.arange(0.1, 2.1, 0.1)
 #lambdas = [0.1]
 
-#For each image, run Rozell and generate sparse code, error table and image grid
+#For each image, run Rozell, generate sparse code, error table and image grid
 for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
+    error = network.error_table(lambdas)
+    
+    '''
     error = pandas.DataFrame() #DataFrame used for error table
     display = []  #List to hold rows of image data for grid (rfields scaled)
     display2 = [] #Unscaled rfields
@@ -130,6 +133,7 @@ for i in range(num_images):
             display_row2.append(rfields[:, k].reshape((28,28)))
         display.append(display_row)
         display2.append(display_row2)
+    '''
 
 
     ##Add column names to error table
@@ -158,7 +162,6 @@ for i in range(num_images):
             grid2[rows, cols] = display2[j][k]
 
     print(error)
-    error.plot()
     
 
     

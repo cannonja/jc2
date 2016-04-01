@@ -2,14 +2,6 @@ import numpy as np
 import math
 import pandas
 
-###To do######
-'''
--Implement methods to:
-    -Save image, reconstruction, and components
-    -Calculate and plot error function E(t)
-        -Implement Rozell's E(t) and Walt's E(t)
-    -
-'''
 
 class r_network:
     'Class to represent Rozell LCA network'
@@ -136,6 +128,43 @@ class r_network:
         coefficients = self.a[indices]
 
         return (coefficients, rfields)
+
+    #This method takes a single lambda (as a list) or an array
+    #of lambdas, then returns an error table where each row represents
+    #different error measures at a particular lambda
+    def error_table(self, lambdas):
+        df = pandas.DataFrame() #DataFrame used for error table
+
+
+
+
+
+        display = []  #List to hold rows of image data for grid (rfields scaled)
+        display2 = [] #Unscaled rfields
+
+        #For each value of lambda, set lambda and run Rozell on the given image
+        for j in lambdas:
+            display_row = []   #List to hold one row of image data (for display)
+            display_row2 = []  #For display2
+            self.set_lambda(j)
+            self.generate_sparse()  #Calculate sparse code        
+            ##Add row of error data to error table
+            row = pandas.DataFrame(self.return_error())
+            df = df.append(row)
+            ##Add list of dictionary elements scaled by coefficients to list
+            ##Also adding recostruction to list
+            indices = np.flatnonzero(self.a)
+            coeff = self.a[indices]
+            rfields = self.dictionary[:, indices]
+            reconstruction = np.dot(rfields, coeff).reshape((28,28))
+            display_row.append(reconstruction)
+            display_row2.append(reconstruction)
+            for k in range(len(coeff)):
+                display_row.append((coeff[k] * rfields[:, k]).reshape((28,28)))
+                display_row2.append(rfields[:, k].reshape((28,28)))
+            display.append(display_row)
+            display2.append(display_row2)
+        
 
         
             
