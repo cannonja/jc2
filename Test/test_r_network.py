@@ -75,7 +75,7 @@ print(signal)
 print(network.dictionary)
 '''
 
-#Build list of files to iterate through - choose first file (t10k-images.idx3-ubyte)
+#Build list of  to iterate through - choose first file (t10k-images.idx3-ubyte)
 
 files = os.listdir()
 file_list = []
@@ -85,12 +85,14 @@ for i in files:
 
 
 #Load MNIST dictionary and signal
-signal_data = mnist.load_images(file_list[0], num_images, 6000)
+#image_file = file_list[0]
+image_file = 't10k-images.idx3-ubyte'
+signal_data = mnist.load_images(image_file, num_images, 6000)
 #Insert stimulus in dictionary
-#dict_data = mnist.load_images(file_list[0], 49, 20)
+#dict_data = mnist.load_images(image_file, 49, 20)
 #D = np.append(signal_data[0].flatten().reshape(784,1), sp.build_dictionary(dict_data), axis = 1)
 ##Use regular dictionary
-dict_data = mnist.load_images(file_list[0], 50)
+dict_data = mnist.load_images(image_file, 50)
 D = sp.build_dictionary(dict_data)
 
 #Run Rozell and generate sparse code
@@ -106,7 +108,6 @@ for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
     error = network.error_table(lambdas)
-    
     '''
     error = pandas.DataFrame() #DataFrame used for error table
     display = []  #List to hold rows of image data for grid (rfields scaled)
@@ -116,7 +117,7 @@ for i in range(num_images):
         display_row = []   #List to hold one row of image data (for display)
         display_row2 = []  #For display2
         network.set_lambda(j)
-        network.generate_sparse()  #Calculate sparse code        
+        network.generate_sparse()  #Calculate sparse code
         ##Add row of error data to error table
         row = pandas.DataFrame(network.return_error())
         error = error.append(row)
@@ -134,7 +135,6 @@ for i in range(num_images):
         display.append(display_row)
         display2.append(display_row2)
     '''
-
 
     ##Add column names to error table
     error.columns = error_names
@@ -162,26 +162,22 @@ for i in range(num_images):
             grid2[rows, cols] = display2[j][k]
 
     print(error)
-    
 
-    
+
 
     '''
     a = plt.plot(error['Lambda'], error['E(t)'], 'r')
     b = plt.plot(error['Lambda'], error['Resid'], 'b')
-    ax2 = plt.twinx()
-    plt.plot(error['Lambda'], error['Sparsity'], 'c')    
+    #x2 = plt.twinx()
+    plt.plot(error['Lambda'], error['Sparsity'], 'c')
     plt.show()
     '''
-
-    
     '''
     im_grid = Image.fromarray(grid)
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
     im_grid2.show()
     '''
-
 
 
 
