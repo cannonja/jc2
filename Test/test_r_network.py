@@ -50,7 +50,7 @@ lamb = .1
 tau = 10
 delta = 0.001
 u_stop = 10
-t_type = 'S'
+t_type = 'H'
 num_images = 1
 
 #Match spreadsheet dictionary (single node case, lamb = 0)
@@ -107,8 +107,8 @@ lambdas = np.arange(0.1, 2.1, 0.1)
 for i in range(num_images):
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
-    error = network.error_table(lambdas)
-    '''
+    #error = network.error_table(lambdas)
+    
     error = pandas.DataFrame() #DataFrame used for error table
     display = []  #List to hold rows of image data for grid (rfields scaled)
     display2 = [] #Unscaled rfields
@@ -134,7 +134,7 @@ for i in range(num_images):
             display_row2.append(rfields[:, k].reshape((28,28)))
         display.append(display_row)
         display2.append(display_row2)
-    '''
+    
 
     ##Add column names to error table
     error.columns = error_names
@@ -165,19 +165,20 @@ for i in range(num_images):
 
 
 
-    '''
-    a = plt.plot(error['Lambda'], error['E(t)'], 'r')
-    b = plt.plot(error['Lambda'], error['Resid'], 'b')
+    plt.subplot(211)
+    plt.plot(lambdas, error['E(t)'], 'r')
+    #b = plt.plot(error['Lambda'], error['Resid'], 'b')
     #x2 = plt.twinx()
-    plt.plot(error['Lambda'], error['Sparsity'], 'c')
+    plt.subplot(212)
+    plt.plot(lambdas, error['Sparsity'], 'c')
     plt.show()
-    '''
-    '''
+    
+    
     im_grid = Image.fromarray(grid)
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
     im_grid2.show()
-    '''
+    
 
 
 
