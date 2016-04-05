@@ -3,13 +3,6 @@ import struct
 from PIL import Image
 import numpy as np
 
-#Big laptop
-#os.chdir("C:\\Users\\Jack2\\Google Drive\\URMP\\jc2\\MNIST_Load")
-
-#Little laptop
-os.chdir("C:\\Users\\Jack\\Google Drive\\URMP\\jc2\\MNIST_Load")
-
-
 
 def print_meta(file_name):
     in_file = open(file_name, 'r+b')
