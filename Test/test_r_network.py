@@ -146,6 +146,7 @@ for i in range(num_images):
     error.columns = error_names
     error.set_index(lambdas)
 
+
     '''
     ##Get max number of components for display grid dimensions
     biggest = 0
@@ -170,6 +171,7 @@ for i in range(num_images):
             grid2[rows, cols] = display2[j][k]
     '''
 
+
     print(error)
 
 
@@ -186,6 +188,7 @@ for i in range(num_images):
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
     im_grid2.show()
+
     
 
 

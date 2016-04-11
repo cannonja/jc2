@@ -178,28 +178,27 @@ class r_network:
             display.append(display_row)
             display2.append(display_row2)
 
-            return (df, display, display2)
+        return (df, display, display2)
 
 
 
 
 
-    def fill_grid(num_rows, grid_data):
+    def fill_grid(self, num_rows, grid_data):
         ##Get max number of components for display grid dimensions
         biggest = 0
         for j in grid_data:
             if (len(j) > biggest):
                 biggest = len(j)
-        ##Allocate pixels for display grid and display grid2
+        ##Allocate pixels for display grid
         grid = np.full((28 * num_rows, 28 * (biggest + 1)), 255.)
-        grid2 = np.full((28 * num_rows, 28 * (biggest + 1)), 255.)
 
         ##Fill display grid with image data
-        ##Iterate over row - for each row, add columns
+        ##Iterate over rows -> for each row, add columns
         for j in range(num_rows):
             rows = slice(j*28, (j+1)*28)
             #Original image
-            grid[rows, :28] = network.s.reshape((28,28))
+            grid[rows, :28] = self.s.reshape((28,28))
             #Reconstruction and components
             for k in range(len(grid_data[j])):
                 cols = slice((k+1)*28, (k+2)*28)
