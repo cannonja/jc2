@@ -121,7 +121,7 @@ class r_network:
 
     #This method returns two arrays:
     #coefficients consists of the active coefficients
-    #rfileds consists of the respective dictionary elements
+    #rfields consists of the respective dictionary elements
     def get_rfields(self):
         indices = np.where(self.a > 0)
         rfields = self.dictionary[:, indices]
@@ -183,7 +183,9 @@ class r_network:
 
 
 
-
+    ##This method takes a number representing the number of image rows and
+    ##the data to fill the grid with.
+    ##It returns a 2-D numpy array of image data for a single image (grid)
     def fill_grid(self, num_rows, grid_data):
         ##Get max number of components for display grid dimensions
         biggest = 0
