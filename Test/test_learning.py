@@ -62,7 +62,8 @@ for i in range(num_images):
 
 print(np.sum(network.dictionary - network.trained))
 
-
+#####DICTIONARY DIDN'T CHANGE AT ALL!!!!!!!!!!
+#####LOOK INTO THIS!!!!!!!
 
 
 
