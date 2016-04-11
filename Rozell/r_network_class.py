@@ -96,6 +96,30 @@ class r_network:
         print df.to_string()
         '''
 
+    def update_trained(self, alpha):
+        stim = self.s
+        recon = np.dot(self.dictionary, self.a)
+        resid = stim - recon
+
+        wdot = resid * (self.a * alpha)[:, np.newaxis]
+        self.trained = self.trained + np.transpose(wdot)
+
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     #Returns 1-D numpy array containing E(t), the left-hand operand of E(t),
     #and the right-hand operand of E(t).
     #That is the operands of the right-hand side of the error equation

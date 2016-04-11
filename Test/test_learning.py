@@ -37,23 +37,39 @@ tau = 10
 delta = 0.001
 u_stop = .01
 t_type = 'S'
-num_images = 1
+alpha = 0.811
 
-################### Load dictionary and training set from MNIST #################################
-################### Dictionary = first 50 images, training set = last 59950 images ##############
+################### Load dictionary from first 50 MNIST images ##################################
+################### Load training set from last 59950 MNIST images ##############################
+num_images = 1000
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, 50)
-training_data = mnist.load_images(image_file, 59950, 49)
+training_data = mnist.load_images(image_file, num_images, 49)
 D = sp.build_dictionary(dict_data)
 
-
-'''
-#Run Rozell and generate sparse code
+#Initialize network dictionary and parameters
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 
+################### Run each training image through network #######################################
+################### For each image, generate sparse code then update trained ######################
+print(network.trained[:,1])
+for i in range(num_images):
+    stimulus = training_data[i].flatten()
+    network.set_stimulus(stimulus)
+    network.generate_sparse()
 
+print(network.trained[:,1])
+
+
+
+
+
+
+
+'''
+#Run Rozell and generate sparse code
 
 #For each image, run Rozell then generate error table and image grid
 for i in range(num_images):
