@@ -8,6 +8,7 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D
+        self.trained = D
         self.s = None
         self.b = None
         self.a = None
