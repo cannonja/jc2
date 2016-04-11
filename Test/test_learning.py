@@ -41,7 +41,7 @@ alpha = 0.811
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
-num_images = 1000
+num_images = 100
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, 50)
 training_data = mnist.load_images(image_file, num_images, 49)
@@ -54,13 +54,13 @@ network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 ################### Run each training image through network #######################################
 ################### For each image, generate sparse code then update trained ######################
-print(network.trained[:,1])
+print(np.sum(network.dictionary - network.trained))
 for i in range(num_images):
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus)
     network.generate_sparse()
 
-print(network.trained[:,1])
+print(np.sum(network.dictionary - network.trained))
 
 
 
