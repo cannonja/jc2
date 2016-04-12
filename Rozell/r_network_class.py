@@ -96,27 +96,18 @@ class r_network:
         print df.to_string()
         '''
 
+
+    #This method updates the copy of the dictionary stored in the "trained"
+    #data member, then returns the residual
     def update_trained(self, alpha):
         stim = self.s
         recon = np.dot(self.dictionary, self.a)
         resid = stim - recon
 
         wdot = resid * (self.a * alpha)[:, np.newaxis]
-        self.trained = self.trained + np.transpose(wdot)
+        self.trained = (self.trained + np.transpose(wdot)).copy()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        return resid
 
 
 

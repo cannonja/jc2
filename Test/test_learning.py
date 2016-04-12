@@ -6,6 +6,9 @@ import numpy as np
 import socket
 import pandas
 import matplotlib.pyplot as plt
+import time
+import datetime
+
 
 machine = socket.gethostname()
 if (machine == 'Jack-PC'):
@@ -26,6 +29,9 @@ else:
     sys.path.append(os.path.join(base1, 'Rozell'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base2
+    dict1_path = file_path + '/orig_dict'
+    dict2_path = file_path + '/trained_dict'
+    write_path = file_path + '/resid_data'
 
 
 
@@ -45,7 +51,7 @@ alpha = 0.811
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images = 10 #60000 - num_rfields
+num_images =  10   #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, num_rfields - 1)
@@ -58,22 +64,38 @@ network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 ################### Run each training image through network #######################################
 ################### For each image, generate sparse code then update trained ######################
-print(np.sum(network.dictionary - network.trained))
-file_path1 = file_path + '/orig_dict'
-file_path2 = file_path + '/trained_dict'
-network.save_dictionary(5, 10, file_path1)
+
+#Print out the time and start the training process
+#Save out the original dictionary
+ts = time.time()
+st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+print("Start time: ", st)
+network.save_dictionary(5, 10, dict1_path)
+
+#Initiate x values and residual array for residual plot
+x = range(num_images)
+resid_plot = np.zeros((num_images))
+
+#Train dictionary as each image is run through network
+#Store length of residual vector in resid_plot array
 for i in range(num_images):
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus)
     network.generate_sparse()
+    y = network.update_trained(alpha)
+    resid_plot[i] = np.sqrt(np.dot(y,y))
 
-print(np.sum(network.dictionary - network.trained))
-network.save_dictionary(5, 10, file_path2, "t")
+#Write residual data to csv file and plot
+df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
+df.to_csv(write_path, index = False)
+#plt.plot(x, resid_plot)
+#plt.show()
 
-#####DICTIONARY DIDN'T CHANGE AT ALL!!!!!!!!!!
-#####LOOK INTO THIS!!!!!!!
-
-
+#Save out trained dictionary and print out time
+network.save_dictionary(5, 10, dict2_path, "t")
+ts = time.time()
+st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+print("End time: ", st)
 
 
 
