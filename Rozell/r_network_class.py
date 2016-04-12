@@ -1,14 +1,14 @@
 import numpy as np
 import math
 import pandas
-
+from PIL import Image
 
 class r_network:
     'Class to represent Rozell LCA network'
 
     def __init__(self, D):
         self.dictionary = D
-        self.trained = D
+        self.trained = D.copy()
         self.s = None
         self.b = None
         self.a = None
@@ -34,7 +34,7 @@ class r_network:
     def set_lambda(self, lamb):
         self.lamb = lamb
 
-    def set_tau(self, tau):    
+    def set_tau(self, tau):
         self.tau = tau
 
     def set_delta(self, delta):
@@ -73,7 +73,7 @@ class r_network:
                         - (np.eye(self.dictionary.shape[1]) / 255)
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
-        
+
         #Generate vector self.a
         #debug = []
         len_u = len(u)
@@ -81,9 +81,9 @@ class r_network:
             u = u + (udot * self.delta)
             #Update a vector
             for i in range(len(self.a)):
-                self.a[i] = self.thresh(u[i])          
-            
-            udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))            
+                self.a[i] = self.thresh(u[i])
+
+            udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
@@ -104,8 +104,8 @@ class r_network:
         wdot = resid * (self.a * alpha)[:, np.newaxis]
         self.trained = self.trained + np.transpose(wdot)
 
-        
-        
+
+
 
 
 
@@ -138,7 +138,7 @@ class r_network:
         elif (norm1 > self.lamb):
             cost = self.lamb / 2
 
-        b = self.lamb * cost        
+        b = self.lamb * cost
         #error = np.array([[self.lamb, (a + b), a, b, sparsity]])
         error = np.array([[(a + b), a, b, sparsity]])
 
@@ -154,27 +154,27 @@ class r_network:
 
         return (coefficients, rfields)
 
-    
+
 
     #This method takes a single lambda (as a list) or an array
     #of lambdas, then returns an error table (as a pandas dataframe)
     #and the data for two images (as lists).
-    
+
     #In the error table, each row represents different error measures at
     #the given lambda.  The images are intended to be displayed as grids
     #where each row corresponds to the lambdas in the error table.
-    
+
     #The first image in each row is the reconstruction and the remaining images
     #in the row are the chosen receptive fields that make up the reconstruction.
     #One image has the coefficients applied to the receptive fields and the other does not.
-    
+
     #The data for each image grid is returned as a list, where each element in the list
     #is a list of 28x28 numpy arrays representing the reconstruction and receptive fields
     #for the respective lambda (rows of the image grid without the stimulus).
     #The stimulus will be added when the final grid image is built.
-    
+
     #It's important to understand that this method uses the values set by the current
-    #network previously!!!!    
+    #network previously!!!!
     def reconstruct(self, lambdas):
         df = pandas.DataFrame() #DataFrame used for error table
         display = []  #List to hold rows of image data for grid (rfields scaled)
@@ -185,7 +185,7 @@ class r_network:
             display_row = []   #List to hold one row of image data (for display)
             display_row2 = []  #For display2
             self.set_lambda(j)
-            self.generate_sparse()  #Calculate sparse code        
+            self.generate_sparse()  #Calculate sparse code
             ##Add row of error data to error table
             row = pandas.DataFrame(self.return_error())
             df = df.append(row)
@@ -232,3 +232,23 @@ class r_network:
                 grid[rows, cols] = grid_data[j][k]
 
         return grid
+
+
+    def save_dictionary(self, num_rows, num_cols, path, d_type = "d"):
+        k = 0
+        grid = np.full((28 * num_rows, 28 * num_cols), 255.)
+
+        for i in range(num_rows):
+            rows = slice(i * 28, (i + 1) * 28)
+            for j in range(num_cols):
+                cols = slice(j * 28, (j + 1) * 28)
+                if (d_type == "d"):
+                    grid[rows, cols] = self.dictionary[:, k].reshape((28,28))
+                else:
+                    grid[rows, cols] = self.trained[:, k].reshape((28,28))
+                k += 1
+
+        im_grid = Image.fromarray(grid)
+        im_grid = im_grid.convert('L')
+        im_grid.save(path, 'PNG')
+
