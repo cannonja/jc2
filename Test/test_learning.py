@@ -32,6 +32,7 @@ else:
     dict1_path = file_path + '/orig_dict'
     dict2_path = file_path + '/trained_dict'
     write_path = file_path + '/resid_data'
+    plot_path = file_path + '/resid_plot'
 
 
 
@@ -46,12 +47,16 @@ tau = 10
 delta = 0.001
 u_stop = .01
 t_type = 'S'
-alpha = 0.811
+alpha = 0.2
+
+##Plotting parameters
+win1 = 5  #Window for mov avg 1
+win2 = 10 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  10   #60000 - num_rfields
+num_images = 50  #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, num_rfields - 1)
@@ -85,51 +90,29 @@ for i in range(num_images):
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
 
-#Write residual data to csv file and plot
-df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
-df.to_csv(write_path, index = False)
-#plt.plot(x, resid_plot)
-#plt.show()
-
 #Save out trained dictionary and print out time
 network.save_dictionary(5, 10, dict2_path, "t")
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 print("End time: ", st)
 
+#Write residual data to csv file and plot
+df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
+df.to_csv(write_path, index = False)
 
 
-'''
-#Run Rozell and generate sparse code
 
-#For each image, run Rozell then generate error table and image grid
-for i in range(num_images):
-    #Get number of rows for error table and image grid
-    #Then set stimulus for Rozell
-    rows = len(lambdas)
-    signal = signal_data[i].flatten()
-    network.set_stimulus(signal)
+#Plot and save out both raw and smoothed residuals
+ma1 = df.iloc[:,1].rolling(window = win1).mean().values
+ma2 = df.iloc[:,1].rolling(window = win2).mean().values
 
-    #Run Rozell and get error and image grid data
-    error, im1, im2 = network.reconstruct(lambdas)
+plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'raw')
+plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
+plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
+plt.xlabel('Image Number')
+plt.title('Reconstruction Error')
+plt.legend()
+plt.savefig(plot_path)
+plt.show()
 
-    #Add error table characteristics
-    #Plot both E(t) and Sparsity vs. lambdas
-    #E(t) on top plot and Sparsity on bottom
-    error.columns = error_names
-    error.set_index(lambdas)
-    print(error)
-    plt.subplot(211)
-    plt.plot(lambdas, error['E(t)'], 'r')
-    plt.subplot(212)
-    plt.plot(lambdas, error['Sparsity'], 'c')
-    plt.show()
 
-    #Generate and show grid images
-    grid = network.fill_grid(rows, im1)
-    grid2 = network.fill_grid(rows, im2)
-    im_grid = Image.fromarray(grid)
-    im_grid2 = Image.fromarray(grid2)
-    im_grid.show()
-    im_grid2.show()
-'''
