@@ -47,19 +47,19 @@ tau = 10
 delta = 0.001
 u_stop = .01
 t_type = 'S'
-alpha = 0.2
+alpha = 0.1
 
 ##Plotting parameters
-win1 = 5  #Window for mov avg 1
-win2 = 10 #Window for mov avg 2
+win1 = 100  #Window for mov avg 1
+win2 = 300 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images = 50  #60000 - num_rfields
+num_images = 10000  #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
-training_data = mnist.load_images(image_file, num_images, num_rfields - 1)
+training_data = mnist.load_images(image_file, num_images, num_rfields - 50)
 D = sp.build_dictionary(dict_data)
 
 #Initialize network dictionary and parameters
