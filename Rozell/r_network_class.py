@@ -18,17 +18,26 @@ class r_network:
         self.u_stop = None
         self.t_type = None
 
-    def scale(self, num):
+    def scale(self, num, train = False):
         self.s *= num
-        self.dictionary *= num
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
-        
+
+        if (train):
+            self.trained *= num
+            self.b = np.dot(np.transpose(self.trained), self.s)
+        else:            
+            self.dictionary *= num
+            self.b = np.dot(np.transpose(self.dictionary), self.s)
+            
 
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
-    def set_stimulus(self, signal):
+    def set_stimulus(self, signal, train = False):
         self.s = np.asarray(signal, dtype=float)
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
+
+        if (train):
+            self.b = np.dot(np.transpose(self.trained), self.s)
+        else:
+            self.b = np.dot(np.transpose(self.dictionary), self.s)
 
 
     def set_lambda(self, lamb):
@@ -65,12 +74,18 @@ class r_network:
         if (self.t_type == 'S'):
             return u - self.lamb
 
-    def generate_sparse(self):
+    def generate_sparse(self, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        self.scale(1/255)
-        inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                        - (np.eye(self.dictionary.shape[1]) / 255)
+        self.scale(1/255, train)
+        #Use trained dictionary if using to train network
+        if (train):
+            inhibit = np.dot(np.transpose(self.trained), self.trained)\
+                            - (np.eye(self.trained.shape[1]) / 255)            
+        else:    
+            inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
+                            - (np.eye(self.dictionary.shape[1]) / 255)
+            
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
 
@@ -90,7 +105,7 @@ class r_network:
 
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
-        self.scale(255)
+        self.scale(255, train)
         '''
         df = pandas.DataFrame(debug)
         print df.to_string()
@@ -101,7 +116,7 @@ class r_network:
     #data member, then returns the residual
     def update_trained(self, alpha):
         stim = self.s
-        recon = np.dot(self.dictionary, self.a)
+        recon = np.dot(self.trained, self.a)
         resid = stim - recon
 
         wdot = resid * (self.a * alpha)[:, np.newaxis]
@@ -225,7 +240,10 @@ class r_network:
         return grid
 
 
-    def save_dictionary(self, num_rows, num_cols, path, d_type = "d"):
+    #This method takes the number of rows and columns for the resulting image grid
+    #It takes a file path to save the dictionary and a boolean (train) to
+    #determine whether the original dictionary or trained dictionary data is used
+    def save_dictionary(self, num_rows, num_cols, path, train = False):
         k = 0
         grid = np.full((28 * num_rows, 28 * num_cols), 255.)
 
@@ -233,10 +251,10 @@ class r_network:
             rows = slice(i * 28, (i + 1) * 28)
             for j in range(num_cols):
                 cols = slice(j * 28, (j + 1) * 28)
-                if (d_type == "d"):
-                    grid[rows, cols] = self.dictionary[:, k].reshape((28,28))
-                else:
+                if (train):
                     grid[rows, cols] = self.trained[:, k].reshape((28,28))
+                else:                    
+                    grid[rows, cols] = self.dictionary[:, k].reshape((28,28))
                 k += 1
 
         im_grid = Image.fromarray(grid)
