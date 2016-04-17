@@ -27,6 +27,12 @@ elif (machine == 'Tab'):
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Rozell')
     os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+    file_path = 'C:\\Users\\Jack\\Desktop'
+    dict1_path = file_path + '/orig_dict.png'
+    dict2_path = file_path + '/trained_dict.png'
+    dict3_path = file_path + '/trained_data.csv'
+    write_path = file_path + '/resid_data.csv'
+    plot_path = file_path + '/resid_plot.png'
 else:
     #PSU machines (linux lab)
     base1 = os.path.expanduser('~/dev/jc2')
@@ -37,6 +43,7 @@ else:
     file_path = base2
     dict1_path = file_path + '/orig_dict'
     dict2_path = file_path + '/trained_dict'
+    dict3_path = file_path + '/trained_data'
     write_path = file_path + '/resid_data'
     plot_path = file_path + '/resid_plot'
 
