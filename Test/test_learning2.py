@@ -54,10 +54,6 @@ u_stop = .01
 t_type = 'S'
 alpha = 0.1
 
-#Plotting parameters
-win1 = 5  #Window for mov avg 1
-win2 = 10 #Window for mov avg 2
-
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
@@ -75,50 +71,4 @@ network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 ################### Run each training image through network #######################################
 ################### For each image, generate sparse code then update trained ######################
-
-#Print out the time and start the training process
-#Save out the original dictionary
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("Start time: ", st)
-network.save_dictionary(5, 10, dict1_path)
-
-#Initiate x values and residual array for residual plot
-x = range(num_images)
-resid_plot = np.zeros((num_images))
-
-#Train dictionary as each image is run through network
-#Store length of residual vector in resid_plot array
-for i in range(num_images):
-    stimulus = training_data[i].flatten()
-    network.set_stimulus(stimulus)
-    network.generate_sparse()
-    y = network.update_trained(alpha)
-    resid_plot[i] = np.sqrt(np.dot(y,y))
-
-#Save out trained dictionary and print out time
-network.save_dictionary(5, 10, dict2_path, "t")
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("End time: ", st)
-
-#Write residual data to csv file and plot
-df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
-df.to_csv(write_path, index = False)
-
-
-
-#Plot and save out both raw and smoothed residuals
-ma1 = df.iloc[:,1].rolling(window = win1).mean().values
-ma2 = df.iloc[:,1].rolling(window = win2).mean().values
-
-plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
-plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
-plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
-plt.xlabel('Image Number')
-plt.title('Reconstruction Error')
-plt.legend()
-plt.savefig(plot_path)
-plt.show()
-
 
