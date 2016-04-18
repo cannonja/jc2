@@ -60,16 +60,16 @@ tau = 10
 delta = 0.001
 u_stop = .01
 t_type = 'S'
-alpha = 0.15
+alpha = 0.2
 
 #Plotting parameters
-win1 = 100  #Window for mov avg 1
-win2 = 300 #Window for mov avg 2
+win1 = 300  #Window for mov avg 1
+win2 = 800 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images = 5000 #60000 - num_rfields
+num_images = 60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, num_rfields)
@@ -97,7 +97,7 @@ resid_plot = np.zeros((num_images))
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
 for i in range(num_images):
-    if (((i + 1) % 100) == 0):
+    if (((i + 1) % 1000) == 0):
         print("Image ",i + 1)
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus, True)
