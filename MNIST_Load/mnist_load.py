@@ -57,7 +57,8 @@ def load_labels(file_name, num_images, start=0):
     #Build label list element-wise where each element
     #is an integer cooresponding to a label of an image
     for i in range(num_images):
-        labels.append(struct.unpack('>1B', in_file.read(1)))
+        label_tuple = struct.unpack('>1B', in_file.read(1))
+        labels.append(label_tuple[0])
     in_file.close()        
     return labels
 
