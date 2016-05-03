@@ -106,6 +106,7 @@ class r_network:
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
         self.scale(255, train)
+        return self.a
         '''
         df = pandas.DataFrame(debug)
         print df.to_string()
