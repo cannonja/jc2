@@ -29,8 +29,10 @@ else:
     base2 = os.path.expanduser('~/Desktop')
     sys.path.append(os.path.join(base1, 'MNIST_Load'))
     sys.path.append(os.path.join(base1, 'Rozell'))
+    sys.path.append(os.path.join(base1, 'Classify'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base2
+    dict_path = base1 + '/Classify/trained_data'
 
 import mnist_load as mnist
 import sparse_algo as sp
@@ -47,7 +49,7 @@ t_type = 'S'
 alpha = 0.1
 
 ################### Load MNIST image and label data #############################################
-num_images = 1
+num_images = 5
 start_pos = 0
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
@@ -64,16 +66,24 @@ rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 weights = np.random.rand(10, 51) #10 nodes in layer j+1 and 50 nodes in layer j
 correct = 0
 for i, j in zip(image_data, label_data):
+    #Run Rozell
     rozell.set_stimulus(i.flatten())
     sparse_code = rozell.generate_sparse()
     sparse_code = np.insert(sparse_code, 0, 1, axis = 0) #Add bias term
+
+    #Integrate weights and sparse code, then feed to sigmoid
     z = np.dot(weights, sparse_code)
     activation = classify.sigmoid(z)[:, np.newaxis]
+
+    #Convert ouptut vector to binary max value set to one
+    #All others set to zero
     prediction = np.where(activation == activation.max())[0][0]
     label = np.zeros((10,1))
     label[j] = 1
+    '''
     if (prediction == j):
         correct += 1
+    '''
     error = activation - label
     MSE = np.dot(np.transpose(error), error) / error.shape[0]
     RMSE = np.sqrt(MSE)
