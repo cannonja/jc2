@@ -49,7 +49,7 @@ t_type = 'S'
 alpha = 0.1
 
 ################### Load MNIST image and label data #############################################
-num_images = 5
+num_images  = 200
 start_pos = 0
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
@@ -61,40 +61,32 @@ dict_data = pd.read_csv(dict_path, header = None)
 rozell = lca.r_network(dict_data.values)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-################### Generate matrix of weights for mapping sparse code ###########################
-################### to output layer.  Then forward prop phase          ###########################
-weights = np.random.rand(10, 51) #10 nodes in layer j+1 and 50 nodes in layer j
+################### Initialize random  matrix of weights for mapping ############################
+################### sparse code to output layer.  Then forward prop phase #######################
+weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
+learn_rate = 0.5
+error_plot = np.array([])
 correct = 0
 for i, j in zip(image_data, label_data):
-    #Run Rozell
+    #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
-    sparse_code = rozell.generate_sparse()
-    sparse_code = np.insert(sparse_code, 0, 1, axis = 0) #Add bias term
-
-    #Integrate weights and sparse code, then feed to sigmoid
-    z = np.dot(weights, sparse_code)
-    activation = classify.sigmoid(z)[:, np.newaxis]
-
-    #Convert ouptut vector to binary max value set to one
-    #All others set to zero
-    prediction = np.where(activation == activation.max())[0][0]
-    label = np.zeros((10,1))
-    label[j] = 1
-    '''
+    sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term
+    prediction, error, D = classify.forward_prop(weights, sparse_code, j)
     if (prediction == j):
         correct += 1
-    '''
-    error = activation - label
-    MSE = np.dot(np.transpose(error), error) / error.shape[0]
-    RMSE = np.sqrt(MSE)
+
+    #Store error - represented as quadratic error: 0.5*(error)^2
+    MSE = np.dot(np.transpose(error), 0.5 * error) / error.shape[0]
+    RMSE = float(np.sqrt(MSE))
+    error_plot = np.append(error_plot, RMSE)
+    #Run backprop
+    update = classify.back_prop(D, sparse_code, error, learn_rate)
+    weights += update
 
 
-    
-    
-    
-
-
-
+print (correct / num_images)
+plt.plot(error_plot)
+plt.show()
 
 
 
