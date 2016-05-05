@@ -37,6 +37,7 @@ else:
     plot_path = base1 + '/Classify/RMSE_plot'
     accuracy_path = base1 + '/Classify/Accuracy_plot'
     weight_path = base1 + '/Classify/weights.csv'
+    confusion_path = base1 + '/Classify/confusion.csv'
 
 import mnist_load as mnist
 import sparse_algo as sp
@@ -45,7 +46,7 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 0.1
+lamb = 1
 tau = 10
 delta = 0.001
 u_stop = .01
@@ -53,8 +54,8 @@ t_type = 'S'
 alpha = 0.1
 
 ################### Load MNIST image and label data #############################################
-num_images  = 20000
-start_pos = 20000
+num_images  = 5000
+start_pos = 50000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
@@ -65,7 +66,7 @@ dict_data = pd.read_csv(dict_path, header = None)
 rozell = lca.r_network(dict_data.values)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-
+'''
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### #######################
 weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
@@ -104,12 +105,15 @@ correct = 0
 count = 0
 error_plot = np.array([])
 accuracy_plot = np.array([])
+confusion = np.zeros((10,10), dtype='int32')  #rows = actual, columns = predicted
+#pdb.set_trace()
 for i, j in zip(image_data, label_data):
     count += 1
     #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
     sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term
     prediction, error, D = classify.forward_prop(weights, sparse_code, j)
+    confusion[j, prediction] += 1
     if (prediction == j):
         correct += 1
 
@@ -120,6 +124,9 @@ for i, j in zip(image_data, label_data):
     accuracy_plot = np.append(accuracy_plot, (correct / count))
 
 accuracy = correct / num_images
+cf = pd.DataFrame(confusion)
+print (cf)
+cf.to_csv(confusion_path, header=range(10), index=range(10))
 
 #Plot RMSE
 plt.figure()
@@ -135,7 +142,7 @@ plt.xlabel('Image Number')
 plt.title('Accuracy During Testing')
 plt.savefig(accuracy_path)
 plt.show()
-'''
+
 
 
 
