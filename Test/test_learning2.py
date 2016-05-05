@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import time
 import datetime
+import pdb
 
 
 machine = socket.gethostname()
@@ -44,7 +45,7 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 1.5
+lamb = 0.1
 tau = 10
 delta = 0.001
 u_stop = .01
@@ -52,8 +53,8 @@ t_type = 'S'
 alpha = 0.1
 
 ################### Load MNIST image and label data #############################################
-num_images  = 1500
-start_pos = 10000
+num_images  = 20000
+start_pos = 20000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
@@ -64,12 +65,13 @@ dict_data = pd.read_csv(dict_path, header = None)
 rozell = lca.r_network(dict_data.values)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-'''
+
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### #######################
 weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
-learn_rate = 0.1
+learn_rate = 0.01
 error_plot = np.array([])
+#pdb.set_trace()
 for i, j in zip(image_data, label_data):
     #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
@@ -133,7 +135,7 @@ plt.xlabel('Image Number')
 plt.title('Accuracy During Testing')
 plt.savefig(accuracy_path)
 plt.show()
-
+'''
 
 
 

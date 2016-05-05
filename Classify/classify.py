@@ -16,7 +16,7 @@ def forward_prop(weights, input_data, label_data):
     #Calc gradient matrix D - only one given the architecture
     z = np.dot(weights, input_data)
     activation = sigmoid(z)[:, np.newaxis]
-    gradients = d_sig(activation)
+    gradients = d_sig(z)
     D = np.diagflat(gradients)
 
     #Convert ouptut vector to binary - max value set to one
