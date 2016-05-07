@@ -8,11 +8,17 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D.astype(float)
-        self.sfactor_dict = None
+        self.dict_range = D.max() = D.min()
+        self.dict_min = D.min()
+        self.dict_scaled = False
         self.trained = D.copy()
-        self.sfactor_tdict = None
+        self.train_range = self.trained.max() - self.trained.min()
+        self.trian_min = self.trained.min()
+        self.train_scaled = False
         self.s = None
-        self.sfactor_s = None
+        self.s_range = None
+        self.s_min = None
+        self.s_scaled = False
         self.b = None
         self.a = None
         self.lamb = None
@@ -22,39 +28,40 @@ class r_network:
         self.t_type = None
 
     def scale(self, train = False):
-        #Deal with stimulus scale factor
-        if self.sfactor_s is None:
-            self.sfactor_s = self.s.max() - self.s.min()
-            self.s /= self.sfactor_s
+        #If s isn't scaled, scale it and set the flag
+        ##Otherwise, unscale it and set the flag
+        if not self.s_scaled:
+            self.s = (self.s - self.s_min) / self.s_range
+            self.s_scaled = True
         else:
-            self.s *= self.sfactor_s
-            self.sfactor_s = None
+            self.s = (self.s * self.s_range) + self.s_min
+            self.s_scaled = False
 
-        #Deal with dictionary
+
+        #If dictionary isn't scaled, scale it and set the flag
+        ##Otherwise, unscale it and set the flag
         if (train):
-            #Deal with trained scale factor
-            if self.sfactor_tdict is None:
-                self.sfactor_tdict = self.trained.max() - self.trained.min()
-                self.trained /= self.sfactor_tdict
-                self.b = np.dot(np.transpose(self.trained), self.s)
+            if not self.train_scaled:
+                self.s = (self.trained - self.train_min) / self.train_range
+                self.train_scaled = True
             else:
-                self.trained *= self.sfactor_tdict
-                self.sfactor_tdict = None
+                self.trained = (self.trained * self.train_range) + self.train_min
+                self.train_scaled = False
         else:
-            #Deal with dictionary scale factor
-            if self.sfactor_dict is None:
-                self.sfactor_dict = self.dictionary.max() - self.dictionary.min()
-                self.dictionary /= self.sfactor_dict
-                self.b = np.dot(np.transpose(self.dictionary), self.s)
+            if not self.dict_scaled:
+                self.dictionary = (self.dictionary - self.dict_min) / self.dict_range
+                self.dict_scaled = True
             else:
-                self.dictionary *= self.sfactor_dict
-                self.sfactor_dict = None
+                self.dictionary = (self.dictionary * self.dict_range) + self.dict_min
+                self.dict_scaled = False
 
 
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal, train = False):
         self.s = np.asarray(signal, dtype=float)
+        self.s_range = self.s.max() - self.s.min()
+        self.s_min = self.s.min()
 
         if (train):
             self.b = np.dot(np.transpose(self.trained), self.s)
@@ -103,10 +110,10 @@ class r_network:
         #Use trained dictionary if using to train network
         if (train):
             inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                            - (np.eye(self.trained.shape[1]) / self.sfactor_tdict)
+                            - (np.eye(self.trained.shape[1]))  # / self.sfactor_tdict)
         else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                            - (np.eye(self.dictionary.shape[1]) / self.sfactor_dict)
+                            - (np.eye(self.dictionary.shape[1]))  # / self.sfactor_dict)
 
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True

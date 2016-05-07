@@ -6,6 +6,7 @@ import numpy as np
 import socket
 import pandas
 import matplotlib.pyplot as plt
+import pdb
 
 machine = socket.gethostname()
 if (machine == 'Jack-PC'):
@@ -49,13 +50,14 @@ signal_data = mnist.load_images(image_file, num_images, 35670)
 #D = sp.build_dictionary(dict_data)
 dict_data = pandas.read_csv('trained_data', header=None, names=None)
 D = dict_data.values
+pdb.set_trace()
 
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 20.5, 0.5)
+lambdas = np.arange(0.1, 0.2, 0.1)
 #lambdas = [0.8]
 
 #For each image, run Rozell then generate error table and image grid
