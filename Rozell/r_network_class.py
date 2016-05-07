@@ -7,9 +7,12 @@ class r_network:
     'Class to represent Rozell LCA network'
 
     def __init__(self, D):
-        self.dictionary = D
+        self.dictionary = D.astype(float)
+        self.sfactor_dict = None
         self.trained = D.copy()
+        self.sfactor_tdict = None
         self.s = None
+        self.sfactor_s = None
         self.b = None
         self.a = None
         self.lamb = None
@@ -18,16 +21,35 @@ class r_network:
         self.u_stop = None
         self.t_type = None
 
-    def scale(self, num, train = False):
-        self.s *= num
+    def scale(self, train = False):
+        #Deal with stimulus scale factor
+        if self.sfactor_s is None:
+            self.sfactor_s = self.s.max() - self.s.min()
+            self.s /= self.sfactor_s
+        else:
+            self.s *= self.sfactor_s
+            self.sfactor_s = None
 
+        #Deal with dictionary
         if (train):
-            self.trained *= num
-            self.b = np.dot(np.transpose(self.trained), self.s)
-        else:            
-            self.dictionary *= num
-            self.b = np.dot(np.transpose(self.dictionary), self.s)
-            
+            #Deal with trained scale factor
+            if self.sfactor_tdict is None:
+                self.sfactor_tdict = self.trained.max() - self.trained.min()
+                self.trained /= self.sfactor_tdict
+                self.b = np.dot(np.transpose(self.trained), self.s)
+            else:
+                self.trained *= self.sfactor_tdict
+                self.sfactor_tdict = None
+        else:
+            #Deal with dictionary scale factor
+            if self.sfactor_dict is None:
+                self.sfactor_dict = self.dictionary.max() - self.dictionary.min()
+                self.dictionary /= self.sfactor_dict
+                self.b = np.dot(np.transpose(self.dictionary), self.s)
+            else:
+                self.dictionary *= self.sfactor_dict
+                self.sfactor_dict = None
+
 
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
@@ -77,15 +99,15 @@ class r_network:
     def generate_sparse(self, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        self.scale(1/255, train)
+        self.scale(train)
         #Use trained dictionary if using to train network
         if (train):
             inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                            - (np.eye(self.trained.shape[1]) / 255)            
-        else:    
+                            - (np.eye(self.trained.shape[1]) / self.sfactor_tdict)
+        else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                            - (np.eye(self.dictionary.shape[1]) / 255)
-            
+                            - (np.eye(self.dictionary.shape[1]) / self.sfactor_dict)
+
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
 
@@ -105,7 +127,7 @@ class r_network:
 
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
 
-        self.scale(255, train)
+        self.scale(train)
         return self.a
         '''
         df = pandas.DataFrame(debug)
