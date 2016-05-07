@@ -33,7 +33,7 @@ else:
     sys.path.append(os.path.join(base1, 'Classify'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base2
-    dict_path = base1 + '/Classify/trained_data'
+    dict_path = base1 + '/Classify/trained_data.csv'
     plot_path = base1 + '/Classify/RMSE_plot'
     accuracy_path = base1 + '/Classify/Accuracy_plot'
     weight_path = base1 + '/Classify/weights.csv'
@@ -46,16 +46,15 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 1
+lamb = 17
 tau = 10
 delta = 0.001
 u_stop = .01
 t_type = 'S'
-alpha = 0.1
 
 ################### Load MNIST image and label data #############################################
-num_images  = 5000
-start_pos = 50000
+num_images  = 3000
+start_pos = 30000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)

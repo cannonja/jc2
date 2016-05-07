@@ -34,7 +34,7 @@ import r_network_class as lca
 ##############################Test return_sparse##########################################################################################
 
 #Set parameters
-lamb = .1
+lamb = 0.8
 tau = 10
 delta = 0.001
 u_stop = .01
@@ -43,18 +43,20 @@ num_images = 1
 
 
 #Load MNIST dictionary and signal
-image_file = 't10k-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images)
+image_file = 'train-images.idx3-ubyte'
+signal_data = mnist.load_images(image_file, num_images, 34000)
 dict_data = mnist.load_images(image_file, 50, 1)
 D = sp.build_dictionary(dict_data)
+#dict_data = pandas.read_csv('trained_data', header=None, names=None)
+#D = dict_data.values
 
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 10.5, 0.5)
-#lambdas = [0.1]
+lambdas = np.arange(0.1, 38.5, 0.5)
+#lambdas = [0.8]
 
 #For each image, run Rozell then generate error table and image grid
 for i in range(num_images):
@@ -63,7 +65,7 @@ for i in range(num_images):
     rows = len(lambdas)
     signal = signal_data[i].flatten()
     network.set_stimulus(signal)
-    
+
     #Run Rozell and get error and image grid data
     error, im1, im2 = network.reconstruct(lambdas)
 
@@ -75,13 +77,17 @@ for i in range(num_images):
     print(error)
     plt.subplot(211)
     plt.plot(lambdas, error['E(t)'], 'r')
+    plt.ylabel('E(t)')
     plt.subplot(212)
     plt.plot(lambdas, error['Sparsity'], 'c')
+    plt.ylabel('Sparsity')
+    plt.suptitle('E(t) and Sparsity vs. Lambda', size=16)
+    plt.subplots_adjust(hspace=0.5)
     plt.show()
-    
+
     #Generate and show grid images
     grid = network.fill_grid(rows, im1)
-    grid2 = network.fill_grid(rows, im2)    
+    grid2 = network.fill_grid(rows, im2)
     im_grid = Image.fromarray(grid)
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
