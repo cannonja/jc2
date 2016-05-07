@@ -55,10 +55,10 @@ import r_network_class as lca
 
 
 ################### Set parameters ##############################################################
-lamb = 17
+lamb = 10
 tau = 10
-delta = 0.001
-u_stop = .01
+delta = 0.0005
+u_stop = 0.0001
 t_type = 'S'
 alpha = 0.2
 
@@ -69,7 +69,7 @@ win2 = 800 #Window for mov avg 2
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  6000       #60000 - num_rfields
+num_images =  3000       #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, num_rfields)

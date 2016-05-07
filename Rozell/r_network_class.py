@@ -214,7 +214,7 @@ class r_network:
             display_row = []   #List to hold one row of image data (for display)
             display_row2 = []  #For display2
             self.set_lambda(j)
-            self.generate_sparse()  #Calculate sparse code
+            catch = self.generate_sparse()  #Calculate sparse code
             ##Add row of error data to error table
             row = pandas.DataFrame(self.return_error())
             df = df.append(row)
