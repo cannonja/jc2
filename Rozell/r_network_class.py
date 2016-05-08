@@ -2,13 +2,14 @@ import numpy as np
 import math
 import pandas
 from PIL import Image
+import pdb
 
 class r_network:
     'Class to represent Rozell LCA network'
 
     def __init__(self, D):
         self.dictionary = D.astype(float)
-        self.dict_range = D.max() = D.min()
+        self.dict_range = D.max() - D.min()
         self.dict_min = D.min()
         self.dict_scaled = False
         self.trained = D.copy()
@@ -47,6 +48,7 @@ class r_network:
             else:
                 self.trained = (self.trained * self.train_range) + self.train_min
                 self.train_scaled = False
+            self.b = np.dot(np.transpose(self.trained), self.s)
         else:
             if not self.dict_scaled:
                 self.dictionary = (self.dictionary - self.dict_min) / self.dict_range
@@ -54,6 +56,7 @@ class r_network:
             else:
                 self.dictionary = (self.dictionary * self.dict_range) + self.dict_min
                 self.dict_scaled = False
+            self.b = np.dot(np.transpose(self.dictionary), self.s)
 
 
 
@@ -110,11 +113,11 @@ class r_network:
         #Use trained dictionary if using to train network
         if (train):
             inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                            - (np.eye(self.trained.shape[1]))  # / self.sfactor_tdict)
+                      - (np.eye(self.trained.shape[1]))    # - self.train_min) / self.train_range)
         else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                            - (np.eye(self.dictionary.shape[1]))  # / self.sfactor_dict)
-
+                         - (np.eye(self.dictionary.shape[1]))    # - self.dict_min) / self.dict_range)
+                               
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
 
@@ -133,7 +136,7 @@ class r_network:
                 loop_flag = False
 
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
-
+        #pdb.set_trace()
         self.scale(train)
         return self.a
         '''

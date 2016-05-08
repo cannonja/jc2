@@ -50,16 +50,17 @@ signal_data = mnist.load_images(image_file, num_images, 35670)
 #D = sp.build_dictionary(dict_data)
 dict_data = pandas.read_csv('trained_data', header=None, names=None)
 D = dict_data.values
-pdb.set_trace()
+
 
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 0.2, 0.1)
+lambdas = np.arange(0.1, 0.3, 0.1)
 #lambdas = [0.8]
 
+#pdb.set_trace()
 #For each image, run Rozell then generate error table and image grid
 for i in range(num_images):
     #Get number of rows for error table and image grid
