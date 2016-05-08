@@ -35,17 +35,17 @@ import r_network_class as lca
 ##############################Test return_sparse##########################################################################################
 
 #Set parameters
-lamb = 0.8
+lamb = 4
 tau = 10
-delta = 0.0005
-u_stop = 0.0001
+delta = 0.001
+u_stop = 0.001
 t_type = 'S'
 num_images = 1
 
 
 #Load MNIST dictionary and signal
-image_file = 'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images, 35670)
+image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
+signal_data = mnist.load_images(image_file, num_images)
 #dict_data = mnist.load_images(image_file, 50, 1)
 #D = sp.build_dictionary(dict_data)
 dict_data = pandas.read_csv('trained_data', header=None, names=None)
@@ -57,7 +57,7 @@ D = dict_data.values
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 0.3, 0.1)
+lambdas = np.arange(0.1, 10.1, 0.5)
 #lambdas = [0.8]
 
 #pdb.set_trace()

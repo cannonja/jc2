@@ -14,7 +14,7 @@ class r_network:
         self.dict_scaled = False
         self.trained = D.copy()
         self.train_range = self.trained.max() - self.trained.min()
-        self.trian_min = self.trained.min()
+        self.train_min = self.trained.min()
         self.train_scaled = False
         self.s = None
         self.s_range = None
@@ -43,7 +43,7 @@ class r_network:
         ##Otherwise, unscale it and set the flag
         if (train):
             if not self.train_scaled:
-                self.s = (self.trained - self.train_min) / self.train_range
+                self.trained = (self.trained - self.train_min) / self.train_range
                 self.train_scaled = True
             else:
                 self.trained = (self.trained * self.train_range) + self.train_min
@@ -113,10 +113,10 @@ class r_network:
         #Use trained dictionary if using to train network
         if (train):
             inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                      - (np.eye(self.trained.shape[1]))    # - self.train_min) / self.train_range)
+                      - ((np.eye(self.trained.shape[1]) - self.train_min) / self.train_range)
         else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                         - (np.eye(self.dictionary.shape[1]))    # - self.dict_min) / self.dict_range)
+                         - ((np.eye(self.dictionary.shape[1]) - self.dict_min) / self.dict_range)
                                
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
