@@ -30,35 +30,16 @@ class r_network:
         self.u_stop = None
         self.t_type = None
 
-    def scale(self, train = False):
-        #If s isn't scaled, scale it and set the flag
-        ##Otherwise, unscale it and set the flag
-        if not self.s_scaled:
-            self.s = (self.s - self.s_min) / self.s_range
-            self.s_scaled = True
-        else:
-            self.s = (self.s * self.s_range) + self.s_min
-            self.s_scaled = False
+    def scale(self, num, train = False):
+        self.s *= num
 
-
-        #If dictionary isn't scaled, scale it and set the flag
-        ##Otherwise, unscale it and set the flag
         if (train):
-            if not self.train_scaled:
-                self.trained = (self.trained - self.train_min) / self.train_range
-                self.train_scaled = True
-            else:
-                self.trained = (self.trained * self.train_range) + self.train_min
-                self.train_scaled = False
+            self.trained *= num
             self.b = np.dot(np.transpose(self.trained), self.s)
         else:
-            if not self.dict_scaled:
-                self.dictionary = (self.dictionary - self.dict_min) / self.dict_range
-                self.dict_scaled = True
-            else:
-                self.dictionary = (self.dictionary * self.dict_range) + self.dict_min
-                self.dict_scaled = False
-            self.b = np.dot(np.transpose(self.dictionary), self.s)
+            self.dictionary *= num
+            self.b np.dot(np.transpose(self.dictionary), self.s)
+
 
     def normalize(self):
         self.s_norm = np.sqrt(np.dot(self.s, self.s))
@@ -83,8 +64,6 @@ class r_network:
     #Takes the stimulus signal, sets s, then computes b according to Rozell
     def set_stimulus(self, signal, train = False):
         self.s = np.asarray(signal, dtype=float)
-        self.s_range = self.s.max() - self.s.min()
-        self.s_min = self.s.min()
 
         if (train):
             self.b = np.dot(np.transpose(self.trained), self.s)
@@ -129,23 +108,20 @@ class r_network:
     def generate_sparse(self, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        #self.scale(train)
-        '''
-        self.s /= 255
-        self.dictionary /= 255
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
-        '''
+        self.scale(1/255.0, train)
+
         #Use trained dictionary if using to train network
         if (train):
-            inhibit = np.dot(np.transpose(self.trained), self.trained) - np.eye(self.trained.shape[1])#- self.train_min) / self.train_range)
+            inhibit = np.dot(np.transpose(self.trained), self.trained)\
+                            - (np.eye(self.trained.shape[1]) / 255.0)        #- self.train_min) / self.train_range)
         else:
-            inhibit = np.dot(np.transpose(self.dictionary), self.dictionary) - np.eye(self.dictionary.shape[1])#- self.dict_min) / self.dict_range)
-                               
+            inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
+                            - (np.eye(self.dictionary.shape[1]) / 255.0)      #- self.dict_min) / self.dict_range)
+
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
 
         #Generate vector self.a
-        #debug = []
         len_u = len(u)
         iterations = 0
         ulen = []
@@ -162,19 +138,9 @@ class r_network:
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
 
-            #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
-        #pdb.set_trace()
-        #self.scale(train)
-        '''
-        self.s *= 255
-        self.dictionary *= 255
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
-        '''
+        self.scale(255.0, train)
+        
         return (self.a)   #, iterations, ulen)
-        '''
-        df = pandas.DataFrame(debug)
-        print df.to_string()
-        '''
 
 
     #This method updates the copy of the dictionary stored in the "trained"

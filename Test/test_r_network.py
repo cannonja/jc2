@@ -46,10 +46,10 @@ num_images = 1
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
 signal_data = mnist.load_images(image_file, num_images)
-#dict_data = mnist.load_images(image_file, 50, 1)
-#D = sp.build_dictionary(dict_data)
-dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
-D = dict_data.values
+dict_data = mnist.load_images(image_file, 50, 1)
+D = sp.build_dictionary(dict_data)
+#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
+#D = dict_data.values
 
 
 
