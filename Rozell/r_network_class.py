@@ -186,6 +186,7 @@ class r_network:
 
         wdot = resid * (self.a * alpha)[:, np.newaxis]
         self.trained = (self.trained + np.transpose(wdot)).copy()
+        self.trained = np.min(1, np.max(0, self.trained))
 
         return resid
 
