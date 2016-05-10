@@ -55,9 +55,9 @@ class r_network:
         self.s *= self.s_norm
         for i in range(self.dictionary.shape[1]):
             self.dictionary[:,i] *= self.norms[i]
-       
 
-        
+
+
 
 
 
@@ -113,20 +113,20 @@ class r_network:
         #Use trained dictionary if using to train network
         if (train):
             inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                            - (np.eye(self.trained.shape[1]) / 255.0)        #- self.train_min) / self.train_range)
+                            - np.eye(self.trained.shape[1])
         else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                            - (np.eye(self.dictionary.shape[1]) / 255.0)      #- self.dict_min) / self.dict_range)
+                            - np.eye(self.dictionary.shape[1])
 
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
 
         #Generate vector self.a
         len_u = len(u)
-        iterations = 0
-        ulen = []
+        #iterations = 0
+        #ulen = []
         while (loop_flag):
-            iterations += 1
+            #iterations += 1
             u = u + (udot * self.delta)
             #Update a vector
             for i in range(len(self.a)):
@@ -134,12 +134,12 @@ class r_network:
 
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
-            ulen.append(udot_length / len_u)
+            #ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
 
         self.scale(255.0, train)
-        
+
         return (self.a)   #, iterations, ulen)
 
 
