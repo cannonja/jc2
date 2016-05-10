@@ -35,8 +35,8 @@ import r_network_class as lca
 ##############################Test return_sparse##########################################################################################
 
 #Set parameters
-lamb = 1
-tau = 10
+lamb = 1.0
+tau = 10.0
 delta = 0.01
 u_stop = 0.001
 t_type = 'S'

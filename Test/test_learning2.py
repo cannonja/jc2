@@ -50,8 +50,8 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 9
-tau = 10
+lamb = 9.0
+tau = 10.0
 delta = 0.01
 u_stop = .001
 t_type = 'S'
