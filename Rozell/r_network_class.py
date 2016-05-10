@@ -12,11 +12,13 @@ class r_network:
         self.dict_range = D.max() - D.min()
         self.dict_min = D.min()
         self.dict_scaled = False
+        self.norms = None
         self.trained = D.copy()
         self.train_range = self.trained.max() - self.trained.min()
         self.train_min = self.trained.min()
         self.train_scaled = False
         self.s = None
+        self.s_norm = None
         self.s_range = None
         self.s_min = None
         self.s_scaled = False
@@ -57,6 +59,24 @@ class r_network:
                 self.dictionary = (self.dictionary * self.dict_range) + self.dict_min
                 self.dict_scaled = False
             self.b = np.dot(np.transpose(self.dictionary), self.s)
+
+    def normalize(self):
+        self.s_norm = np.sqrt(np.dot(self.s, self.s))
+        self.s /= self.s_norm
+        self.norms = np.array([])
+        for i in range(self.dictionary.shape[1]):
+            norm = np.sqrt(np.dot(self.dictionary[:,i],self.dictionary[:,i]))
+            self.dictionary[:,i] /= norm
+            self.norms = np.append(self.norms, norm)
+        self.b = np.dot(np.transpose(self.dictionary), self.s)
+
+    def unnormalize(self):
+        self.s *= self.s_norm
+        for i in range(self.dictionary.shape[1]):
+            self.dictionary[:,i] *= self.norms[i]
+       
+
+        
 
 
 
@@ -109,14 +129,17 @@ class r_network:
     def generate_sparse(self, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        self.scale(train)
+        #self.scale(train)
+        '''
+        self.s /= 255
+        self.dictionary /= 255
+        self.b = np.dot(np.transpose(self.dictionary), self.s)
+        '''
         #Use trained dictionary if using to train network
         if (train):
-            inhibit = np.dot(np.transpose(self.trained), self.trained)\
-                      - ((np.eye(self.trained.shape[1]) - self.train_min) / self.train_range)
+            inhibit = np.dot(np.transpose(self.trained), self.trained) - np.eye(self.trained.shape[1])#- self.train_min) / self.train_range)
         else:
-            inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
-                         - ((np.eye(self.dictionary.shape[1]) - self.dict_min) / self.dict_range)
+            inhibit = np.dot(np.transpose(self.dictionary), self.dictionary) - np.eye(self.dictionary.shape[1])#- self.dict_min) / self.dict_range)
                                
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
@@ -124,7 +147,10 @@ class r_network:
         #Generate vector self.a
         #debug = []
         len_u = len(u)
+        iterations = 0
+        ulen = []
         while (loop_flag):
+            iterations += 1
             u = u + (udot * self.delta)
             #Update a vector
             for i in range(len(self.a)):
@@ -132,13 +158,19 @@ class r_network:
 
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
+            ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
 
             #debug.append({ 'a': self.a.copy(), 'u': u.copy(), 'udot': ... })
         #pdb.set_trace()
-        self.scale(train)
-        return self.a
+        #self.scale(train)
+        '''
+        self.s *= 255
+        self.dictionary *= 255
+        self.b = np.dot(np.transpose(self.dictionary), self.s)
+        '''
+        return (self.a)   #, iterations, ulen)
         '''
         df = pandas.DataFrame(debug)
         print df.to_string()

@@ -18,7 +18,7 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Classify')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack2\\Desktop'
-    dict_path = file_path + '\\Git_Repos\\jc2\\Classify\\trained_data.csv'
+    dict_path = file_path + '\\Git_Repos\\jc2\\Classify\\notrain_dict.csv'
     plot_path = file_path + '\\Git_Repos\\jc2\\Classify\\RMSE_plot'
     accuracy_path = file_path + '\\Git_Repos\\jc2\\Classify\\Accuracy_plot'
     weight_path = file_path + '\\Git_Repos\\jc2\\Classify\\weights.csv'
@@ -50,15 +50,15 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 1
+lamb = 9
 tau = 10
-delta = 0.001
-u_stop = .01
+delta = 0.01
+u_stop = .001
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 500
-start_pos = 40000
+num_images  = 2000
+start_pos = 30000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
@@ -76,10 +76,14 @@ weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer
 learn_rate = 0.01
 error_plot = np.array([])
 #pdb.set_trace()
+counter = 0
 for i, j in zip(image_data, label_data):
+    counter += 1
+    if (counter % 100 == 0):
+        print ("Image #: " + str(counter))
     #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
-    sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term
+    sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term    
     _, error, D = classify.forward_prop(weights, sparse_code, j)
 
     #Store error - represented as quadratic error: 0.5*(error)^2
