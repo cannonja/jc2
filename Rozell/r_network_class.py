@@ -146,13 +146,14 @@ class r_network:
     #This method updates the copy of the dictionary stored in the "trained"
     #data member, then returns the residual
     def update_trained(self, alpha):
+        pdb.set_trace()
         stim = self.s
         recon = np.dot(self.trained, self.a)
         resid = stim - recon
 
         wdot = resid * (self.a * alpha)[:, np.newaxis]
         self.trained = (self.trained + np.transpose(wdot)).copy()
-        self.trained = np.min(1, np.max(0, self.trained))
+        self.trained = np.minimum(1, np.maximum(0, self.trained))
 
         return resid
 
