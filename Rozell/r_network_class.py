@@ -38,7 +38,7 @@ class r_network:
             self.b = np.dot(np.transpose(self.trained), self.s)
         else:
             self.dictionary *= num
-            self.b np.dot(np.transpose(self.dictionary), self.s)
+            self.b = np.dot(np.transpose(self.dictionary), self.s)
 
 
     def normalize(self):
