@@ -92,7 +92,6 @@ class r_network:
 
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
-            print (udot_length / len_u)
             #ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
@@ -132,7 +131,7 @@ class r_network:
         if (self.t_type == 'S'):
             cost = norm1
         elif (norm1 > self.lamb):
-            cost = self.lamb / 2
+            cost = self.lamb / 2.
 
         b = self.lamb * cost
         #error = np.array([[self.lamb, (a + b), a, b, sparsity]])
@@ -178,13 +177,10 @@ class r_network:
 
         #For each value of lambda, set lambda and run Rozell on the given image
         for j in lambdas:
-            print(j)
             display_row = []   #List to hold one row of image data (for display)
             display_row2 = []  #For display2
             self.set_lambda(j)
-            print ('Start sparse')
             catch = self.generate_sparse() #Calculate sparse code
-            print ('End sparse')
             ##Add row of error data to error table
             row = pandas.DataFrame(self.return_error())
             df = df.append(row)
@@ -250,6 +246,7 @@ class r_network:
                     grid[rows, cols] = self.dictionary[:, k].reshape((28,28))
                 k += 1
 
+        grid *= 255.
         im_grid = Image.fromarray(grid)
         im_grid = im_grid.convert('L')
         im_grid.save(path, 'PNG')

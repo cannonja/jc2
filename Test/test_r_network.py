@@ -37,25 +37,27 @@ import r_network_class as lca
 #Set parameters
 lamb = 1.0
 tau = 10.0
-delta = 0.000001
-u_stop = 17
+delta = 0.01
+u_stop = .001
 t_type = 'S'
 num_images = 1
 
-#pdb.set_trace()
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images, 598)
+signal_data = mnist.load_images(image_file, num_images, 696)
+
+#Scale stimulus and dictionary before running Rozell
 signal_data[0] = signal_data[0].astype(float)
 signal_data[0] /= 255.
 dict_data = mnist.load_images(image_file, 50, 1)
-for i in dict_data:
-    i = i.astype(float)
-    i /= 255.
+#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
+#dict_data = [ np.asarray(r, dtype=float) / 255. for r in dict_data ]
+for i in range(len(dict_data)):
+    dict_data[i] = dict_data[i].astype(float)
+    dict_data[i] /= 255.
 
 
 D = sp.build_dictionary(dict_data)
-#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
 #D = dict_data.values
 
 
