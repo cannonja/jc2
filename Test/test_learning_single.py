@@ -58,7 +58,7 @@ import r_network_class as lca
 lamb = 1.0
 tau = 10.0
 delta = 0.001
-u_stop = 0.01
+u_stop = 0.1
 t_type = 'S'
 alpha = 0.2
 
@@ -68,58 +68,39 @@ win2 = 500 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
-num_rfields = 50
-num_images =  1000      #60000 - num_rfields
+num_iterations =  10
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-dict_data = mnist.load_images(image_file, num_rfields)
-training_data = mnist.load_images(image_file, num_images, 50)
+dict_data = np.random.rand(28,28)
+training_data = mnist.load_images(image_file, 1)[0]
+og_im_data = training_data.copy()
+training_data = training_data.astype(float)
+training_data /= 255.
 
-for i in range(len(dict_data)):
-    dict_data[i] = dict_data[i].astype(float)
-    dict_data[i] /= 255.
-
-for i in range(len(training_data)):
-    training_data[i] = training_data[i].astype(float)
-    training_data[i] /= 255.
-
-#Initialize network dictionary and parameters
-D = sp.build_dictionary(dict_data)
-network = lca.r_network(D)
+#Initialize network dictionary, then save stimulus and orig dict
+network = lca.r_network(dict_data.flatten())
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
-
-
-################### Run each training image through network #######################################
-################### For each image, generate sparse code then update trained ######################
-
-#Print out the time and start the training process
-#Save out the original dictionary
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("Start time: ", st)
-network.save_dictionary(5, 10, dict1_path)
+network.set_stimulus(training_data.flatten(), True)
+og_im = Image.fromarray(og_im_data)
+og_im.save(file_path + '/og.png')
 
 #Initiate x values and residual array for residual plot
-x = range(num_images)
-resid_plot = np.zeros((num_images))
+x = range(num_iterations)
+resid_plot = np.zeros((num_iterations))
 
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
-for i in range(num_images):
+for i in range(num_iterations):
     if (((i + 1) % 100) == 0):
         print("Image ",i + 1)
-    stimulus = training_data[i].flatten()
-    network.set_stimulus(stimulus, True)
     network.generate_sparse(True)
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
 
-#Save out trained dictionary as image and csv, then print out time
-network.save_dictionary(5, 10, dict2_path, True)
-data = pandas.DataFrame(network.trained)
-data.to_csv(dict3_path, index = False, header = False)
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("End time: ", st)
+#Save out trained dictionary as image
+tdict_data = network.trained.copy()
+tdict_im = Image.fromarray(tdict_data.reshape((28,28)))
+tdict_im = tdict_im.convert('L')
+tdict_im.save(dict2_path)
 
 #Write residual data to csv file and plot
 df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
@@ -139,5 +120,4 @@ plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path)
 plt.show()
-
 
