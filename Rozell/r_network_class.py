@@ -69,10 +69,9 @@ class r_network:
         self.a = u.copy()  #Initialize a by setting equal to u
 
         #Use trained dictionary if using to train network
-        ###Modified for single node case!!!!
         if (train):
-            inhibit = np.dot(np.transpose(self.trained), self.trained) - 1
-                           # - np.eye(self.trained.shape[1])
+            inhibit = np.dot(np.transpose(self.trained), self.trained)\
+                            - np.eye(self.trained.shape[1])
         else:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
                             - np.eye(self.dictionary.shape[1])
@@ -81,28 +80,20 @@ class r_network:
         loop_flag = True
 
         #Generate vector self.a
-        #len_u = len(u)  Modified for single case!!!!!!
+        len_u = len(u)
         #iterations = 0
         #ulen = []
         while (loop_flag):
             #iterations += 1
             u = u + (udot * self.delta)
-            '''
             #Update a vector
             for i in range(len(self.a)):
                 self.a[i] = self.thresh(u[i])
-            '''
-            self.a = self.thresh(u)  ###Modified for single node case!!!!
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
-            '''   ####Modified for single node case!!!!!
             udot_length = math.sqrt(np.dot(udot,udot))
             #ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
-            '''
-            if (udot < self.u_stop):
-                loop_flag = False
-
 
         return (self.a)   #, iterations, ulen)
 
@@ -114,8 +105,7 @@ class r_network:
         recon = np.dot(self.trained, self.a)
         resid = stim - recon
 
-        wdot = resid * (self.a * alpha)
-        #wdot = resid * (self.a * alpha)[:, np.newaxis] ##Modified for single node case!!!!!
+        wdot = resid * (self.a * alpha)[:, np.newaxis]
         self.trained = (self.trained + np.transpose(wdot)).copy()
         #Clamp to [0,1]
         self.trained = np.minimum(1., np.maximum(0, self.trained))

@@ -48,7 +48,6 @@ else:
     plot_path = file_path + '/resid_plot.png'
 
 
-
 import mnist_load as mnist
 import sparse_algo as sp
 import r_network_class_single as lca
