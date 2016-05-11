@@ -9,19 +9,8 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D.astype(float)
-        self.dict_range = D.max() - D.min()
-        self.dict_min = D.min()
-        self.dict_scaled = False
-        self.norms = None
         self.trained = D.copy()
-        self.train_range = self.trained.max() - self.trained.min()
-        self.train_min = self.trained.min()
-        self.train_scaled = False
         self.s = None
-        self.s_norm = None
-        self.s_range = None
-        self.s_min = None
-        self.s_scaled = False
         self.b = None
         self.a = None
         self.lamb = None
@@ -29,36 +18,6 @@ class r_network:
         self.delta = None
         self.u_stop = None
         self.t_type = None
-
-    def scale(self, num, train = False):
-        self.s *= num
-
-        if (train):
-            self.trained *= num
-            self.b = np.dot(np.transpose(self.trained), self.s)
-        else:
-            self.dictionary *= num
-            self.b = np.dot(np.transpose(self.dictionary), self.s)
-
-
-    def normalize(self):
-        self.s_norm = np.sqrt(np.dot(self.s, self.s))
-        self.s /= self.s_norm
-        self.norms = np.array([])
-        for i in range(self.dictionary.shape[1]):
-            norm = np.sqrt(np.dot(self.dictionary[:,i],self.dictionary[:,i]))
-            self.dictionary[:,i] /= norm
-            self.norms = np.append(self.norms, norm)
-        self.b = np.dot(np.transpose(self.dictionary), self.s)
-
-    def unnormalize(self):
-        self.s *= self.s_norm
-        for i in range(self.dictionary.shape[1]):
-            self.dictionary[:,i] *= self.norms[i]
-
-
-
-
 
 
     #Takes the stimulus signal, sets s, then computes b according to Rozell
@@ -108,7 +67,6 @@ class r_network:
     def generate_sparse(self, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
-        self.scale(1/255.0, train)
 
         #Use trained dictionary if using to train network
         if (train):
@@ -134,11 +92,10 @@ class r_network:
 
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
+            print (udot_length / len_u)
             #ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
-
-        self.scale(255.0, train)
 
         return (self.a)   #, iterations, ulen)
 
@@ -152,9 +109,9 @@ class r_network:
 
         wdot = resid * (self.a * alpha)[:, np.newaxis]
         self.trained = (self.trained + np.transpose(wdot)).copy()
-        self.trained /= 255.
+        #Clamp to [0,1]
         self.trained = np.minimum(1., np.maximum(0, self.trained))
-        self.trained *= 255.
+
         return resid
 
 
@@ -221,10 +178,13 @@ class r_network:
 
         #For each value of lambda, set lambda and run Rozell on the given image
         for j in lambdas:
+            print(j)
             display_row = []   #List to hold one row of image data (for display)
             display_row2 = []  #For display2
             self.set_lambda(j)
-            catch = self.generate_sparse()  #Calculate sparse code
+            print ('Start sparse')
+            catch = self.generate_sparse() #Calculate sparse code
+            print ('End sparse')
             ##Add row of error data to error table
             row = pandas.DataFrame(self.return_error())
             df = df.append(row)
