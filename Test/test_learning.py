@@ -40,7 +40,7 @@ else:
     sys.path.append(os.path.join(base1, 'MNIST_Load'))
     sys.path.append(os.path.join(base1, 'Rozell'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
-    file_path = base2
+    file_path = base1 + '/Test/DB Classifier/Overnight run'
     dict1_path = file_path + '/orig_dict.png'
     dict2_path = file_path + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
@@ -57,10 +57,10 @@ import r_network_class as lca
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
-delta = 0.001
-u_stop = 0.01
+delta = 0.01
+u_stop = 0.001
 t_type = 'S'
-alpha = 0.2
+alpha = 0.001
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -69,8 +69,8 @@ win2 = 500 #Window for mov avg 2
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  1000      #60000 - num_rfields
-image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
+num_images =  100      #60000 - num_rfields
+image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, 50)
 
@@ -115,7 +115,7 @@ for i in range(num_images):
 
 #Save out trained dictionary as image and csv, then print out time
 network.save_dictionary(5, 10, dict2_path, True)
-data = pandas.DataFrame(network.trained)
+data = pandas.DataFrame(network.trained * 255.)
 data.to_csv(dict3_path, index = False, header = False)
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
