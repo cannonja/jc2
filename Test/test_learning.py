@@ -8,6 +8,7 @@ import pandas
 import matplotlib.pyplot as plt
 import time
 import datetime
+import pdb
 
 
 machine = socket.gethostname()
@@ -57,10 +58,10 @@ import r_network_class as lca
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
-delta = 0.01
-u_stop = 0.001
+delta = 0.001
+u_stop = 0.01
 t_type = 'S'
-alpha = 0.0001
+alpha = 1.
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -69,7 +70,7 @@ win2 = 500 #Window for mov avg 2
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  3000      #60000 - num_rfields
+num_images =  500      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, 50)
