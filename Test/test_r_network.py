@@ -44,7 +44,7 @@ num_images = 1
 
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images, 696)
+signal_data = mnist.load_images(image_file, num_images)
 
 #Scale stimulus and dictionary before running Rozell
 signal_data[0] = signal_data[0].astype(float)
@@ -67,8 +67,8 @@ D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-lambdas = np.arange(0.1, 10.5, 1)
-#lambdas = [0.8]
+#lambdas = np.arange(0.1, 10.5, 1)
+lambdas = [1.]
 
 #pdb.set_trace()
 #For each image, run Rozell then generate error table and image grid
@@ -86,7 +86,7 @@ for i in range(num_images):
     #Plot both E(t) and Sparsity vs. lambdas
     #E(t) on top plot and Sparsity on bottom
     error.columns = error_names
-    error.set_index(lambdas)
+    #error.set_index(lambdas)
     print(error)
     plt.subplot(211)
     plt.plot(lambdas, error['E(t)'], 'r')

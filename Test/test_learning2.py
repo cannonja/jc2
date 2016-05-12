@@ -50,28 +50,34 @@ import classify
 
 
 ################### Set parameters ##############################################################
-lamb = 9.0
-tau = 10.0
+lamb = 1.
+tau = 10.
 delta = 0.01
 u_stop = .001
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 2000
-start_pos = 30000
+num_images  = 1000
+start_pos = 40000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
 label_data = mnist.load_labels(label_file, num_images, start_pos)
 
-################### Initialize Rozell network and set parameters ################################
+################## Scale data down before running through network ##############################
 dict_data = pd.read_csv(dict_path, header = None)
-rozell = lca.r_network(dict_data.values)
+dict_data = dict_data.values / 255.
+for i in range(len(image_data)):
+    image_data[i] = image_data[i].astype(float)
+    image_data[i] /= 255.
+
+################### Initialize Rozell network and set parameters ################################
+rozell = lca.r_network(dict_data)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-'''
 ################### Initialize random  matrix of weights for mapping ############################
-################### sparse code to output layer.  Then train network #### #######################
+################### sparse code to output layer.  Then train network #### ######################
+'''
 weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
 learn_rate = 0.01
 error_plot = np.array([])
@@ -83,7 +89,7 @@ for i, j in zip(image_data, label_data):
         print ("Image #: " + str(counter))
     #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
-    sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term    
+    sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term
     _, error, D = classify.forward_prop(weights, sparse_code, j)
 
     #Store error - represented as quadratic error: 0.5*(error)^2
@@ -114,7 +120,7 @@ count = 0
 error_plot = np.array([])
 accuracy_plot = np.array([])
 confusion = np.zeros((10,10), dtype='int32')  #rows = actual, columns = predicted
-#pdb.set_trace()
+pdb.set_trace()
 for i, j in zip(image_data, label_data):
     count += 1
     #Run Rozell and forwardprop

@@ -212,7 +212,7 @@ class r_network:
             if (len(j) > biggest):
                 biggest = len(j)
         ##Allocate pixels for display grid
-        grid = np.full((28 * num_rows, 28 * (biggest + 1)), 255.)
+        grid = np.full((28 * num_rows, 28 * (biggest + 1)), 0)
 
         ##Fill display grid with image data
         ##Iterate over rows -> for each row, add columns
