@@ -19,6 +19,7 @@ if (machine == 'Jack-PC'):
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack2\\Desktop'
     dict_path = file_path + '\\Git_Repos\\jc2\\Classify\\notrain_dict.csv'
+    dict3_path = file_path + '\\trained_data.csv'
     plot_path = file_path + '\\Git_Repos\\jc2\\Classify\\RMSE_plot'
     accuracy_path = file_path + '\\Git_Repos\\jc2\\Classify\\Accuracy_plot'
     weight_path = file_path + '\\Git_Repos\\jc2\\Classify\\weights.csv'
@@ -53,11 +54,11 @@ import classify
 lamb = 1.
 tau = 10.
 delta = 0.01
-u_stop = .001
+u_stop = .1
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 1000
+num_images  = 3000
 start_pos = 40000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
@@ -65,7 +66,7 @@ image_data = mnist.load_images(image_file, num_images, start_pos)
 label_data = mnist.load_labels(label_file, num_images, start_pos)
 
 ################## Scale data down before running through network ##############################
-dict_data = pd.read_csv(dict_path, header = None)
+dict_data = pd.read_csv(dict3_path, header = None)
 dict_data = dict_data.values / 255.
 for i in range(len(image_data)):
     image_data[i] = image_data[i].astype(float)
@@ -120,7 +121,7 @@ count = 0
 error_plot = np.array([])
 accuracy_plot = np.array([])
 confusion = np.zeros((10,10), dtype='int32')  #rows = actual, columns = predicted
-pdb.set_trace()
+#pdb.set_trace()
 for i, j in zip(image_data, label_data):
     count += 1
     #Run Rozell and forwardprop

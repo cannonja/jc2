@@ -14,6 +14,8 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+    dict_path = 'C:\\Users\\Jack2\\Desktop\\dict.png'
+    stim_path = 'C:\\Users\\Jack2\\Desktop\\stim.png'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
@@ -44,8 +46,10 @@ num_images = 1
 
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images)
+signal_data = mnist.load_images(image_file, num_images, 50)
+Image.fromarray(signal_data[0]).save(stim_path)
 
+'''
 #Scale stimulus and dictionary before running Rozell
 signal_data[0] = signal_data[0].astype(float)
 signal_data[0] /= 255.
@@ -65,10 +69,11 @@ D = sp.build_dictionary(dict_data)
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
+#network.save_dictionary(5, 10, dict_path)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
 #lambdas = np.arange(0.1, 10.5, 1)
-lambdas = [1.]
+lambdas = [3.]
 
 #pdb.set_trace()
 #For each image, run Rozell then generate error table and image grid
@@ -107,3 +112,5 @@ for i in range(num_images):
     im_grid2 = Image.fromarray(grid2)
     im_grid.show()
     im_grid2.show()
+
+'''

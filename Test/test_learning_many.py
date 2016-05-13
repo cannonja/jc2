@@ -18,11 +18,11 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack2\\Desktop'
-    dict1_path = file_path + '/orig_dict.png'
-    dict2_path = file_path + '/trained_dict.png'
-    dict3_path = file_path + '/trained_data.csv'
-    write_path = file_path + '/resid_data.csv'
-    plot_path = file_path + '/resid_plot.png'
+    dict1_path = file_path + '\\orig_dict.png'
+    dict2_path = file_path + '\\trained_dict.png'
+    dict3_path = file_path + '\\trained_data.csv'
+    write_path = file_path + '\\resid_data.csv'
+    plot_path = file_path + '\\resid_plot.png'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
@@ -60,8 +60,8 @@ tau = 10.0
 delta = 0.01
 u_stop = 0.1
 t_type = 'S'
-alpha = 1.0
-num_stims = 59000
+alpha = 0.9
+num_stims = 10000
 num_nodes = 50
 num_dict_rows = 5
 num_dict_cols = int(num_nodes / num_dict_rows)
@@ -130,6 +130,9 @@ for i in range(num_iterations):
             print ("Image # ", j + 1)
         network.set_stimulus(training_data[j].flatten(), True)
         network.generate_sparse(True)
+        if ((j + 1) % 100 == 0):
+            alpha -= 0.00894
+            print (alpha)
         y = network.update_trained(alpha)
         resid_plot[j] = np.sqrt(np.dot(y,y))
         #resid_plot[i] = np.sqrt(np.dot(y,y))
@@ -139,6 +142,8 @@ for i in range(num_iterations):
             #print (im_pass)
 #Save out trained dictionary as image
 network.save_dictionary(num_dict_rows, num_dict_cols, dict2_path, True)
+data = pandas.DataFrame(network.trained * 255.)
+data.to_csv(dict3_path, index = False, header = False)
 
 #Write residual data to csv file and plot
 plt.plot(x, resid_plot, label = 'Raw')
@@ -147,3 +152,5 @@ plt.title('Reconstruction Error - ' + str(num_stims) + ' stims, '\
         + str(num_nodes) + ' nodes, alpha = ' + str(alpha))
 plt.savefig(plot_path)
 plt.show()
+print(alpha)
+
