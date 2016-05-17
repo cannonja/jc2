@@ -91,7 +91,7 @@ class r_network:
                 self.a[i] = self.thresh(u[i])
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
-            #print (udot_length)
+            #print (udot_length / len_u)
             #ulen.append(udot_length / len_u)
             if ((udot_length / len_u) < (self.u_stop)):
                 loop_flag = False
@@ -103,14 +103,14 @@ class r_network:
     #data member, then returns the residual
     def update_trained(self, alpha):
         stim = self.s
-        #recon = np.dot(self.trained, self.a)
         recon = np.dot(self.a, np.transpose(self.trained))
         resid = stim - recon
 
-        wdot = resid * (self.a * alpha)[:, np.newaxis]
-        self.trained = (self.trained + np.transpose(wdot)).copy()
+        wdot = resid * ((self.a * alpha)[:, np.newaxis])
+        #self.trained = (self.trained + np.transpose(wdot)).copy()
+        self.trained += np.transpose(wdot)
         #Clamp to [0,1]
-        self.trained = np.minimum(1., np.maximum(0, self.trained))
+        #self.trained = np.minimum(1., np.maximum(0, self.trained))
 
         return resid
 

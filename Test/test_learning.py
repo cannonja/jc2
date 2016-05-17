@@ -59,9 +59,9 @@ import r_network_class as lca
 lamb = 1.0
 tau = 10.0
 delta = 0.001
-u_stop = 0.01
+u_stop = 0.1
 t_type = 'S'
-alpha = 1.
+alpha = 0.85
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -70,7 +70,7 @@ win2 = 500 #Window for mov avg 2
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  500      #60000 - num_rfields
+num_images =  10000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, 50)
@@ -111,6 +111,9 @@ for i in range(num_images):
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus, True)
     network.generate_sparse(True)
+    if ((i + 1) % 100 == 0):
+        alpha *= 0.92
+        print (alpha)    
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
 

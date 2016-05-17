@@ -60,8 +60,8 @@ tau = 10.0
 delta = 0.01
 u_stop = 0.1
 t_type = 'S'
-alpha = 0.9
-num_stims = 10000
+alpha = 1.
+num_stims = 6000
 num_nodes = 50
 num_dict_rows = 5
 num_dict_cols = int(num_nodes / num_dict_rows)
@@ -121,7 +121,7 @@ resid_plot = np.zeros((num_stims))
 
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
-#im_pass = 0
+im_pass = 0
 for i in range(num_iterations):
     if (((i + 1) % 100) == 0):
         print("Iteration ", i + 1)
@@ -131,7 +131,7 @@ for i in range(num_iterations):
         network.set_stimulus(training_data[j].flatten(), True)
         network.generate_sparse(True)
         if ((j + 1) % 100 == 0):
-            alpha -= 0.00894
+            alpha *= 0.92
             print (alpha)
         y = network.update_trained(alpha)
         resid_plot[j] = np.sqrt(np.dot(y,y))
@@ -140,10 +140,13 @@ for i in range(num_iterations):
         #im_pass += 1
         #if (im_pass % 100 == 0):
             #print (im_pass)
+        
 #Save out trained dictionary as image
 network.save_dictionary(num_dict_rows, num_dict_cols, dict2_path, True)
 data = pandas.DataFrame(network.trained * 255.)
 data.to_csv(dict3_path, index = False, header = False)
+
+
 
 #Write residual data to csv file and plot
 plt.plot(x, resid_plot, label = 'Raw')
