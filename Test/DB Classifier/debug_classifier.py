@@ -35,9 +35,9 @@ import r_network_class as lca
 ##############################Test return_sparse##########################################################################################
 
 #Set parameters
-lamb = .1
+lamb = 8
 tau = 10
-delta = 0.01
+delta = 0.001
 u_stop = 0.001
 t_type = 'S'
 num_images = 1
@@ -45,11 +45,17 @@ num_images = 1
 
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images, 740)
+signal_data = mnist.load_images(image_file, num_images, 9000)
 dict_data = mnist.load_images(image_file, 50, 1)
+#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None).values
+
+signal_data[0] = signal_data[0].astype(float)
+signal_data[0] = np.multiply(signal_data[0], 1/255.)
+for i in range(len(dict_data)):
+    dict_data[i] = dict_data[i].astype(float)
+    dict_data[i] /= 255.
 D = sp.build_dictionary(dict_data)
-#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
-#D = dict_data.values
+#D = dict_data
 
 #Run Rozell and generate sparse code
 network = lca.r_network(D)
@@ -61,13 +67,13 @@ lambdas = [lamb]
 og_image = signal_data[0]
 signal = og_image.flatten()
 network.set_stimulus(signal)
-network.normalize()
 
 #Generate sparse code, show original image and reconstruction
 code = network.generate_sparse()
-network.unnormalize()
-print (code)
+print (np.count_nonzero(code) / 50)
 recon_data = np.dot(network.dictionary, code).reshape((28,28))
+recon_data *= 255.
+og_image *= 255.
 
 for i in (og_image, recon_data):
     im = Image.fromarray(i)

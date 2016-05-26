@@ -46,23 +46,23 @@ num_images = 1
 
 #Load MNIST dictionary and signal
 image_file = 't10k-images.idx3-ubyte'  #'train-images.idx3-ubyte'
-signal_data = mnist.load_images(image_file, num_images, 50)
-Image.fromarray(signal_data[0]).save(stim_path)
+signal_data = mnist.load_images(image_file, num_images, 9014)
+#Image.fromarray(signal_data[0]).save(stim_path)
 
-'''
+
 #Scale stimulus and dictionary before running Rozell
 signal_data[0] = signal_data[0].astype(float)
 signal_data[0] /= 255.
-dict_data = mnist.load_images(image_file, 50, 1)
-#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None)
+#dict_data = mnist.load_images(image_file, 50)
+dict_data = pandas.read_csv('trained_data.csv', header=None, names=None).values
 #dict_data = [ np.asarray(r, dtype=float) / 255. for r in dict_data ]
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
     dict_data[i] /= 255.
 
 
-D = sp.build_dictionary(dict_data)
-#D = dict_data.values
+#D = sp.build_dictionary(dict_data)
+D = dict_data
 
 
 
@@ -72,8 +72,8 @@ network = lca.r_network(D)
 #network.save_dictionary(5, 10, dict_path)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
-#lambdas = np.arange(0.1, 10.5, 1)
-lambdas = [3.]
+lambdas = np.arange(0.1, 15.1, 1)
+#lambdas = [3.]
 
 #pdb.set_trace()
 #For each image, run Rozell then generate error table and image grid
@@ -91,15 +91,18 @@ for i in range(num_images):
     #Plot both E(t) and Sparsity vs. lambdas
     #E(t) on top plot and Sparsity on bottom
     error.columns = error_names
-    #error.set_index(lambdas)
+    error.set_index(lambdas)
     print(error)
     plt.subplot(211)
     plt.plot(lambdas, error['E(t)'], 'r')
-    plt.ylabel('E(t)')
+    plt.plot(lambdas, error['Resid'], 'b')
+    plt.plot(lambdas, error['Cost'], 'g')
+    plt.legend(loc=2, fontsize='small')
+    plt.ylabel('E(t) Components')
     plt.subplot(212)
     plt.plot(lambdas, error['Sparsity'], 'c')
-    plt.ylabel('Sparsity')
-    plt.suptitle('E(t) and Sparsity vs. Lambda', size=16)
+    plt.ylabel('Num non-zero')
+    plt.suptitle('E(t) Components and Sparsity vs. Lambda', size=16)
     plt.subplots_adjust(hspace=0.5)
     plt.show()
 
@@ -113,4 +116,4 @@ for i in range(num_images):
     im_grid.show()
     im_grid2.show()
 
-'''
+

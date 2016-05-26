@@ -58,7 +58,7 @@ import r_network_class as lca
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
-delta = 0.001
+delta = 0.01
 u_stop = 0.1
 t_type = 'S'
 alpha = 0.85
