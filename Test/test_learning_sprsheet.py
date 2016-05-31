@@ -61,7 +61,7 @@ tau = 10.0
 delta = 0.01
 u_stop = 0.1
 t_type = 'S'
-alpha = 0.85
+alpha = 0.1
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -75,7 +75,6 @@ c = np.array([[1,2,3,4,5]])
 D = np.repeat(c, 10, axis=0)
 training_data = np.hstack((D, np.arange(10,60).reshape((10,5))))
 num_images =  training_data.shape[1]
-pdb.set_trace()
 
 '''
 num_rfields = 50
@@ -122,16 +121,17 @@ for i in range(num_images):
     if (((i + 1) % 100) == 0):
         print("Image ",i + 1)
     stimulus = training_data[:,i]    #.flatten()
-    network.set_stimulus(stimulus)   #, True)
-    network.generate_sparse()  #True)
+    network.set_stimulus(stimulus, True)
+    network.generate_sparse(True)
     print (network.a)
     '''
     if ((i + 1) % 100 == 0):
         alpha *= 0.92
-        print (alpha)    
+        print (alpha)
+    '''
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
-    '''
+    
 
 
 
