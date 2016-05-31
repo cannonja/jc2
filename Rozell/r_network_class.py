@@ -9,7 +9,7 @@ class r_network:
 
     def __init__(self, D):
         self.dictionary = D.astype(float)
-        self.trained = D.copy()
+        self.trained = self.dictionary.copy()
         self.s = None
         self.b = None
         self.a = None
@@ -110,7 +110,7 @@ class r_network:
         #self.trained = (self.trained + np.transpose(wdot)).copy()
         self.trained += np.transpose(wdot)
         #Clamp to [0,1]
-        #self.trained = np.minimum(1., np.maximum(0, self.trained))
+        self.trained = np.minimum(1., np.maximum(0, self.trained))
 
         return resid
 
@@ -125,7 +125,8 @@ class r_network:
         resid = stim - recon
         a = 0.5 * math.sqrt(np.dot(resid, resid))
         b = None
-        sparsity = len(self.a[self.a > 0]) / len(self.a)
+        #sparsity = len(self.a[self.a > 0]) / len(self.a)
+        sparsity = np.count_nonzero(self.a)
         norm1 = sum(abs(self.a))
         cost = 0
 
