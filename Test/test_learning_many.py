@@ -22,7 +22,7 @@ if (machine == 'Jack-PC'):
     dict2_path = file_path + '\\trained_dict.png'
     dict3_path = file_path + '\\trained_data.csv'
     write_path = file_path + '\\resid_data.csv'
-    plot_path = file_path + '\\resid_plot.png'
+    plot_path = file_path + '\\resid_plot.eps'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
@@ -61,7 +61,7 @@ delta = 0.01
 u_stop = 0.1
 t_type = 'S'
 alpha = 1.
-num_stims = 6000
+num_stims = 3000
 num_nodes = 50
 num_dict_rows = 5
 num_dict_cols = int(num_nodes / num_dict_rows)
@@ -153,7 +153,7 @@ plt.plot(x, resid_plot, label = 'Raw')
 plt.xlabel('Iteration')
 plt.title('Reconstruction Error - ' + str(num_stims) + ' stims, '\
         + str(num_nodes) + ' nodes, alpha = ' + str(alpha))
-plt.savefig(plot_path)
+plt.savefig(plot_path, format='eps', dpi=250)
 plt.show()
 print(alpha)
 

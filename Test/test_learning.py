@@ -22,7 +22,7 @@ if (machine == 'Jack-PC'):
     dict2_path = file_path + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
     write_path = file_path + '/resid_data.csv'
-    plot_path = file_path + '/resid_plot.png'
+    plot_path = file_path + '/resid_plot2.eps'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
@@ -70,7 +70,7 @@ win2 = 500 #Window for mov avg 2
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
 num_rfields = 50
-num_images =  10000      #60000 - num_rfields
+num_images =  20000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, 50)
@@ -141,7 +141,7 @@ plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Image Number')
 plt.title('Reconstruction Error')
 plt.legend()
-plt.savefig(plot_path)
+plt.savefig(plot_path, format='eps', dpi=250)
 plt.show()
 
 
