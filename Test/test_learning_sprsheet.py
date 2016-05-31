@@ -69,6 +69,15 @@ win2 = 500 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
+
+######Arbitrary dictionary and stimuli - for matching with spreadsheet###########
+c = np.array([[1,2,3,4,5]])
+D = np.repeat(c, 10, axis=0)
+training_data = np.hstack((D, np.arange(10,60).reshape((10,5))))
+num_images =  training_data.shape[1]
+pdb.set_trace()
+
+'''
 num_rfields = 50
 num_images =  20000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
@@ -85,19 +94,23 @@ for i in range(len(training_data)):
 
 #Initialize network dictionary and parameters
 D = sp.build_dictionary(dict_data)
+'''
+
+
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 
 ################### Run each training image through network #######################################
 ################### For each image, generate sparse code then update trained ######################
-
+'''
 #Print out the time and start the training process
 #Save out the original dictionary
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 print("Start time: ", st)
 network.save_dictionary(5, 10, dict1_path)
+'''
 
 #Initiate x values and residual array for residual plot
 x = range(num_images)
@@ -108,15 +121,23 @@ resid_plot = np.zeros((num_images))
 for i in range(num_images):
     if (((i + 1) % 100) == 0):
         print("Image ",i + 1)
-    stimulus = training_data[i].flatten()
-    network.set_stimulus(stimulus, True)
-    network.generate_sparse(True)
+    stimulus = training_data[:,i]    #.flatten()
+    network.set_stimulus(stimulus)   #, True)
+    network.generate_sparse()  #True)
+    print (network.a)
+    '''
     if ((i + 1) % 100 == 0):
         alpha *= 0.92
         print (alpha)    
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
+    '''
 
+
+
+
+
+'''
 #Save out trained dictionary as image and csv, then print out time
 network.save_dictionary(5, 10, dict2_path, True)
 data = pandas.DataFrame(network.trained * 255.)
@@ -143,5 +164,5 @@ plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path, format='eps', dpi=250)
 plt.show()
-
+'''
 
