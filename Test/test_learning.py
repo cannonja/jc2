@@ -59,7 +59,7 @@ import r_network_class as lca
 lamb = 1.0
 tau = 10.0
 delta = 0.01
-u_stop = 0.1
+u_stop = 0.0001
 t_type = 'S'
 alpha = 0.85
 
@@ -69,11 +69,11 @@ win2 = 500 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
-num_rfields = 50
-num_images =  20000      #60000 - num_rfields
+num_rfields = 100
+num_images =  10000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
-training_data = mnist.load_images(image_file, num_images, 50)
+training_data = mnist.load_images(image_file, num_images, 100)
 
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
@@ -111,7 +111,7 @@ for i in range(num_images):
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus, True)
     network.generate_sparse(True)
-    if ((i + 1) % 100 == 0):
+    if ((i + 1) % 1000 == 0):
         alpha *= 0.92
         print (alpha)    
     y = network.update_trained(alpha)

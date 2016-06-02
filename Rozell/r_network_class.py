@@ -81,10 +81,10 @@ class r_network:
 
         #Generate vector self.a
         len_u = len(u)
-        #iterations = 0
+        iterations = 0
         #ulen = []
         while (loop_flag):
-            #iterations += 1
+            iterations += 1
             u = u + (udot * self.delta)
             #Update a vector
             for i in range(len(self.a)):
@@ -93,8 +93,9 @@ class r_network:
             udot_length = math.sqrt(np.dot(udot,udot))
             #print (udot_length / len_u)
             #ulen.append(udot_length / len_u)
-            if ((udot_length / len_u) < (self.u_stop)):
+            if udot_length / len_u < self.u_stop and iterations > 30 or iterations > 60:
                 loop_flag = False
+                #print (iterations)
 
         return (self.a)   #, iterations, ulen)
 
@@ -107,11 +108,12 @@ class r_network:
         resid = stim - recon
 
         wdot = resid * ((self.a * alpha)[:, np.newaxis])
+        wdot = np.asmatrix(resid).T * (np.asmatrix(self.a) * alpha)
+        #print("resid {}, a {}".format(resid.__class__, self.a.__class__))
         #self.trained = (self.trained + np.transpose(wdot)).copy()
-        self.trained += np.transpose(wdot)
+        self.trained += wdot
         #Clamp to [0,1]
         self.trained = np.minimum(1., np.maximum(0, self.trained))
-
         return resid
 
 

@@ -61,13 +61,13 @@ delta = 0.01
 u_stop = 0.1
 t_type = 'S'
 alpha = 1.
-num_stims = 3000
-num_nodes = 50
+num_stims = 1
+num_nodes = 5
 num_dict_rows = 5
 num_dict_cols = int(num_nodes / num_dict_rows)
-num_stim_rows = 2
+num_stim_rows = 1
 num_stim_cols = int(num_stims / num_stim_rows)
-num_iterations = 1
+num_iterations = 1000
 image_file =  'train-images.idx3-ubyte'  #'t10k-images.idx3-ubyte'  'train-images.idx3-ubyte'
 #plot_detail = '/[' + str(num_stims) + ' stim, alpha = ' + str(alpha) + ']'
 #plot_path = file_path + plot_detail + '.png'
@@ -110,10 +110,10 @@ network.set_parameters(lamb, tau, delta, u_stop, t_type)
 
 ####Initiate x values and residual array for residual plot
 ####There are different cases depending on the scenario
-x = range(num_stims)  #Run single image through once
-resid_plot = np.zeros((num_stims))
-#x = range(num_iterations)  #Run one image through multiple times
-#resid_plot = np.zeros((num_iterations))
+#x = range(num_stims)  #Run single image through once
+#resid_plot = np.zeros((num_stims))
+x = range(num_iterations)  #Run one image through multiple times
+resid_plot = np.zeros((num_iterations))
 #x = range(num_iterations * num_stims)  #Run multiple images through multiple times
 #resid_plot = np.zeros((num_iterations * num_stims))
 
@@ -134,8 +134,8 @@ for i in range(num_iterations):
             alpha *= 0.92
             print (alpha)
         y = network.update_trained(alpha)
-        resid_plot[j] = np.sqrt(np.dot(y,y))
-        #resid_plot[i] = np.sqrt(np.dot(y,y))
+        #resid_plot[j] = np.sqrt(np.dot(y,y))
+        resid_plot[i] = np.sqrt(np.dot(y,y))
         #resid_plot[im_pass] = np.sqrt(np.dot(y,y))
         #im_pass += 1
         #if (im_pass % 100 == 0):
