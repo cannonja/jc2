@@ -42,7 +42,7 @@ class image_class:
         patch_list = []
         for i in range(num_rows):
             for j in range(num_cols):
-                patch_list.append(self.data[i:patch_shape[0], j:patch_shape[0], :])
+                patch_list.append(self.data[i:patch_shape[0], j:patch_shape[1], :])
 
         return patch_list       
         
