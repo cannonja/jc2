@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import random
 
 class image_class:
     'Class for manipulating an image'
@@ -27,7 +28,7 @@ class image_class:
 
     #This method takes a 2-tuple indicating the shape of the patches (l and w)
     #It returns the image as a list of (patch_shape[0] x patch_shape[1] x 3) patches
-    def slice_patches(self, patch_shape = (8.,8.)):
+    def slice_patches(self, patch_shape = (8., 8.)):
         #Make sure elements are floats
         patch_shape = list(patch_shape)
         patch_shape = [float(i) for i in patch_shape]
@@ -44,8 +45,32 @@ class image_class:
             for j in range(num_cols):
                 patch_list.append(self.data[i:patch_shape[0], j:patch_shape[1], :])
 
-        return patch_list       
-        
+        return patch_list
+
+    
+
+    #This method slices the specified number of patches randomly
+    #It returns the patches as a list just like slice_patches
+    def slice_random(self, num_patches, patch_shape = (8., 8.)):
+        #Stack boolean dimension on top of image data to identify selected patches
+        self.data = np.dstack((self.data, np.zeros((self.data.shape[0],self.data.shape[1]))))
+        #Set limits of selection space ffor patches
+        row_max = self.data.shape[0] - patch_shape[0]
+        col_max = self.data.shape[1] - patch_shape[1]
+        selection_space  = row_max * col_max
+        #Randomly select patches, if they're out of bounds - reselect
+        patch_list = []
+        patches = 0
+        while patches < num_patches:
+            selection = random.randint(0, selection_space)
+            rows = slice(selection, selection + patch_shape[0])
+            cols = slice(selection, selection + patch_shape[1])
+            if np.sum(self.data[rows,cols,3]) == 0:
+                patch_list.append(self.data[rows,cols,3])
+                self.data[rows,cols,3] = 1
+                patches += 1
+
+        return patch_list
         
         
         
