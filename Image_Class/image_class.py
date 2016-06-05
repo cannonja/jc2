@@ -25,6 +25,35 @@ class image_class:
         self.data_gray = self.data_gray.astype('uint8')
         self.im = Image.fromarray(self.data_gray)
 
+    #This method takes a 2-tuple indicating the shape of the patches (l and w)
+    #It returns the image as a list of (patch_shape[0] x patch_shape[1] x 3) patches
+    def slice_patches(self, patch_shape = (8.,8.)):
+        #Make sure elements are floats
+        patch_shape = list(patch_shape)
+        patch_shape = [float(i) for i in patch_shape]
+        #Verify compatible dimensions
+        if self.data.shape[0] % patch_shape[0] or self.data.shape[1] % patch_shape[1]:
+            print ('Image dimension not compatible with specified patch size')
+            return
+        #Set number of rows and columns to slice image into
+        #Iterate columns over rows to build patch_list
+        num_rows = self.data.shape[0] / patch_shape[0]
+        num_cols = self.data.shape[1] / patch_shape[1]
+        patch_list = []
+        for i in range(num_rows):
+            for j in range(num_cols):
+                patch_list.append(self.data[i:patch_shape[0] - 1, j:patch_shape[0] - 1, :])
+
+        return patch_list       
+        
+        
+        
+        
+
+    #This method takes three tuples as arguments
+    #coord is a 2-tuple of coordinates for he top left corner of the section
+    #size is a 2-tuple specifying the length and width of the section
+    #rgb is a 3-tuple indicating the r, g, and b settings for the pixels
     def set_block(self, coord, size, rgb):
         'Add exception if arguments are out of range?'
         length = coord[0] + size[0]
