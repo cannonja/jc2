@@ -37,12 +37,12 @@ class image_class:
             return
         #Set number of rows and columns to slice image into
         #Iterate columns over rows to build patch_list
-        num_rows = self.data.shape[0] / patch_shape[0]
-        num_cols = self.data.shape[1] / patch_shape[1]
+        num_rows = int(self.data.shape[0] / patch_shape[0])
+        num_cols = int(self.data.shape[1] / patch_shape[1])
         patch_list = []
         for i in range(num_rows):
             for j in range(num_cols):
-                patch_list.append(self.data[i:patch_shape[0] - 1, j:patch_shape[0] - 1, :])
+                patch_list.append(self.data[i:patch_shape[0], j:patch_shape[0], :])
 
         return patch_list       
         

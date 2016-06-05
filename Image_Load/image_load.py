@@ -52,13 +52,15 @@ else:
     write_path = file_path + '/resid_data.csv'
     plot_path = file_path + '/resid_plot.png'
 
-from PIL import Image
-import numpy as np
+import image_class as ic
+
 
 ##Read image and convert to numpy array
-im = Image.open(nat_path + '\\Lenna.png')
-array = np.asarray(im)
-print (array.shape[0] / 8., array.shape[1] / 8.)
+im = ic.image_class(nat_path + '\\city.jpg')
+patches = im.slice_patches()
+print (len(patches), patches[0].shape)
+
+
 
 '''
 array.flags.writeable = True
