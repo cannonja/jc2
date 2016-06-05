@@ -16,6 +16,7 @@ if (machine == 'Jack-PC'):
     #Big laptop
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
+    sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Image_Class')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack2\\Desktop'
     dict1_path = file_path + '/orig_dict.png'
@@ -28,6 +29,7 @@ elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Rozell')
+    sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Image_Class')
     os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack\\Desktop'
     dict1_path = file_path + '/orig_dict.png'
@@ -41,6 +43,7 @@ else:
     base2 = os.path.expanduser('~/Desktop')
     sys.path.append(os.path.join(base1, 'MNIST_Load'))
     sys.path.append(os.path.join(base1, 'Rozell'))
+    sys.path.append(os.path.join(base1, 'Image_Class'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
     dict1_path = file_path + '/orig_dict.png'
@@ -54,8 +57,9 @@ else:
 import mnist_load as mnist
 import sparse_algo as sp
 import r_network_class as lca
+import image_class as ic
 
-
+'''
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
@@ -68,8 +72,8 @@ alpha = 0.85
 win1 = 100  #Window for mov avg 1
 win2 = 500 #Window for mov avg 2
 
-################### Load dictionary from first 50 MNIST images ##################################
-################### Load training set from last 59950 MNIST images ##############################
+################### Initialize dictionary with random noise ##################################
+################### Load training using 8x8 patches from an image ##############################
 num_rfields = 50
 num_patches =  10000      
 dict_data = np.random.rand((192, num_rfields))
@@ -143,5 +147,5 @@ plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path, format='eps', dpi=250)
 plt.show()
-
+'''
 
