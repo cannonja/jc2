@@ -56,8 +56,9 @@ import image_class as ic
 
 
 ##Read image and convert to numpy array
-im = ic.image_class(nat_path + '\\city.jpg')
-patches = im.slice_patches()
+im = ic.image_class(nat_path + '\\city3.jpg')
+#patches = im.slice_patches()
+patches = im.slice_random(50)
 print (len(patches), patches[0].shape)
 
 

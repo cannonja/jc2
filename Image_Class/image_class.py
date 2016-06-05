@@ -65,8 +65,9 @@ class image_class:
             selection = random.randint(0, selection_space)
             rows = slice(selection, selection + patch_shape[0])
             cols = slice(selection, selection + patch_shape[1])
+            print (rows, cols)
             if np.sum(self.data[rows,cols,3]) == 0:
-                patch_list.append(self.data[rows,cols,3])
+                patch_list.append(self.data[rows,cols,:3])
                 self.data[rows,cols,3] = 1
                 patches += 1
 
