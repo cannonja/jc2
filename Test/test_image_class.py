@@ -4,16 +4,15 @@ import numpy as np
 ##Import module in ic object
 
 ##Home machine import
-#ic = imp.load_source('image_class', 'C:\\Users\\Jack2\\Google Drive\\
-#        Grad School\\URMP\\jc2\\Image_Class\\image_class.py')
+ic = imp.load_source('image_class', 'C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Image_Class\\image_class.py')
 
 ##tlab machine import
-ic = imp.load_source('image_class', '/u/jc2/dev/jc2/Image_Class/image_class.py')
+#ic = imp.load_source('image_class', '/u/jc2/dev/jc2/Image_Class/image_class.py')
 
 ##Check image object created correctly
 image1 = ic.image_class("Bears.jpg")
-image2 = ic.image_class("Bears.jpg")
-#image1.im.show()
+#image2 = ic.image_class("Bears.jpg")
+image1.im.show()
 
 #print (image1.data.shape)
 #print (image1.data_gray.shape)

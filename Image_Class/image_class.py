@@ -8,7 +8,7 @@ class image_class:
         self.im = Image.open(file_path)
         self.data = np.asarray(self.im)
         self.data.flags.writeable = True
-        self.data_orig = self.data
+        self.data_orig = self.data.copy()
         self.data_gray = np.zeros((self.data.shape[0], self.data.shape[1]))
 
     def get_wh(self):
