@@ -8,6 +8,7 @@ import pandas
 import matplotlib.pyplot as plt
 import time
 import datetime
+import random
 import pdb
 
 
@@ -63,10 +64,10 @@ import image_class as ic
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
-delta = 0.01
-u_stop = 0.0001
+delta = 0.001
+u_stop = 0.01
 t_type = 'S'
-alpha = 0.85
+alpha = 0.01
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -75,17 +76,20 @@ win2 = 500 #Window for mov avg 2
 ################### Initialize dictionary with random noise ##################################
 ################### Load training using 8x8 patches from an image ##############################
 num_rfields = 50
-num_patches =  3000
+num_patches =  6000
 im_dims = (8,8,3)
 dict_data = np.random.rand(np.prod(im_dims), num_rfields)
 nat_image = ic.image_class(nat_path + '\\' + 'city2.jpg')
 training_data = nat_image.slice_patches()[:num_patches]
+random.shuffle(training_data)
 
 
 
+'''
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
     dict_data[i] /= 255.
+'''
 
 for i in range(len(training_data)):
     training_data[i] = training_data[i].astype(float)
@@ -111,15 +115,16 @@ network.save_dictionary(5, 10, dict1_path)
 x = range(num_patches)
 resid_plot = np.zeros((num_patches))
 
-pdb.set_trace()
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
 for i in range(num_patches):
+    print ('Image ', i + 1)
     if (((i + 1) % 100) == 0):
         print("Image ",i + 1)
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus, True)
     network.generate_sparse(True)
+    #pdb.set_trace()
     if ((i + 1) % 1000 == 0):
         alpha *= 0.92
         print (alpha)    
@@ -144,6 +149,7 @@ df.to_csv(write_path, index = False)
 ma1 = df.iloc[:,1].rolling(window = win1).mean().values
 ma2 = df.iloc[:,1].rolling(window = win2).mean().values
 
+plt.figure(1)
 plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
@@ -152,5 +158,7 @@ plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path)
 plt.show()
+
+
 
 

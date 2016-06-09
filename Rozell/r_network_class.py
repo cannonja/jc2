@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pandas
 from PIL import Image
+import matplotlib.pyplot as plt
 import pdb
 
 class r_network:
@@ -87,7 +88,7 @@ class r_network:
         #Generate vector self.a
         len_u = len(u)
         iterations = 0
-        #ulen = []
+        ulen = []
         while (loop_flag):
             iterations += 1
             u = u + (udot * self.delta)
@@ -97,11 +98,18 @@ class r_network:
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
             #print (udot_length / len_u)
-            #ulen.append(udot_length / len_u)
-            if udot_length / len_u < self.u_stop and iterations > 30 or iterations > 60:
+            ulen.append(udot_length / len_u)
+            if udot_length / len_u < self.u_stop and iterations > 60: #or iterations > 5100:
                 loop_flag = False
-                #print (iterations)
+                print (iterations)
 
+        '''
+        plt.figure()
+        plt.plot(range(iterations), ulen)
+        plt.show()
+        '''
+        
+        
         return (self.a)   #, iterations, ulen)
 
 
