@@ -42,8 +42,10 @@ class image_class:
         num_cols = int(self.data.shape[1] / patch_shape[1])
         patch_list = []
         for i in range(num_rows):
+            rows = slice(patch_shape[0] * i, patch_shape[0] * i + patch_shape[0])            
             for j in range(num_cols):
-                patch_list.append(self.data[i:patch_shape[0], j:patch_shape[1], :])
+                cols = slice(patch_shape[1] * j, patch_shape[1] * j + patch_shape[1])
+                patch_list.append(self.data[rows, cols, :])
 
         return patch_list
 
