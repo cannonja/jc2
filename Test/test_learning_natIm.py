@@ -94,7 +94,7 @@ for i in range(len(training_data)):
 #Initialize network dictionary and parameters
 network = lca.r_network(dict_data)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
-metwork.set_dim(im_dims)
+network.set_dim(im_dims)
 
 
 ################### Run each training image through network #######################################
@@ -111,6 +111,7 @@ network.save_dictionary(5, 10, dict1_path)
 x = range(num_patches)
 resid_plot = np.zeros((num_patches))
 
+pdb.set_trace()
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
 for i in range(num_patches):

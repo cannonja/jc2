@@ -243,20 +243,32 @@ class r_network:
     #determine whether the original dictionary or trained dictionary data is used
     def save_dictionary(self, num_rows, num_cols, path, train = False):
         k = 0
-        grid = np.full((im_dim[0] * num_rows, im_dim[1] * num_cols), 255.)
+        if (len(self.im_dim) == 2):
+            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols), 255.)
+        else:
+            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols, 3), 255.)
 
         for i in range(num_rows):
-            rows = slice(i * im_dim[0], (i + 1) * im_dim[0])
+            rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
             for j in range(num_cols):
-                cols = slice(j * im_dim[1], (j + 1) * im_dim[1])
+                cols = slice(j * self.im_dim[1], (j + 1) * self.im_dim[1])
                 if (train):
-                    grid[rows, cols] = self.trained[:, k].reshape(im_dim)                        
+                    if (len(self.im_dim) == 2):
+                        grid[rows, cols] = self.trained[:, k].reshape(self.im_dim)
+                    else:
+                        grid[rows, cols, :] = self.trained[:, k].reshape(self.im_dim)
                 else:
-                    grid[rows, cols] = self.dictionary[:, k].reshape(im_dim)
+                    if (len(self.im_dim) == 2):
+                        grid[rows, cols] = self.dictionary[:, k].reshape(self.im_dim)
+                    else:
+                        grid[rows, cols, :] = self.dictionary[:, k].reshape(self.im_dim)
                 k += 1
 
         grid *= 255.
-        im_grid = Image.fromarray(grid)
-        im_grid = im_grid.convert('L')
+        if (len(self.im_dim) == 2):
+            im_grid = Image.fromarray(grid, mode='L')
+        else:
+            im_grid = Image.fromarray(grid, mode='RGB')
+        #im_grid = im_grid.convert('L')
         im_grid.save(path, 'PNG')
 
