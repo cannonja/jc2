@@ -59,7 +59,7 @@ import sparse_algo as sp
 import r_network_class as lca
 import image_class as ic
 
-'''
+
 ################### Set parameters ##############################################################
 lamb = 1.0
 tau = 10.0
@@ -75,10 +75,13 @@ win2 = 500 #Window for mov avg 2
 ################### Initialize dictionary with random noise ##################################
 ################### Load training using 8x8 patches from an image ##############################
 num_rfields = 50
-num_patches =  10000      
-dict_data = np.random.rand((192, num_rfields))
-training_data = 
+num_patches =  3000      
+dict_data = np.random.rand(192, num_rfields)
+nat_image = ic.image_class(nat_path + '\\' + 'city2.jpg')
+training_data = nat_image.slice_patches()[:num_patches]
 
+
+'''
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
     dict_data[i] /= 255.
