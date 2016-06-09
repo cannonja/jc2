@@ -75,13 +75,14 @@ win2 = 500 #Window for mov avg 2
 ################### Initialize dictionary with random noise ##################################
 ################### Load training using 8x8 patches from an image ##############################
 num_rfields = 50
-num_patches =  3000      
-dict_data = np.random.rand(192, num_rfields)
+num_patches =  3000
+im_dims = (8,8,3)
+dict_data = np.random.rand(np.prod(im_dims), num_rfields)
 nat_image = ic.image_class(nat_path + '\\' + 'city2.jpg')
 training_data = nat_image.slice_patches()[:num_patches]
 
 
-'''
+
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
     dict_data[i] /= 255.
@@ -91,9 +92,9 @@ for i in range(len(training_data)):
     training_data[i] /= 255.
 
 #Initialize network dictionary and parameters
-D = sp.build_dictionary(dict_data)
-network = lca.r_network(D)
+network = lca.r_network(dict_data)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
+metwork.set_dim(im_dims)
 
 
 ################### Run each training image through network #######################################
@@ -148,7 +149,7 @@ plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Image Number')
 plt.title('Reconstruction Error')
 plt.legend()
-plt.savefig(plot_path, format='eps', dpi=250)
+plt.savefig(plot_path)
 plt.show()
-'''
+
 

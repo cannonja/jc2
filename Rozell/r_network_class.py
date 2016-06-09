@@ -10,6 +10,7 @@ class r_network:
     def __init__(self, D):
         self.dictionary = D.astype(float)
         self.trained = self.dictionary.copy()
+        self.im_dim = None
         self.s = None
         self.b = None
         self.a = None
@@ -28,6 +29,10 @@ class r_network:
             self.b = np.dot(np.transpose(self.trained), self.s)
         else:
             self.b = np.dot(np.transpose(self.dictionary), self.s)
+
+    #Takes a tuple and sets the dimensions of the images in question
+    def set_dim(self, dims):
+        self.im_dim = dims
 
 
     def set_lambda(self, lamb):
@@ -238,16 +243,16 @@ class r_network:
     #determine whether the original dictionary or trained dictionary data is used
     def save_dictionary(self, num_rows, num_cols, path, train = False):
         k = 0
-        grid = np.full((28 * num_rows, 28 * num_cols), 255.)
+        grid = np.full((im_dim[0] * num_rows, im_dim[1] * num_cols), 255.)
 
         for i in range(num_rows):
-            rows = slice(i * 28, (i + 1) * 28)
+            rows = slice(i * im_dim[0], (i + 1) * im_dim[0])
             for j in range(num_cols):
-                cols = slice(j * 28, (j + 1) * 28)
+                cols = slice(j * im_dim[1], (j + 1) * im_dim[1])
                 if (train):
-                    grid[rows, cols] = self.trained[:, k].reshape((28,28))
+                    grid[rows, cols] = self.trained[:, k].reshape(im_dim)                        
                 else:
-                    grid[rows, cols] = self.dictionary[:, k].reshape((28,28))
+                    grid[rows, cols] = self.dictionary[:, k].reshape(im_dim)
                 k += 1
 
         grid *= 255.
