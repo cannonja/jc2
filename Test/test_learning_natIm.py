@@ -52,7 +52,7 @@ else:
     dict3_path = file_path + '/trained_data.csv'
     write_path = file_path + '/resid_data.csv'
     plot_path = file_path + '/resid_plot.png'
-
+    nat_path = base1 + '/Rozell/Natural_images'
 
 
 import mnist_load as mnist
@@ -67,7 +67,7 @@ tau = 10.0
 delta = 0.001
 u_stop = 0.01
 t_type = 'S'
-alpha = 0.01
+alpha = 0.8
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
@@ -76,10 +76,10 @@ win2 = 500 #Window for mov avg 2
 ################### Initialize dictionary with random noise ##################################
 ################### Load training using 8x8 patches from an image ##############################
 num_rfields = 50
-num_patches =  6000
+num_patches = 3000
 im_dims = (8,8,3)
 dict_data = np.random.rand(np.prod(im_dims), num_rfields)
-nat_image = ic.image_class(nat_path + '\\' + 'city2.jpg')
+nat_image = ic.image_class(nat_path + '/' + 'city2.jpg')
 training_data = nat_image.slice_patches()[:num_patches]
 random.shuffle(training_data)
 
