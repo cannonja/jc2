@@ -1,7 +1,7 @@
 
 from .circuit import Circuit
 
-import job_stream
+#import job_stream
 import numpy as np
 import os
 import re

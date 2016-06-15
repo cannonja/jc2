@@ -22,9 +22,11 @@ def forward_prop(weights, input_data, label_data):
     #Convert ouptut vector to binary - max value set to one
     #All others set to zero
     prediction = np.where(activation == activation.max())[0][0]
+    label = label_data
+    '''
     label = np.zeros((10,1))
     label[label_data] = 1
-
+    '''
     error = activation - label
 
     return (prediction, error, D)
