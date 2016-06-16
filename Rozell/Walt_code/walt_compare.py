@@ -7,6 +7,7 @@ import sys
 import mr
 import random
 import matplotlib.pyplot as plt
+from PIL import Image
 from mr.unsupervised import Lca
 
 
@@ -45,8 +46,8 @@ else:
     sys.path.append(os.path.join(base1, 'Image_Class'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
-    dict1_path = file_path + '/orig_dict.png'
-    dict2_path = file_path + '/trained_dict.png'
+    dict1_path = base2 + '/orig_dict.png'
+    dict2_path = base2 + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
     write_path = file_path + '/resid_data.csv'
     plot_path = file_path + '/resid_plot.png'
@@ -54,26 +55,44 @@ else:
 
 
 import mnist_load as mnist
+import r_network_class as Lca_jack
 import image_class as ic
 
 num_rfields = 50
 num_patches = 3000
-im_dims = (8,8,3)
+im_dims = (8,8,3)  #Patch shape
 nat_image = ic.image_class(nat_path + '/' + 'city2.jpg')
+
+## Get patches and set Lca variables
 training_data = nat_image.slice_patches()[:num_patches]
 random.shuffle(training_data)
-
 X = np.zeros((num_patches, np.product(im_dims)))
 for i in range(len(training_data)):
     X[i, :] = training_data[i].flatten()
-
 net = Lca(num_rfields)
-net.fit(X)
-Y = net.reconstruct(X)
-resid = Y - X
-MSEs = np.mean(np.square(resid), axis=1)
-RMSEs = np.sqrt(MSEs)
+net.init(np.product(im_dims),num_rfields)
 
+## Use my Lca class to save pre dictionary
+d1 = Lca_jack.r_network(np.array(net._crossbar))
+d1.set_dim(im_dims)
+d1.save_dictionary(5, 10, dict1_path)
+
+## Run patches through Lca and train dictionary
+MSEs = np.zeros((num_patches,))
+for i in range(num_patches):
+    patch = X[i, :].reshape(1, np.product(im_dims))
+    recon = net.reconstruct(patch)
+    resid = recon - patch
+    MSEs[i] = np.mean(np.square(resid), axis=1)
+    net.partial_fit(patch)
+
+## Use my Lca class to save post dictionary
+d2 = Lca_jack.r_network(np.array(net._crossbar))
+d2.set_dim(im_dims)
+d2.save_dictionary(5, 10, dict2_path)
+
+
+RMSEs = np.sqrt(MSEs)
 '''
 print (MSEs[0], RMSEs[0])
 MSE = net.score(X)
@@ -100,7 +119,7 @@ plt.plot(x, RMSEs,  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Patch Number')
-plt.title('Reconstruction Error (MSE)')
+plt.title('Reconstruction Error (RMSE)')
 plt.legend()
 plt.savefig(plot_path)
 plt.show()
