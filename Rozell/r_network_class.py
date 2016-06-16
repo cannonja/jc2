@@ -108,8 +108,8 @@ class r_network:
         plt.plot(range(iterations), ulen)
         plt.show()
         '''
-        
-        
+
+
         return (self.a)   #, iterations, ulen)
 
 
@@ -250,27 +250,40 @@ class r_network:
     #It takes a file path to save the dictionary and a boolean (train) to
     #determine whether the original dictionary or trained dictionary data is used
     def save_dictionary(self, num_rows, num_cols, path, train = False):
-        k = 0
+        ## Initialize grid
+        line_pix = 2        #Pixels allocated for grid line thinkness
+        line_color = 0      #Color of grid lines
+        r_data = (self.im_dim[0] + line_pix) * num_rows
+        c_data = (self.im_dim[1] + line_pix) * num_cols
         if (len(self.im_dim) == 2):
-            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols), 255.)
+            grid = np.full((r_data, c_data), 255.)
         else:
-            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols, 3), 255.)
+            grid = np.full((r_data, c_data, 3), 255.)
 
+        k = 0
         for i in range(num_rows):
-            rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
+            rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0] + line_pix)
             for j in range(num_cols):
-                cols = slice(j * self.im_dim[1], (j + 1) * self.im_dim[1])
+                cols = slice(j * self.im_dim[1], (j + 1) * self.im_dim[1] + line_pix)
                 if (train):
                     if (len(self.im_dim) == 2):
-                        grid[rows, cols] = self.trained[:, k].reshape(self.im_dim)
+                        im_data = self.trained[:, k].reshape(self.im_dim)
+                        grid_data = np.hstack(im_data, np.full((r_data, line_pix)), line_color)
+                        grid[rows, cols] = np.vstack(grid_data, np.full((line_pix, c_data), line_color))
                     else:
-                        grid[rows, cols, :] = self.trained[:, k].reshape(self.im_dim)
+                        im_data = self.trained[:, k].reshape(self.im_dim)
+                        grid_data = np.hstack(im_data, np.full((r_data, line_pix, 3)), line_color)
+                        grid[rows, cols, :] = np.vstack(grid_data, np.full((line_pix, c_data, 3), line_color))
                 else:
-                    if (len(self.im_dim) == 2):
-                        grid[rows, cols] = self.dictionary[:, k].reshape(self.im_dim)
+                     if (len(self.im_dim) == 2):
+                        im_data = self.dictionary[:, k].reshape(self.im_dim)
+                        grid_data = np.hstack(im_data, np.full((r_data, line_pix)), line_color)
+                        grid[rows, cols] = np.vstack(grid_data, np.full((line_pix, c_data), line_color))
                     else:
-                        grid[rows, cols, :] = self.dictionary[:, k].reshape(self.im_dim)
-                k += 1
+                        im_data = self.dicitonary[:, k].reshape(self.im_dim)
+                        grid_data = np.hstack(im_data, np.full((r_data, line_pix, 3)), line_color)
+                        grid[rows, cols, :] = np.vstack(grid_data, np.full((line_pix, c_data, 3), line_color))
+               k += 1
 
         grid *= 255.
         if (len(self.im_dim) == 2):
