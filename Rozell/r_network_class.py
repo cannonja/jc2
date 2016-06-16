@@ -249,10 +249,8 @@ class r_network:
     #This method takes the number of rows and columns for the resulting image grid
     #It takes a file path to save the dictionary and a boolean (train) to
     #determine whether the original dictionary or trained dictionary data is used
-    def save_dictionary(self, num_rows, num_cols, path, train = False):
+    def save_dictionary(self, num_rows, num_cols, path, line_color = 255, line_pix = 20, train = False):
         ## Initialize grid
-        line_pix = 2        #Pixels allocated for grid line thinkness
-        line_color = 0      #Color of grid lines
         r_data = (self.im_dim[0] + line_pix) * num_rows
         c_data = (self.im_dim[1] + line_pix) * num_cols
         if (len(self.im_dim) == 2):
