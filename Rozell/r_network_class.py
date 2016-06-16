@@ -249,8 +249,9 @@ class r_network:
     #This method takes the number of rows and columns for the resulting image grid
     #It takes a file path to save the dictionary and a boolean (train) to
     #determine whether the original dictionary or trained dictionary data is used
-    def save_dictionary(self, num_rows, num_cols, path, line_color = 255, line_pix = 20, train = False):
+    def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 2, train = False):
         ## Initialize grid
+        line_color /= 255.
         r_data = (self.im_dim[0] + line_pix) * num_rows
         c_data = (self.im_dim[1] + line_pix) * num_cols
         if (len(self.im_dim) == 2):
@@ -266,22 +267,24 @@ class r_network:
                 if (train):
                     if (len(self.im_dim) == 2):
                         im_data = self.trained[:, k].reshape(self.im_dim)
-                        grid_data = np.hstack(im_data, np.full((r_data, line_pix)), line_color)
-                        grid[rows, cols] = np.vstack(grid_data, np.full((line_pix, c_data), line_color))
+                        grid_data = np.hstack((im_data, np.full((self.im_dim[0], line_pix), line_color)))
+                        grid[rows, cols] = np.vstack((grid_data, np.full((line_pix, self.im_dim[1] + line_pix), line_color)))
                     else:
                         im_data = self.trained[:, k].reshape(self.im_dim)
-                        grid_data = np.hstack(im_data, np.full((r_data, line_pix, 3)), line_color)
-                        grid[rows, cols, :] = np.vstack(grid_data, np.full((line_pix, c_data, 3), line_color))
+                        grid_data = np.hstack((im_data, np.full((self.im_dim[0], line_pix, 3), line_color)))
+                        grid[rows, cols] = np.vstack((grid_data, np.full((line_pix, self.im_dim[1] + line_pix, 3), line_color)))
                 else:
-                     if (len(self.im_dim) == 2):
+                    if (len(self.im_dim) == 2):
                         im_data = self.dictionary[:, k].reshape(self.im_dim)
-                        grid_data = np.hstack(im_data, np.full((r_data, line_pix)), line_color)
-                        grid[rows, cols] = np.vstack(grid_data, np.full((line_pix, c_data), line_color))
+                        grid_data = np.hstack((im_data, np.full((self.im_dim[0], line_pix), line_color)))
+                        grid[rows, cols] = np.vstack((grid_data, np.full((line_pix, self.im_dim[1] + line_pix), line_color)))
                     else:
-                        im_data = self.dicitonary[:, k].reshape(self.im_dim)
-                        grid_data = np.hstack(im_data, np.full((r_data, line_pix, 3)), line_color)
-                        grid[rows, cols, :] = np.vstack(grid_data, np.full((line_pix, c_data, 3), line_color))
-               k += 1
+                        im_data = self.dictionary[:, k].reshape(self.im_dim)
+                        grid_data = np.hstack((im_data, np.full((self.im_dim[0], line_pix, 3), line_color)))
+                        grid[rows, cols] = np.vstack((grid_data, np.full((line_pix, self.im_dim[1] + line_pix, 3), line_color)))
+                if k % 5 == 0:
+                    pdb.set_trace()
+                k += 1
 
         grid *= 255.
         if (len(self.im_dim) == 2):
