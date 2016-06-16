@@ -85,6 +85,7 @@ for i in range(num_patches):
     resid = recon - patch
     MSEs[i] = np.mean(np.square(resid), axis=1)
     net.partial_fit(patch)
+RMSEs = np.sqrt(MSEs)
 
 ## Use my Lca class to save post dictionary
 d2 = Lca_jack.r_network(np.array(net._crossbar))
@@ -92,7 +93,6 @@ d2.set_dim(im_dims)
 d2.save_dictionary(5, 10, dict2_path)
 
 
-RMSEs = np.sqrt(MSEs)
 '''
 print (MSEs[0], RMSEs[0])
 MSE = net.score(X)
@@ -105,7 +105,7 @@ print (MSE, RMSE)
 
 
 
-
+'''
 #Plot and save out both raw and smoothed residuals
 x = range(num_patches)
 win1 = 100
@@ -121,6 +121,6 @@ plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Patch Number')
 plt.title('Reconstruction Error (RMSE)')
 plt.legend()
-plt.savefig(plot_path)
+#plt.savefig(plot_path)
 plt.show()
-
+'''
