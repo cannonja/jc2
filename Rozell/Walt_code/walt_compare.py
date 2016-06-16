@@ -1,9 +1,12 @@
 from __future__ import print_function
 import numpy as np
+import pandas as pd
 import socket
 import os
 import sys
 import mr
+import random
+import matplotlib.pyplot as plt
 from mr.unsupervised import Lca
 
 
@@ -58,7 +61,7 @@ num_patches = 3000
 im_dims = (8,8,3)
 nat_image = ic.image_class(nat_path + '/' + 'city2.jpg')
 training_data = nat_image.slice_patches()[:num_patches]
-#random.shuffle(training_data)
+random.shuffle(training_data)
 
 X = np.zeros((num_patches, np.product(im_dims)))
 for i in range(len(training_data)):
@@ -66,33 +69,39 @@ for i in range(len(training_data)):
 
 net = Lca(num_rfields)
 net.fit(X)
+Y = net.reconstruct(X)
+resid = Y - X
+MSEs = np.mean(np.square(resid), axis=1)
+RMSEs = np.sqrt(MSEs)
 
+'''
+print (MSEs[0], RMSEs[0])
 MSE = net.score(X)
 RMSE = np.sqrt(MSE)
 print (MSE, RMSE)
-
-
-
-
-
-
-
-
-
-
 '''
+
+
+
+
+
+
+
 #Plot and save out both raw and smoothed residuals
-ma1 = df.iloc[:,1].rolling(window = win1).mean().values
-ma2 = df.iloc[:,1].rolling(window = win2).mean().values
+x = range(num_patches)
+win1 = 100
+win2 = 300
+df = pd.DataFrame(RMSEs, index=x)
+ma1 = df.rolling(window = win1).mean().values
+ma2 = df.rolling(window = win2).mean().values
 
 plt.figure(1)
-plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
+plt.plot(x, RMSEs,  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
-plt.xlabel('Image Number')
-plt.title('Reconstruction Error')
+plt.xlabel('Patch Number')
+plt.title('Reconstruction Error (MSE)')
 plt.legend()
 plt.savefig(plot_path)
 plt.show()
-'''
 
