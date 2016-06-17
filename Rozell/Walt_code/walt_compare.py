@@ -50,7 +50,7 @@ else:
     dict2_path = base2 + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
     write_path = file_path + '/resid_data.csv'
-    plot_path = file_path + '/resid_plot.png'
+    plot_path = base2 + '/resid_plot.png'
     nat_path = base1 + '/Rozell/Natural_images'
 
 
@@ -73,6 +73,7 @@ net = Lca(num_rfields)
 net.init(np.product(im_dims),num_rfields)
 
 ## Use my Lca class to save pre dictionary
+before = np.array(np.array(net._crossbar.copy()))
 d1 = Lca_jack.r_network(np.array(net._crossbar))
 d1.set_dim(im_dims)
 d1.save_dictionary(5, 10, dict1_path)
@@ -88,6 +89,7 @@ for i in range(num_patches):
 RMSEs = np.sqrt(MSEs)
 
 ## Use my Lca class to save post dictionary
+after = np.array(net._crossbar.copy())
 d2 = Lca_jack.r_network(np.array(net._crossbar))
 d2.set_dim(im_dims)
 d2.save_dictionary(5, 10, dict2_path)
@@ -104,7 +106,6 @@ print (MSE, RMSE)
 
 
 
-'''
 #Plot and save out both raw and smoothed residuals
 x = range(num_patches)
 win1 = 100
@@ -113,13 +114,16 @@ df = pd.DataFrame(RMSEs, index=x)
 ma1 = df.rolling(window = win1).mean().values
 ma2 = df.rolling(window = win2).mean().values
 
-plt.figure(1)
+plt.figure()
 plt.plot(x, RMSEs,  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Patch Number')
 plt.title('Reconstruction Error (RMSE)')
 plt.legend()
-#plt.savefig(plot_path)
+plt.savefig(plot_path)
+
+plt.figure()
+hmap_data = np.sum(after - before, axis=2)
+plt.colormesh(hmap_data, cmap='RdBu')
 plt.show()
-'''
