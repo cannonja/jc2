@@ -250,25 +250,44 @@ class r_network:
     #It's intended to take dictionary data and add the lines such that the patches are visible
     #It returns the modified data
     def add_gridlines(self, data, num_rows, num_cols, line_color, line_pix):
-        new1 = np.array(data[:self.im_dim[0], :])
-        line = np.full((line_pix, data.shape[1]), line_color)
-        for i in range(1, num_rows):
-            new1 = np.vstack(new1, line)
-            new1 = np.vstack(new1, data[i * self.im_dim[0], :])
 
-        new2 = np.array(new1[:, :self.im_dim[1]])
-        line = np.full((new1.shape[0], line_pix), line_color)
-        for i in range(1, num_cols):
-            new2 = np.hstack(new2, line)
-            new2 = np.hstack(new2, new1[:, i * self.im_dim[1]])
+        if len(self.im_dim) == 3:
+            new1 = np.array(data[:self.im_dim[0], :, :])
+            line = np.full((line_pix, data.shape[1], 3), line_color)
+            for i in range(1, num_rows):
+                rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
+                new1 = np.vstack((new1, line))
+                new1 = np.vstack((new1, data[rows, :, :]))
+
+            new2 = np.array(new1[:, :self.im_dim[1], :])
+            line = np.full((new1.shape[0], line_pix, 3), line_color)
+            for i in range(1, num_cols):
+                cols = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
+                new2 = np.hstack((new2, line))
+                new2 = np.hstack((new2, new1[:, cols, :]))
+
+        else:
+            new1 = np.array(data[:self.im_dim[0], :])
+            line = np.full((line_pix, data.shape[1]), line_color)
+            for i in range(1, num_rows):
+                rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
+                new1 = np.vstack((new1, line))
+                new1 = np.vstack((new1, data[rows, :]))
+
+            new2 = np.array(new1[:, :self.im_dim[1]])
+            line = np.full((new1.shape[0], line_pix), line_color)
+            for i in range(1, num_cols):
+                cols = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
+                new2 = np.hstack((new2, line))
+                new2 = np.hstack((new2, new1[:, cols]))
 
         return new2
-    
-    
+
+
     #This method takes the number of rows and columns for the resulting image grid
     #It takes a file path to save the dictionary and a boolean (train) to
     #determine whether the original dictionary or trained dictionary data is used
-    def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 2, train = False):
+    def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 1, train = False):
         ## Initialize grid
         line_color /= 255.
         if (len(self.im_dim) == 2):
@@ -293,11 +312,17 @@ class r_network:
                         grid[rows, cols, :] = self.dictionary[:, k].reshape(self.im_dim)
                 k += 1
 
+        grid = self.add_gridlines(grid, num_rows, num_cols, line_color, line_pix)
+        plt.figure(figsize=(2,2))
+        plt.imshow(grid)
+        plt.savefig(path)
+        #plt.show()
         grid *= 255.
+        '''
         if (len(self.im_dim) == 2):
             im_grid = Image.fromarray(grid, mode='L')
         else:
             im_grid = Image.fromarray(grid, mode='RGB')
         #im_grid = im_grid.convert('L')
         im_grid.save(path, 'PNG')
-
+        '''

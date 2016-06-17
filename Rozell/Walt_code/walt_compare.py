@@ -92,7 +92,6 @@ d2 = Lca_jack.r_network(np.array(net._crossbar))
 d2.set_dim(im_dims)
 d2.save_dictionary(5, 10, dict2_path)
 
-
 '''
 print (MSEs[0], RMSEs[0])
 MSE = net.score(X)
