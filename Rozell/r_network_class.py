@@ -101,7 +101,7 @@ class r_network:
             ulen.append(udot_length / len_u)
             if udot_length / len_u < self.u_stop and iterations > 60: #or iterations > 5100:
                 loop_flag = False
-                print (iterations)
+                #print (iterations)
 
         '''
         plt.figure()
@@ -121,12 +121,16 @@ class r_network:
         resid = stim - recon
 
         wdot = resid * ((self.a * alpha)[:, np.newaxis])
-        wdot = np.asmatrix(resid).T * (np.asmatrix(self.a) * alpha)
+        #wdot = np.asmatrix(resid).T * (np.asmatrix(self.a) * alpha)
         #print("resid {}, a {}".format(resid.__class__, self.a.__class__))
         #self.trained = (self.trained + np.transpose(wdot)).copy()
-        self.trained += wdot
+        before = self.trained.copy()
+        self.trained += np.transpose(wdot)
         #Clamp to [0,1]
         self.trained = np.minimum(1., np.maximum(0, self.trained))
+        after = self.trained.copy()
+        print ("Sum of changes = {}".format(np.sum(after - before)))
+
         return resid
 
 
@@ -312,12 +316,15 @@ class r_network:
                         grid[rows, cols, :] = self.dictionary[:, k].reshape(self.im_dim)
                 k += 1
 
+        dict_data = grid.copy() * 255.
         grid = self.add_gridlines(grid, num_rows, num_cols, line_color, line_pix)
-        plt.figure(figsize=(2,2))
+        plt.figure()
+        #grid *= 255.
         plt.imshow(grid)
         plt.savefig(path)
         #plt.show()
-        grid *= 255.
+
+        return dict_data
         '''
         if (len(self.im_dim) == 2):
             im_grid = Image.fromarray(grid, mode='L')
