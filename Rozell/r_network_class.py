@@ -250,11 +250,11 @@ class r_network:
     #It's intended to take dictionary data and add the lines such that the patches are visible
     #It returns the modified data
     def add_gridlines(self, data, num_rows, num_cols, line_color, line_pix):
-        new1 = np.array(data[:self.im_dim[0], :]))
+        new1 = np.array(data[:self.im_dim[0], :])
         line = np.full((line_pix, data.shape[1]), line_color)
         for i in range(1, num_rows):
             new1 = np.vstack(new1, line)
-            new1 = np.vstack(new1, data[i * self.im_dim[0], :]
+            new1 = np.vstack(new1, data[i * self.im_dim[0], :])
 
         new2 = np.array(new1[:, :self.im_dim[1]])
         line = np.full((new1.shape[0], line_pix), line_color)
@@ -271,28 +271,26 @@ class r_network:
     def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 2, train = False):
         ## Initialize grid
         line_color /= 255.
-        r_data = (self.im_dim[0] + line_pix) * num_rows
-        c_data = (self.im_dim[1] + line_pix) * num_cols
         if (len(self.im_dim) == 2):
-            grid = np.full((r_data, c_data), 255.)
+            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols), 255.)
         else:
-            grid = np.full((r_data, c_data, 3), 255.)
+            grid = np.full((self.im_dim[0] * num_rows, self.im_dim[1] * num_cols, 3), 255.)
 
         k = 0
         for i in range(num_rows):
-            rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0] + line_pix)
+            rows = slice(i * self.im_dim[0], (i + 1) * self.im_dim[0])
             for j in range(num_cols):
-                cols = slice(j * self.im_dim[1], (j + 1) * self.im_dim[1] + line_pix)
+                cols = slice(j * self.im_dim[1], (j + 1) * self.im_dim[1])
                 if (train):
                     if (len(self.im_dim) == 2):
                         grid[rows, cols] = self.trained[:, k].reshape(self.im_dim)
                     else:
-                        grid[rows, cols] = self.trained[:, k].reshape(self.im_dim)
+                        grid[rows, cols, :] = self.trained[:, k].reshape(self.im_dim)
                 else:
                     if (len(self.im_dim) == 2):
                         grid[rows, cols] = self.dictionary[:, k].reshape(self.im_dim)
                     else:
-                        grid[rows, cols] = self.dictionary[:, k].reshape(self.im_dim)
+                        grid[rows, cols, :] = self.dictionary[:, k].reshape(self.im_dim)
                 k += 1
 
         grid *= 255.
