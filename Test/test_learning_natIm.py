@@ -109,7 +109,7 @@ network.set_dim(im_dims)
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 print("Start time: ", st)
-network.save_dictionary(5, 10, dict1_path)
+before = network.save_dictionary(5, 10, dict1_path)
 
 #Initiate x values and residual array for residual plot
 x = range(num_patches)
@@ -118,21 +118,21 @@ resid_plot = np.zeros((num_patches))
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
 for i in range(num_patches):
-    print ('Image ', i + 1)
+    print ('Patch ', i + 1)
     if (((i + 1) % 100) == 0):
-        print("Image ",i + 1)
+        print("Patch ",i + 1)
     stimulus = training_data[i].flatten()
     network.set_stimulus(stimulus, True)
     network.generate_sparse(True)
     #pdb.set_trace()
     if ((i + 1) % 1000 == 0):
         alpha *= 0.92
-        print (alpha)    
+        print (alpha)
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
 
 #Save out trained dictionary as image and csv, then print out time
-network.save_dictionary(5, 10, dict2_path, True)
+after = network.save_dictionary(5, 10, dict2_path, train=True)
 data = pandas.DataFrame(network.trained * 255.)
 data.to_csv(dict3_path, index = False, header = False)
 ts = time.time()
@@ -149,14 +149,19 @@ df.to_csv(write_path, index = False)
 ma1 = df.iloc[:,1].rolling(window = win1).mean().values
 ma2 = df.iloc[:,1].rolling(window = win2).mean().values
 
-plt.figure(1)
+plt.figure()
 plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
-plt.xlabel('Image Number')
+plt.xlabel('Patch Number')
 plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path)
+
+plt.figure()
+hmap_data = np.sum(after - before, axis=2)
+plt.pcolormesh(hmap_data, cmap='RdBu')
+plt.colorbar()
 plt.show()
 
 
