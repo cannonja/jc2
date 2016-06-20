@@ -26,6 +26,7 @@ class ff_net:
             print ('Input data dim doesn\'t match network input layer dim')
             return
         self.input = np.array(data_in).reshape(data_in.shape[0], 1)
+        self.input = np.append(self.input, 1)  #Add bias term
         self.activations.append(self.input.copy())
 
     def sigmoid(self, x):
@@ -50,9 +51,7 @@ class ff_net:
         for i in range(len(self.D) - 2, -1, -1):
             self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i]), self.d[0]))
         for i in range(len(self.d)):
-            
-
-        self.connections += -learn_rate * np.dot(d)
+            self.connections += -learn_rate * np.dot(d)
             
         
         
