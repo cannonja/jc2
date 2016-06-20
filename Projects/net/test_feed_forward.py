@@ -46,12 +46,12 @@ import image_class as ic
 from feed_forward import ff_net as nn
 
 
-net = nn([10, 1, 1])
-print ("layers = {}\nnum connections = {}\n".format(net.layers, len(net.connections)))
+net = nn([10, 5, 3])
+#print ("layers = {}\nnum connections = {}\n".format(net.layers, len(net.connections)))
 in_data = np.repeat(0, 10).reshape(10,1)
 net.set_input(in_data)
-net.forward_prop()
-print (net.activations)
+net.forward_prop(np.array([[1],[0],[0]]))
+
 
 
 

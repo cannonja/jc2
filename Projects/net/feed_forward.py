@@ -19,29 +19,31 @@ class ff_net:
         
 
         for i in range(len(layers) - 1):
-            self.connections.append(np.random.rand(self.layers[i+1], self.layers[i]))
+            ## Extra column is added to "from" layer to account for bias weights 
+            self.connections.append(np.random.rand(self.layers[i+1], self.layers[i] + 1))
 
     def set_input(self, data_in):
         if data_in.shape[0] != self.layers[0]:
             print ('Input data dim doesn\'t match network input layer dim')
             return
         self.input = np.array(data_in).reshape(data_in.shape[0], 1)
-        self.input = np.append(self.input, 1)  #Add bias term
-        self.activations.append(self.input.copy())
+        self.activations.append(np.vstack((self.input, 1)))  #Add bias term
 
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
 
     def d_sig(self, x):
-        sig = sigmoid(x)
+        sig = self.sigmoid(x)
         return np.multiply(sig, (1 - sig))
 
     def forward_prop(self, label):
         self.D = []
         for i in range(len(self.connections)):
             z = np.dot(self.connections[i], self.activations[i])
-            self.activations.append(self.sigmoid(z))
-            self.D.append(np.diagflat(self.d_sig(z)))
+            self.activations.append(np.vstack((self.sigmoid(z), 1)))  #Add bias term
+            self.D.append(np.diagflat(self.d_sig(z)))  #Exclude bias term
+        z = np.dot(self.connections[-1], self.activations[-1][:-1])
+        self.activations.append(self.sigmoid(z))  #Exclude bias term for output activation
         self.output = self.activations[-1].copy()
         self.error = self.output - label
 
@@ -49,7 +51,7 @@ class ff_net:
         self.d = []
         self.d.append(np.dot(self.D[-1], self.error))
         for i in range(len(self.D) - 2, -1, -1):
-            self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i]), self.d[0]))
+            self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i][:, :-1]), self.d[0]))
         for i in range(len(self.d)):
             self.connections += -learn_rate * np.dot(d)
             
