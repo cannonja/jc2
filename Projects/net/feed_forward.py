@@ -68,12 +68,17 @@ class ff_net:
 
 
     def back_prop(learn_rate):
+        if self.output in None:
+            print ('No output data')
+            return
+        
         self.d = []
         self.d.append(np.dot(self.D[-1], self.error))
-        for i in range(len(self.D) - 2, -1, -1):
-            self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i][:, :-1]), self.d[0]))
+        if len(self.D > 1):
+            for i in range(len(self.D) - 2, -1, -1):
+                self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i][:, :-1]), self.d[0]))
         for i in range(len(self.d)):
-            self.connections += -learn_rate * np.dot(d)
+            self.connections += -learn_rate * np.dot(self.d[i], self.activations[i])
             
         
         
