@@ -2,6 +2,7 @@ import numpy as np
 import pandas
 import matplotlib.pyplot as plt
 import random
+import pdb
 
 
 class ff_net:
@@ -22,6 +23,8 @@ class ff_net:
             ## Extra column is added to "from" layer to account for bias weights 
             self.connections.append(np.random.rand(self.layers[i+1], self.layers[i] + 1))
 
+
+
     def set_input(self, data_in):
         if data_in.shape[0] != self.layers[0]:
             print ('Input data dim doesn\'t match network input layer dim')
@@ -29,23 +32,40 @@ class ff_net:
         self.input = np.array(data_in).reshape(data_in.shape[0], 1)
         self.activations.append(np.vstack((self.input, 1)))  #Add bias term
 
+
+
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
+
+
 
     def d_sig(self, x):
         sig = self.sigmoid(x)
         return np.multiply(sig, (1 - sig))
 
+
+
     def forward_prop(self, label):
+        if self.input is None:
+            print ('No input data')
+            return
+
+        ## Loop through all but last activation as last activation
+        ## excludes bias term
         self.D = []
-        for i in range(len(self.connections)):
+        for i in range(len(self.connections) - 1):
             z = np.dot(self.connections[i], self.activations[i])
             self.activations.append(np.vstack((self.sigmoid(z), 1)))  #Add bias term
-            self.D.append(np.diagflat(self.d_sig(z)))  #Exclude bias term
-        z = np.dot(self.connections[-1], self.activations[-1][:-1])
+            self.D.append(np.diagflat(self.d_sig(z)))  #Exclude bias term in gradients
+        z = np.dot(self.connections[-1], self.activations[-1])
         self.activations.append(self.sigmoid(z))  #Exclude bias term for output activation
+        self.D.append(np.diagflat(self.d_sig(z))) #Exclude bias term in gradients
+        
         self.output = self.activations[-1].copy()
         self.error = self.output - label
+
+
+
 
     def back_prop(learn_rate):
         self.d = []
