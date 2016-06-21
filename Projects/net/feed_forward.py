@@ -6,31 +6,35 @@ import pdb
 
 
 class ff_net:
-    'Class represents a generalized, fully-connected neural network'
+    '''Class represents a generalized, fully-connected neural network using
+       the frame work discussed in Rojas Chpt. 7'''
 
     def __init__(self, layers):
         self.layers = layers   #List of layer sizes
-        self.input = None      #Input layer
+        self.input = None      #Input layer - 'o' vector in Rojas
         self.output = None     #Output layer
-        self.error = None      #Error for current data point
+        self.e = None          #Error for current data point
         self.activations = []  #list of activation values throughout each forward prop
-        self.connections = []  #list of connection matrices (num layers - 1)
+        self.W_bar = []        #list of connection matrices (num layers - 1)
         self.D = []            #list of gradient matrices
-        self.d = []            #list of 
-        
+        self.d = []            #list of backpropagated erros
 
         for i in range(len(layers) - 1):
-            ## Extra column is added to "from" layer to account for bias weights 
-            self.connections.append(np.random.rand(self.layers[i+1], self.layers[i] + 1))
+            self.W_bar.append(np.random.rand(self.layers[i] + 1, self.layers[i+1]))
 
 
 
     def set_input(self, data_in):
-        if data_in.shape[0] != self.layers[0]:
+        self.activations = []
+        # If input is a row vector, assign to class and add bias term for activation
+        if data_in.shape == (1, self.layers[0]):
+            self.input = data_in
+        elif data_in.shape == (self.layers[0], 1):
+            self.input = data_in.T
+        else:
             print ('Input data dim doesn\'t match network input layer dim')
             return
-        self.input = np.array(data_in).reshape(data_in.shape[0], 1)
-        self.activations.append(np.vstack((self.input, 1)))  #Add bias term
+        self.activations.append(np.hstack((self.input, np.array([[1]]))))  #Add bias term
 
 
 
@@ -49,20 +53,19 @@ class ff_net:
         if self.input is None:
             print ('No input data')
             return
-
         ## Loop through all but last activation as last activation
         ## excludes bias term
         self.D = []
-        for i in range(len(self.connections) - 1):
-            z = np.dot(self.connections[i], self.activations[i])
-            self.activations.append(np.vstack((self.sigmoid(z), 1)))  #Add bias term
+        for i in range(len(self.W_bar) - 1):
+            z = np.dot(self.activations[i], self.W_bar[i])
+            self.activations.append(np.hstack((self.sigmoid(z), np.array([[1]]))))  #Add bias term
             self.D.append(np.diagflat(self.d_sig(z)))  #Exclude bias term in gradients
-        z = np.dot(self.connections[-1], self.activations[-1])
+        z = np.dot(self.activations[-1], self.W_bar[-1])
         self.activations.append(self.sigmoid(z))  #Exclude bias term for output activation
         self.D.append(np.diagflat(self.d_sig(z))) #Exclude bias term in gradients
-        
+
         self.output = self.activations[-1].copy()
-        self.error = self.output - label
+        self.e = self.output.T - label    # e is supposed to be a column vector
 
 
 
@@ -72,14 +75,14 @@ class ff_net:
             print ('No output data')
             return
 
-        pdb.set_trace()
         self.d = []
-        self.d.append(np.dot(self.D[-1], self.error))
+        self.d.append(np.dot(self.D[-1], self.e))
         if len(self.D) > 1:
             for i in range(len(self.D) - 2, -1, -1):
-                self.d.insert(0, np.dot(np.dot(self.D[i], self.connections[i][:, :-1]), self.d[0]))
+                self.d.insert(0, np.dot(np.dot(self.D[i], self.W_bar[i][:-1,:]), self.d[0]))
+        pdb.set_trace()
         for i in range(len(self.d)):
-            self.connections[i] += -learn_rate * np.dot(self.d[i], self.activations[i][:-1].T)
+            self.W_bar[i] += (-learn_rate * np.dot(self.d[i], self.activations[i])).T
             
         
         
