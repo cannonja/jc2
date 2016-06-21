@@ -71,7 +71,8 @@ class ff_net:
         if self.output is None:
             print ('No output data')
             return
-        
+
+        pdb.set_trace()
         self.d = []
         self.d.append(np.dot(self.D[-1], self.error))
         if len(self.D) > 1:

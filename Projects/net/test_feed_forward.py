@@ -18,9 +18,9 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Image_Class')
-    sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Projects/net')
+    sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Projects\\net')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
-    file_path = 'C:\\Users\\Jack2\\Desktop'    
+    file_path = 'C:\\Users\\Jack2\\Desktop'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
@@ -35,6 +35,7 @@ else:
     sys.path.append(os.path.join(base1, 'MNIST_Load'))
     sys.path.append(os.path.join(base1, 'Rozell'))
     sys.path.append(os.path.join(base1, 'Image_Class'))
+    sys.path.append(os.path.join(base1, 'Projects/net'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
     
