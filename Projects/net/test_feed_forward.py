@@ -52,7 +52,7 @@ in_data = np.repeat(0, 3).reshape(3,1)
 net.set_input(in_data)
 net.forward_prop(np.array([[1],[0],[0]]))
 print (net.connections)
-net.forward_prop(0.01)
+net.back_prop(0.01)
 print (net.connections)
 
 
