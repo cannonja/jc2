@@ -30,7 +30,11 @@ def denormalize(norm, dmax, dmin):
 #Then flattens each image (converts to atom) and adds to dictionary
 #Function returns a dictionary where each atom is an image
 def build_dictionary(im_data):
-    rows, cols, _ = im_data[0].shape
+    if len(im_data[0].shape) == 3:
+        rows, cols, _ = im_data[0].shape
+    else:
+        rows, cols = im_data[0].shape
+
     dictionary = np.zeros(((rows * cols), len(im_data)))
     
     for i in range(len(im_data)):

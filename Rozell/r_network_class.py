@@ -124,12 +124,12 @@ class r_network:
         #wdot = np.asmatrix(resid).T * (np.asmatrix(self.a) * alpha)
         #print("resid {}, a {}".format(resid.__class__, self.a.__class__))
         #self.trained = (self.trained + np.transpose(wdot)).copy()
-        before = self.trained.copy()
+        #before = self.trained.copy()
         self.trained += np.transpose(wdot)
         #Clamp to [0,1]
         self.trained = np.minimum(1., np.maximum(0, self.trained))
-        after = self.trained.copy()
-        print ("Sum of changes = {}".format(np.sum(after - before)))
+        #after = self.trained.copy()
+        #print ("Sum of changes = {}".format(np.sum(after - before)))
 
         return resid
 
@@ -320,7 +320,10 @@ class r_network:
         grid = self.add_gridlines(grid, num_rows, num_cols, line_color, line_pix)
         plt.figure()
         #grid *= 255.
-        plt.imshow(grid)
+        if len(self.im_dim) == 2:
+            plt.imshow(grid, cmap=plt.get_cmap('gray'))
+        else:
+            plt.imshow(grid)
         plt.savefig(path)
         #plt.show()
 

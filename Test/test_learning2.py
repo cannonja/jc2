@@ -79,7 +79,7 @@ rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### ######################
 '''
-weights = np.random.rand(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
+weights = np.random.randn(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
 learn_rate = 0.01
 error_plot = np.array([])
 #pdb.set_trace()

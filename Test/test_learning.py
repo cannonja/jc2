@@ -69,11 +69,11 @@ win2 = 500 #Window for mov avg 2
 
 ################### Load dictionary from first 50 MNIST images ##################################
 ################### Load training set from last 59950 MNIST images ##############################
-num_rfields = 100
-num_images =  10000      #60000 - num_rfields
+num_rfields = 50
+num_images =  5000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 dict_data = mnist.load_images(image_file, num_rfields)
-training_data = mnist.load_images(image_file, num_images, 100)
+training_data = mnist.load_images(image_file, num_images, num_rfields)
 
 for i in range(len(dict_data)):
     dict_data[i] = dict_data[i].astype(float)
@@ -87,6 +87,7 @@ for i in range(len(training_data)):
 D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
+network.set_dim(dict_data[0].shape)
 
 
 ################### Run each training image through network #######################################
@@ -97,7 +98,7 @@ network.set_parameters(lamb, tau, delta, u_stop, t_type)
 ts = time.time()
 st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
 print("Start time: ", st)
-network.save_dictionary(5, 10, dict1_path)
+network.save_dictionary(5, 10, dict1_path, line_color = 255)
 
 #Initiate x values and residual array for residual plot
 x = range(num_images)
@@ -113,12 +114,12 @@ for i in range(num_images):
     network.generate_sparse(True)
     if ((i + 1) % 1000 == 0):
         alpha *= 0.92
-        print (alpha)    
+        print (alpha)
     y = network.update_trained(alpha)
     resid_plot[i] = np.sqrt(np.dot(y,y))
 
 #Save out trained dictionary as image and csv, then print out time
-network.save_dictionary(5, 10, dict2_path, True)
+network.save_dictionary(5, 10, dict2_path, line_color = 255, train=True)
 data = pandas.DataFrame(network.trained * 255.)
 data.to_csv(dict3_path, index = False, header = False)
 ts = time.time()
@@ -135,6 +136,7 @@ df.to_csv(write_path, index = False)
 ma1 = df.iloc[:,1].rolling(window = win1).mean().values
 ma2 = df.iloc[:,1].rolling(window = win2).mean().values
 
+plt.figure()
 plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
 plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
 plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
@@ -142,6 +144,6 @@ plt.xlabel('Image Number')
 plt.title('Reconstruction Error')
 plt.legend()
 plt.savefig(plot_path, format='eps', dpi=250)
-plt.show()
+###plt.show()
 
 
