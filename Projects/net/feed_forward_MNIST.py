@@ -48,13 +48,15 @@ from feed_forward import ff_net
 
 ############## Load MNIST images and labels
 image_file = 'train-images.idx3-ubyte'
+image_file2 = 't10k-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
-num_images = 50000
-num_timages = 9000
+label_file2 = 't10k-labels.idx1-ubyte'
+num_images = 60000
+num_timages = 10000
 image_data = mnist.load_images(image_file, num_images)
 label_data = mnist.load_labels(label_file, num_images)
-timage_data = mnist.load_images(image_file, num_timages, num_images)
-tlabel_data = mnist.load_labels(label_file, num_timages, num_images)
+timage_data = mnist.load_images(image_file2, num_timages)
+tlabel_data = mnist.load_labels(label_file2, num_timages)
 
 
 
@@ -75,6 +77,7 @@ for i in range(len(label_data)):
     labels.append(label)
 
 training_set = [(images[i], labels[i]) for i in range(len(images))]
+#random.shuffle(training_set)
 
 
 ############# Build test set
@@ -94,17 +97,20 @@ for i in range(len(tlabel_data)):
     labels.append(label)
 
 test_set = [(images[i], labels[i]) for i in range(len(images))]
+#random.shuffle(test_set)
 
 
 
 ########### Train network
 layers = [784, 50, 10]
-learn_rate = 0.01
+learn_rate = 1.05
 net = ff_net(layers)
 
 for i in range(len(training_set)):
-    if (i+1) % 1000 == 0:
+    '''
+    if (i+1) % 10000 == 0:
         print ("Training Image {}".format(i+1))
+    '''
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop(learn_rate)
@@ -114,8 +120,10 @@ for i in range(len(training_set)):
 confusion = np.zeros((10, 10), dtype='int32')
 correct = 0
 for i in range(len(test_set)):
+    '''
     if (i+1) % 1000 == 0:
         print ("Test Image {}".format(i+1))
+    '''
     net.set_input(test_set[i][0])
     net.forward_prop(test_set[i][1])
     prediction = np.where(net.output == net.output.max())[1][0]
@@ -124,7 +132,8 @@ for i in range(len(test_set)):
         correct += 1
 
 accuracy = correct / num_timages
-print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
+print ("Learn rate = {}\nAccuracy = {}".format(learn_rate, accuracy))
+#print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
 
 
 
