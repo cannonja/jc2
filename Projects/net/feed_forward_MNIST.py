@@ -38,7 +38,7 @@ else:
     sys.path.append(os.path.join(base1, 'Projects/net'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
-    
+
 
 import mnist_load as mnist
 import sparse_algo as sp
@@ -46,34 +46,113 @@ import r_network_class as lca
 import image_class as ic
 from feed_forward import ff_net
 
+############## Load MNIST images and labels
+image_file = 'train-images.idx3-ubyte'
+label_file = 'train-labels.idx1-ubyte'
+num_images = 5000
+num_timages = 1000
+image_data = mnist.load_images(image_file, num_images)
+label_data = mnist.load_labels(label_file, num_images)
+timage_data = mnist.load_images(image_file, num_timages, num_images)
+tlabel_data = mnist.load_labels(label_file, num_timages, num_images)
 
+
+
+############# Build training set
+
+# Images
+images = []
+for i in range(len(image_data)):
+    image_data[i] = image_data[i].astype(float)
+    image_data[i] /= 255.
+    images.append(image_data[i].flatten()[np.newaxis, :])
+
+# Labels
+labels = []
+for i in range(len(label_data)):
+    label = np.zeros((10, 1))
+    label[label_data[i]] = 1
+    labels.append(label)
+
+training_set = [(images[i], labels[i]) for i in range(len(images))]
+
+
+############# Build test set
+
+# Images
+images = []
+for i in range(len(timage_data)):
+    timage_data[i] = timage_data[i].astype(float)
+    timage_data[i] /= 255.
+    images.append(timage_data[i].flatten()[np.newaxis, :])
+
+# Labels
+labels = []
+for i in range(len(tlabel_data)):
+    label = np.zeros((10, 1))
+    label[tlabel_data[i]] = 1
+    labels.append(label)
+
+test_set = [(images[i], labels[i]) for i in range(len(images))]
+
+
+
+########### Train network
+layers = [784, 50, 10]
+learn_rate = 0.01
+net = ff_net(layers)
+
+for i in range(len(training_set)):
+    if i % 100 == 0:
+        print ("Image {}".format(i))
+    net.set_input(training_set[i][0])
+    net.forward_prop(training_set[i][1])
+    net.back_prop(learn_rate)
+
+
+########### Test network
+confusion = np.zeros((10, 10), dtype='int32')
+for i in range(len(test_set)):
+    if i % 100 == 0:
+        print ("Image {}".format(i))
+    net.set_input(test_set[i][0])
+    net.forward_prop(test_set[i][1])
+    prediction = np.where(net.output == net.output.max())
+    confusion[tlabel_data[i], prediction] += 1
+    if prediction == tlabel_data[i] == prediction:
+        correct += 1
+
+accuracy = correct / num_timages
+print ("Accuracy = {}\n\nConfusion:\n{}".format(accuracy, confusion))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+'''
 net = ff_net([3, 3, 3])
-#print ("layers = {}\nnum connections = {}\n".format(net.layers, len(net.connections)))
 in_data = np.repeat(1, 3).reshape(3,1)
 net.set_input(in_data)
 net.forward_prop(np.array([[1],[0],[0]]))
-'''
-print ("Dimensions of all NN variables after one forward prop:")
-print ("input = {}, with bias = {}".format(net.input.shape, net.activations[0].shape))
-print ("W1 = {}, W1 bias = {}, W2 = {}, W2 bias = {}"\
-        .format(net.connections[0][:,:-1].shape, net.connections[0].shape,\
-        net.connections[1][:,:-1].shape, net.connections[1].shape))
-print ("D1 = {}, D2 = {}".format(net.D[0].shape, net.D[1].shape))
-print ("activations = {}, {}, {}".format(net.activations[0].shape,\
-        net.activations[1].shape, net.activations[2].shape))
-print ("output = {}".format(net.output.shape))
-'''
-
-pre = [np.array(i) for i in net.W_bar]
-#print ("{}\t{}\n\n".format(net.W_bar[0], net.W_bar[1]))
 net.back_prop(1.0)
-#print ("{}\t{}\n\n".format(net.W_bar[0], net.W_bar[1]))
-post = [np.array(i) for i in net.W_bar]
-change = [np.subtract(j, i) for i,j in zip(pre, post)]
-print ("{}\n\n{}\n\n".format(pre[0], post[0]))
-print ("{}\n\n{}\n\n".format(pre[1], post[1]))
-print ("{}\n\n{}".format(change[0], change[1]))
-
+'''
 
 
 
