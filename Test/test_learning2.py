@@ -28,8 +28,9 @@ elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Rozell')
+    sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Classify')
     os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
-    file_path = 'C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Test\\DB Classifier\\Overnight run\\R1'
+    file_path = 'C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Test\\DB Classifier\\Overnight run\\R1'
     dict_path = file_path + '\\trained_data.csv'
     dict3_path = file_path + '\\trained_data.csv'
     plot_path = file_path + '\\RMSE_plot'
@@ -65,7 +66,7 @@ u_stop = .0001
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 500
+num_images  = 10000
 start_pos = 40000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
