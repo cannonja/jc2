@@ -20,7 +20,7 @@ class ff_net:
         self.d = []            #list of backpropagated erros
 
         for i in range(len(layers) - 1):
-            self.W_bar.append(np.random.rand(self.layers[i] + 1, self.layers[i+1]))
+            self.W_bar.append(np.random.randn(self.layers[i] + 1, self.layers[i+1]))
 
 
 
@@ -79,13 +79,12 @@ class ff_net:
         self.d.append(np.dot(self.D[-1], self.e))
         if len(self.D) > 1:
             for i in range(len(self.D) - 2, -1, -1):
-                self.d.insert(0, np.dot(np.dot(self.D[i], self.W_bar[i][:-1,:]), self.d[0]))
-        pdb.set_trace()
+                self.d.insert(0, np.dot(np.dot(self.D[i], self.W_bar[i+1][:-1,:]), self.d[0]))
         for i in range(len(self.d)):
             self.W_bar[i] += (-learn_rate * np.dot(self.d[i], self.activations[i])).T
-            
-        
-        
+
+
+
 
     
 

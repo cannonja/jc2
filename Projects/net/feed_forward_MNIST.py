@@ -49,8 +49,8 @@ from feed_forward import ff_net
 ############## Load MNIST images and labels
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
-num_images = 5000
-num_timages = 1000
+num_images = 50000
+num_timages = 9000
 image_data = mnist.load_images(image_file, num_images)
 label_data = mnist.load_labels(label_file, num_images)
 timage_data = mnist.load_images(image_file, num_timages, num_images)
@@ -103,27 +103,28 @@ learn_rate = 0.01
 net = ff_net(layers)
 
 for i in range(len(training_set)):
-    if i % 100 == 0:
-        print ("Image {}".format(i))
+    if (i+1) % 1000 == 0:
+        print ("Training Image {}".format(i+1))
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop(learn_rate)
 
-
+#pdb.set_trace()
 ########### Test network
 confusion = np.zeros((10, 10), dtype='int32')
+correct = 0
 for i in range(len(test_set)):
-    if i % 100 == 0:
-        print ("Image {}".format(i))
+    if (i+1) % 1000 == 0:
+        print ("Test Image {}".format(i+1))
     net.set_input(test_set[i][0])
     net.forward_prop(test_set[i][1])
-    prediction = np.where(net.output == net.output.max())
+    prediction = np.where(net.output == net.output.max())[1][0]
     confusion[tlabel_data[i], prediction] += 1
-    if prediction == tlabel_data[i] == prediction:
+    if prediction == tlabel_data[i]:
         correct += 1
 
 accuracy = correct / num_timages
-print ("Accuracy = {}\n\nConfusion:\n{}".format(accuracy, confusion))
+print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
 
 
 
