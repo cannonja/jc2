@@ -45,12 +45,12 @@ else:
     sys.path.append(os.path.join(base1, 'Rozell'))
     sys.path.append(os.path.join(base1, 'Image_Class'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
-    file_path = base1 + '/Test/DB Classifier/Overnight run'
-    dict1_path = base2 + '/orig_dict.png'
-    dict2_path = base2 + '/trained_dict.png'
+    file_path = base1 + '/Test/DB Classifier/Nat Images/Walt Run'
+    dict1_path = file_path + '/orig_dict.png'
+    dict2_path = file_path + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
     write_path = file_path + '/resid_data.csv'
-    plot_path = base2 + '/resid_plot.png'
+    plot_path = file_path + '/resid_plot.png'
     nat_path = base1 + '/Rozell/Natural_images'
 
 
@@ -69,7 +69,7 @@ random.shuffle(training_data)
 X = np.zeros((num_patches, np.product(im_dims)))
 for i in range(len(training_data)):
     X[i, :] = training_data[i].flatten()
-net = Lca(num_rfields)
+net = Lca(num_rfields, tAlpha=0.8, tLambda=1.0)
 net.init(np.product(im_dims),num_rfields)
 
 ## Use my Lca class to save pre dictionary
@@ -106,7 +106,7 @@ print (MSE, RMSE)
 
 
 
-#Plot and save out both raw and smoothed residuals
+#Plot both raw and smoothed residuals
 x = range(num_patches)
 win1 = 100
 win2 = 300
@@ -122,8 +122,9 @@ plt.xlabel('Patch Number')
 plt.title('Reconstruction Error (RMSE)')
 plt.legend()
 plt.savefig(plot_path)
-
+'''
 plt.figure()
 hmap_data = np.sum(after - before, axis=2)
 plt.colormesh(hmap_data, cmap='RdBu')
 plt.show()
+'''

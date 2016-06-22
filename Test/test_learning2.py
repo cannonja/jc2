@@ -37,12 +37,12 @@ else:
     sys.path.append(os.path.join(base1, 'Rozell'))
     sys.path.append(os.path.join(base1, 'Classify'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
-    file_path = base2
-    dict_path = base1 + '/Classify/trained_data.csv'
-    plot_path = base1 + '/Classify/RMSE_plot'
-    accuracy_path = base1 + '/Classify/Accuracy_plot'
-    weight_path = base1 + '/Classify/weights.csv'
-    confusion_path = base1 + '/Classify/confusion.csv'
+    file_path = base1 + '/Test/DB Classifier/Overnight run/R1'
+    dict_path = file_path + '/trained_data.csv'
+    plot_path = file_path + '/RMSE_plot'
+    accuracy_path = file_path + '/Accuracy_plot.png'
+    weight_path = file_path + '/weights.csv'
+    confusion_path = file_path + '/confusion.csv'
 
 import mnist_load as mnist
 import sparse_algo as sp
@@ -54,19 +54,19 @@ import classify
 lamb = 1.
 tau = 10.
 delta = 0.01
-u_stop = .1
+u_stop = .0001
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 3000
-start_pos = 40000
+num_images  = 500
+start_pos = 50000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
 label_data = mnist.load_labels(label_file, num_images, start_pos)
 
 ################## Scale data down before running through network ##############################
-dict_data = pd.read_csv(dict3_path, header = None)
+dict_data = pd.read_csv(dict_path, header = None)
 dict_data = dict_data.values / 255.
 for i in range(len(image_data)):
     image_data[i] = image_data[i].astype(float)
@@ -76,9 +76,9 @@ for i in range(len(image_data)):
 rozell = lca.r_network(dict_data)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
+'''
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### ######################
-'''
 weights = np.random.randn(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
 learn_rate = 0.01
 error_plot = np.array([])
@@ -108,7 +108,7 @@ df.to_csv(weight_path, header=False, index=False)
 plt.plot(error_plot)
 plt.xlabel('Image Number')
 plt.title('RMSE During Backprop')
-plt.savefig(plot_path)
+plt.savefig(plot_path + '.png')
 plt.show()
 '''
 
@@ -124,6 +124,8 @@ confusion = np.zeros((10,10), dtype='int32')  #rows = actual, columns = predicte
 #pdb.set_trace()
 for i, j in zip(image_data, label_data):
     count += 1
+    if count % 100 == 0:
+        print ("Image #: ", count)
     #Run Rozell and forwardprop
     rozell.set_stimulus(i.flatten())
     sparse_code = np.append(rozell.generate_sparse(), 1) #Add bias term
@@ -148,7 +150,7 @@ plt.figure()
 plt.plot(error_plot)
 plt.xlabel('Image Number')
 plt.title('RMSE During Testing - accuracy = ' + str(accuracy))
-plt.savefig(plot_path + '2')
+plt.savefig(plot_path + '2.png')
 
 #Plot accuracy
 plt.figure()
@@ -157,7 +159,6 @@ plt.xlabel('Image Number')
 plt.title('Accuracy During Testing')
 plt.savefig(accuracy_path)
 plt.show()
-
 
 
 

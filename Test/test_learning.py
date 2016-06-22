@@ -17,7 +17,7 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
-    file_path = 'C:\\Users\\Jack2\\Desktop'
+    file_path = 'C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Test\\DB Classifier\\Overnight run'
     dict1_path = file_path + '/orig_dict.png'
     dict2_path = file_path + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
@@ -143,7 +143,7 @@ plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
 plt.xlabel('Image Number')
 plt.title('Reconstruction Error')
 plt.legend()
-plt.savefig(plot_path, format='eps', dpi=250)
+plt.savefig(plot_path)
 ###plt.show()
 
 

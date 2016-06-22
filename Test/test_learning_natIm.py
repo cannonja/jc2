@@ -46,7 +46,7 @@ else:
     sys.path.append(os.path.join(base1, 'Rozell'))
     sys.path.append(os.path.join(base1, 'Image_Class'))
     os.chdir(os.path.join(base1, 'MNIST_Load'))
-    file_path = base1 + '/Test/DB Classifier/Overnight run'
+    file_path = base1 + '/Test/DB Classifier/Nat Images/Jack Run'
     dict1_path = file_path + '/orig_dict.png'
     dict2_path = file_path + '/trained_dict.png'
     dict3_path = file_path + '/trained_data.csv'
@@ -118,7 +118,6 @@ resid_plot = np.zeros((num_patches))
 #Train dictionary as each image is run through network
 #Store length of residual vector in resid_plot array
 for i in range(num_patches):
-    print ('Patch ', i + 1)
     if (((i + 1) % 100) == 0):
         print("Patch ",i + 1)
     stimulus = training_data[i].flatten()
