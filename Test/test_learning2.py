@@ -17,18 +17,25 @@ if (machine == 'Jack-PC'):
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Rozell')
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Classify')
     os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
-    file_path = 'C:\\Users\\Jack2\\Desktop'
-    dict_path = file_path + '\\Git_Repos\\jc2\\Classify\\notrain_dict.csv'
+    file_path = 'C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Test\\DB Classifier\\Overnight run\\R1'
+    dict_path = file_path + '\\trained_data.csv'
     dict3_path = file_path + '\\trained_data.csv'
-    plot_path = file_path + '\\Git_Repos\\jc2\\Classify\\RMSE_plot'
-    accuracy_path = file_path + '\\Git_Repos\\jc2\\Classify\\Accuracy_plot'
-    weight_path = file_path + '\\Git_Repos\\jc2\\Classify\\weights.csv'
-    confusion_path = file_path + '\\Git_Repos\\jc2\\Classify\\confusion.csv'
+    plot_path = file_path + '\\RMSE_plot'
+    accuracy_path = file_path + '\\Accuracy_plot'
+    weight_path = file_path + '\\weights.csv'
+    confusion_path = file_path + '\\confusion.csv'
 elif (machine == 'Tab'):
     #Little laptop
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     sys.path.append('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\Rozell')
     os.chdir('C:\\Users\\Jack\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
+    file_path = 'C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Test\\DB Classifier\\Overnight run\\R1'
+    dict_path = file_path + '\\trained_data.csv'
+    dict3_path = file_path + '\\trained_data.csv'
+    plot_path = file_path + '\\RMSE_plot'
+    accuracy_path = file_path + '\\Accuracy_plot'
+    weight_path = file_path + '\\weights.csv'
+    confusion_path = file_path + '\\confusion.csv'
 else:
     #PSU machines (linux lab)
     base1 = os.path.expanduser('~/dev/jc2')
@@ -59,7 +66,7 @@ t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
 num_images  = 500
-start_pos = 50000
+start_pos = 40000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
@@ -76,7 +83,7 @@ for i in range(len(image_data)):
 rozell = lca.r_network(dict_data)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-'''
+
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### ######################
 weights = np.random.randn(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
@@ -109,10 +116,10 @@ plt.plot(error_plot)
 plt.xlabel('Image Number')
 plt.title('RMSE During Backprop')
 plt.savefig(plot_path + '.png')
-plt.show()
+#plt.show()
+
+
 '''
-
-
 #################### Read in weights and test network #########################################
 df = pd.read_csv(weight_path, header= None, names=None)
 weights = df.values
@@ -158,8 +165,8 @@ plt.plot(accuracy_plot)
 plt.xlabel('Image Number')
 plt.title('Accuracy During Testing')
 plt.savefig(accuracy_path)
-plt.show()
-
+#plt.show()
+'''
 
 
 
