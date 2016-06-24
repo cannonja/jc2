@@ -48,17 +48,17 @@ from feed_forward import ff_net
 ################################## Set model params ####################################################
 
 layers = [784, 50, 10]   #Specify number of neurons per layer
-learn_rate = 0.95        #Set learning rate
+learn_rate = 1.5        #Set learning rate
 shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
 decay = 0                #Flag to decay learning rate (1 = yes, 0 = no) 
-decay_rate = 0.95        #Set learning rate decay
+decay_rate = 0.9        #Set learning rate decay
 decay_iters = 1000       #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
 label_file = 'train-labels.idx1-ubyte'    #Training labels
 tlabel_file = 't10k-labels.idx1-ubyte'    #Test labels
-num_images = 30000   #Number of training images
+num_images = 40000   #Number of training images
 num_timages = 10000  #Number of test images
 
 
