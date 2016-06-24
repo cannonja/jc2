@@ -24,9 +24,8 @@ class ff_net:
         self.lr_decay = np.array([])  #variable to hold data for plotting learning rate decay
     
         for i in range(len(layers) - 1):
-            self.W_bar.append(np.random.randn(self.layers[i] + 1, self.layers[i+1]))
-
-
+            #self.W_bar.append(np.random.randn(self.layers[i] + 1, self.layers[i+1]))
+            self.W_bar.append(np.random.normal(0, 0.1, (self.layers[i] + 1, self.layers[i+1])))
 
 
     def clear_rmse(self):
@@ -94,7 +93,7 @@ class ff_net:
 
 
     def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
+        return 1.0 / (1.0 + np.exp(-x))
 
 
 
@@ -120,8 +119,9 @@ class ff_net:
         self.D.append(np.diagflat(self.d_sig(z))) #Exclude bias term in gradients
 
         self.output = self.activations[-1].copy()
-        self.e = self.output.T - label    # e is supposed to be a column vector
-        self.rmse = np.append(self.rmse, np.sqrt(np.dot(self.e.T, self.e)))
+        #self.e = self.output.T - label    # e is supposed to be a column vector
+        self.e += (self.output.T - label)    # e is supposed to be a column vector
+        #self.rmse = np.append(self.rmse, np.sqrt(np.dot(self.e.T, self.e)))
 
 
 

@@ -47,18 +47,18 @@ from feed_forward import ff_net
 
 ################################## Set model params ####################################################
 
-layers = [784, 50, 10]   #Specify number of neurons per layer
+layers = [784, 30, 10]   #Specify number of neurons per layer
 learn_rate = 1.5        #Set learning rate
 shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
-decay = 0                #Flag to decay learning rate (1 = yes, 0 = no) 
+decay = 1                #Flag to decay learning rate (1 = yes, 0 = no) 
 decay_rate = 0.9        #Set learning rate decay
 decay_iters = 1000       #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
 label_file = 'train-labels.idx1-ubyte'    #Training labels
 tlabel_file = 't10k-labels.idx1-ubyte'    #Test labels
-num_images = 40000   #Number of training images
+num_images = 50000   #Number of training images
 num_timages = 10000  #Number of test images
 
 
@@ -102,7 +102,7 @@ for i in range(len(timage_data)):
 test_set = [(images[i], labels[i]) for i in range(len(images))]
 
 
-## Shuffle?
+## Shuffle
 if shuffle_data:
     random.shuffle(training_set)
     random.shuffle(test_set)   
@@ -111,10 +111,32 @@ if shuffle_data:
 ############################### Train network ######################################
 
 net = ff_net(layers)
+net.e = 0
 if decay:
     net.set_lr_stats(learn_rate, decay_rate)
 else:
     net.set_lr_stats(learn_rate)    
+
+for epoch in range(10):
+    print ("Epoch ", epoch + 1)
+    for i in range(len(training_set)):
+        if (i+1) % 10000 == 0 and show_imnums:
+            print ("Training Image {}".format(i+1))
+        if decay and (i+1) % decay_iters == 0:
+            net.decay()
+        net.set_input(training_set[i][0])
+        net.forward_prop(training_set[i][1])
+        if (i+1) % 10 == 0:
+            net.back_prop()
+            net.rmse = np.append(net.rmse, np.sqrt(np.dot(net.e.T, net.e)))
+            net.e = 0
+    random.shuffle(training_set)
+    net.learn_rate = learn_rate
+
+
+
+
+'''
 for i in range(len(training_set)):
     if (i+1) % 10000 == 0 and show_imnums:
         print ("Training Image {}".format(i+1))
@@ -123,10 +145,12 @@ for i in range(len(training_set)):
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop()
+'''
 
 net.plot_rmse()
 net.clear_rmse()
 net.plot_lr_decay()
+
 
 ################################ Test network #########################################
 
