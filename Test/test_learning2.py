@@ -66,8 +66,8 @@ u_stop = .0001
 t_type = 'S'
 
 ################### Load MNIST image and label data #############################################
-num_images  = 10000
-start_pos = 40000
+num_images  = 5000
+start_pos = 50000
 image_file = 'train-images.idx3-ubyte'
 label_file = 'train-labels.idx1-ubyte'
 image_data = mnist.load_images(image_file, num_images, start_pos)
@@ -84,11 +84,11 @@ for i in range(len(image_data)):
 rozell = lca.r_network(dict_data)
 rozell.set_parameters(lamb, tau, delta, u_stop, t_type)
 
-
+'''
 ################### Initialize random  matrix of weights for mapping ############################
 ################### sparse code to output layer.  Then train network #### ######################
 weights = np.random.randn(10, 51)    #10 nodes in layer j+1 and 50 nodes in layer j
-learn_rate = 0.01
+learn_rate = 0.5
 error_plot = np.array([])
 #pdb.set_trace()
 counter = 0
@@ -117,10 +117,10 @@ plt.plot(error_plot)
 plt.xlabel('Image Number')
 plt.title('RMSE During Backprop')
 plt.savefig(plot_path + '.png')
-#plt.show()
-
-
+plt.show()
 '''
+
+
 #################### Read in weights and test network #########################################
 df = pd.read_csv(weight_path, header= None, names=None)
 weights = df.values
@@ -166,8 +166,8 @@ plt.plot(accuracy_plot)
 plt.xlabel('Image Number')
 plt.title('Accuracy During Testing')
 plt.savefig(accuracy_path)
-#plt.show()
-'''
+plt.show()
+
 
 
 
