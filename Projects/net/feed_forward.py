@@ -28,6 +28,10 @@ class ff_net:
 
 
 
+
+    def clear_rmse(self):
+        self.rmse = np.array([])
+
     def set_lr_stats(self, learn_rate, decay_rate = 1.0):
         self.learn_rate = learn_rate
         self.decay_rate = decay_rate
@@ -62,8 +66,9 @@ class ff_net:
         plt.plot(self.rmse, color = 'gray', alpha = 0.6, label = 'Raw')
         plt.plot(ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
         plt.plot(ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
-        plt.xlabel('Number of training examples seen')
-        plt.title('RMSE During Backprop')
+        plt.xlabel('Number of examples seen')
+        plt.ylabel('RMSE')
+        #plt.title('RMSE During Backprop')
         plt.legend()
         if path is None:
             plt.show()

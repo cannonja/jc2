@@ -48,7 +48,7 @@ from feed_forward import ff_net
 ################################## Set model params ####################################################
 
 layers = [784, 50, 10]   #Specify number of neurons per layer
-learn_rate = 1.5         #Set learning rate
+learn_rate = 0.95        #Set learning rate
 shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
 decay = 0                #Flag to decay learning rate (1 = yes, 0 = no) 
@@ -58,7 +58,7 @@ image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
 label_file = 'train-labels.idx1-ubyte'    #Training labels
 tlabel_file = 't10k-labels.idx1-ubyte'    #Test labels
-num_images = 60000   #Number of training images
+num_images = 30000   #Number of training images
 num_timages = 10000  #Number of test images
 
 
@@ -101,6 +101,7 @@ for i in range(len(timage_data)):
 
 test_set = [(images[i], labels[i]) for i in range(len(images))]
 
+
 ## Shuffle?
 if shuffle_data:
     random.shuffle(training_set)
@@ -119,14 +120,14 @@ for i in range(len(training_set)):
         print ("Training Image {}".format(i+1))
     if decay and (i+1) % decay_iters == 0:
         net.decay()
-        print (net.learn_rate, net.decay_rate)
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop()
 
 net.plot_rmse()
-#net.plot_lr_decay()
-'''
+net.clear_rmse()
+net.plot_lr_decay()
+
 ################################ Test network #########################################
 
 confusion = np.zeros((10, 10), dtype='int32')
@@ -141,10 +142,11 @@ for i in range(len(test_set)):
     if prediction == tlabel_data[i]:
         correct += 1
 
+#net.plot_rmse()
 accuracy = correct / num_timages
-print ("Learn rate = {}\nAccuracy = {}".format(learn_rate, accuracy))
+print ("Learn rate = {}".format(learn_rate))
 print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
-'''
+
 
 
 
