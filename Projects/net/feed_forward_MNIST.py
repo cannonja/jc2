@@ -39,91 +39,89 @@ else:
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
 
-
 import mnist_load as mnist
 import sparse_algo as sp
 import r_network_class as lca
 import image_class as ic
 from feed_forward import ff_net
 
-############## Load MNIST images and labels
-image_file = 'train-images.idx3-ubyte'
-image_file2 = 't10k-images.idx3-ubyte'
-label_file = 'train-labels.idx1-ubyte'
-label_file2 = 't10k-labels.idx1-ubyte'
-num_images = 60000
-num_timages = 10000
+################################## Set model params ####################################################
+
+layers = [784, 50, 10]   #Specify number of neurons per layer
+learn_rate = 0.5         #Set learning rate
+shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
+show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
+image_file = 'train-images.idx3-ubyte'    #Training images
+timage_file = 't10k-images.idx3-ubyte'    #Test images
+label_file = 'train-labels.idx1-ubyte'    #Training labels
+tlabel_file = 't10k-labels.idx1-ubyte'    #Test labels
+num_images = 40000   #Number of training images
+num_timages = 10000  #Number of test images
+
+
+############################ Load MNIST images and labels #########################################
+
 image_data = mnist.load_images(image_file, num_images)
 label_data = mnist.load_labels(label_file, num_images)
-timage_data = mnist.load_images(image_file2, num_timages)
-tlabel_data = mnist.load_labels(label_file2, num_timages)
+timage_data = mnist.load_images(timage_file, num_timages)
+tlabel_data = mnist.load_labels(tlabel_file, num_timages)
+if len(image_data) != len(label_data):
+    print ('TRAINING DATA ERROR: Num of images doesn\'t match num of labels!!!!!')
+if len(timage_data) != len(tlabel_data):
+    print ('TEST DATA ERROR: Num of images doesn\'t match num of labels!!!!!')
 
+############################### Build training set ###################################
 
-
-############# Build training set
-
-# Images
 images = []
+labels = []    
 for i in range(len(image_data)):
     image_data[i] = image_data[i].astype(float)
     image_data[i] /= 255.
     images.append(image_data[i].flatten()[np.newaxis, :])
-
-# Labels
-labels = []
-for i in range(len(label_data)):
     label = np.zeros((10, 1))
     label[label_data[i]] = 1
     labels.append(label)
 
 training_set = [(images[i], labels[i]) for i in range(len(images))]
-#random.shuffle(training_set)
 
+################################ Build test set ########################################
 
-############# Build test set
-
-# Images
 images = []
+labels = []
 for i in range(len(timage_data)):
     timage_data[i] = timage_data[i].astype(float)
     timage_data[i] /= 255.
     images.append(timage_data[i].flatten()[np.newaxis, :])
-
-# Labels
-labels = []
-for i in range(len(tlabel_data)):
     label = np.zeros((10, 1))
     label[tlabel_data[i]] = 1
     labels.append(label)
 
 test_set = [(images[i], labels[i]) for i in range(len(images))]
-#random.shuffle(test_set)
+
+## Shuffle?
+if shuffle_data:
+    random.shuffle(training_set)
+    random.shuffle(test_set)   
 
 
+############################### Train network ######################################
 
-########### Train network
-layers = [784, 50, 10]
-learn_rate = 1.05
 net = ff_net(layers)
-
 for i in range(len(training_set)):
-    '''
-    if (i+1) % 10000 == 0:
+    if (i+1) % 10000 == 0 and show_imnums:
         print ("Training Image {}".format(i+1))
-    '''
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop(learn_rate)
 
-#pdb.set_trace()
-########### Test network
+
+################################ Test network #########################################
+
 confusion = np.zeros((10, 10), dtype='int32')
 correct = 0
 for i in range(len(test_set)):
-    '''
-    if (i+1) % 1000 == 0:
+    if (i+1) % 1000 == 0 and show_imnums:
         print ("Test Image {}".format(i+1))
-    '''
     net.set_input(test_set[i][0])
     net.forward_prop(test_set[i][1])
     prediction = np.where(net.output == net.output.max())[1][0]
@@ -133,7 +131,7 @@ for i in range(len(test_set)):
 
 accuracy = correct / num_timages
 print ("Learn rate = {}\nAccuracy = {}".format(learn_rate, accuracy))
-#print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
+print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
 
 
 
@@ -153,16 +151,6 @@ print ("Learn rate = {}\nAccuracy = {}".format(learn_rate, accuracy))
 
 
 
-
-
-
-'''
-net = ff_net([3, 3, 3])
-in_data = np.repeat(1, 3).reshape(3,1)
-net.set_input(in_data)
-net.forward_prop(np.array([[1],[0],[0]]))
-net.back_prop(1.0)
-'''
 
 
 
