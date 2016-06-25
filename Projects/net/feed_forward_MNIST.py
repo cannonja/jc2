@@ -47,13 +47,13 @@ from feed_forward import ff_net
 
 ################################## Set model params ####################################################
 
-layers = [784, 30, 10]   #Specify number of neurons per layer
-learn_rate = 1.5        #Set learning rate
+layers = [784, 50, 10]   #Specify number of neurons per layer
+learn_rate = 1.5         #Set learning rate
 shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
 decay = 1                #Flag to decay learning rate (1 = yes, 0 = no) 
-decay_rate = 0.9        #Set learning rate decay
-decay_iters = 1000       #Set learning rate to decay every number of specified iterations
+decay_rate = 0.99        #Set learning rate decay
+decay_iters = 500        #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
 label_file = 'train-labels.idx1-ubyte'    #Training labels
@@ -62,7 +62,7 @@ num_images = 50000   #Number of training images
 num_timages = 10000  #Number of test images
 
 
-############################ Load MNIST images and labels #########################################
+############################ Load all MNIST images and labels #########################################
 
 image_data = mnist.load_images(image_file, num_images)
 label_data = mnist.load_labels(label_file, num_images)
@@ -73,7 +73,7 @@ if len(image_data) != len(label_data):
 if len(timage_data) != len(tlabel_data):
     print ('TEST DATA ERROR: Num of images doesn\'t match num of labels!!!!!')
 
-############################### Build training set ###################################
+############################### Build training data ###################################
 
 images = []
 labels = []    
@@ -85,9 +85,9 @@ for i in range(len(image_data)):
     label[label_data[i]] = 1
     labels.append(label)
 
-training_set = [(images[i], labels[i]) for i in range(len(images))]
+training_data = [(images[i], labels[i]) for i in range(len(images))]
 
-################################ Build test set ########################################
+################################ Build test data ########################################
 
 images = []
 labels = []
@@ -99,44 +99,27 @@ for i in range(len(timage_data)):
     label[tlabel_data[i]] = 1
     labels.append(label)
 
-test_set = [(images[i], labels[i]) for i in range(len(images))]
+test_data = [(images[i], labels[i]) for i in range(len(images))]
 
+########################### Select training and test sets ###############################
 
-## Shuffle
+## If shuffled, data is randomly selected, otherwise
+## selected data is the first num_images/num_timages in the set
 if shuffle_data:
-    random.shuffle(training_set)
-    random.shuffle(test_set)   
+    random.shuffle(training_data)
+    #random.shuffle(test_data)
 
+training_set = training_data[:num_images]
+test_set = test_data[:num_timages]
 
-############################### Train network ######################################
+############################### Train network ###########################################
 
 net = ff_net(layers)
-net.e = 0
 if decay:
     net.set_lr_stats(learn_rate, decay_rate)
 else:
     net.set_lr_stats(learn_rate)    
 
-for epoch in range(10):
-    print ("Epoch ", epoch + 1)
-    for i in range(len(training_set)):
-        if (i+1) % 10000 == 0 and show_imnums:
-            print ("Training Image {}".format(i+1))
-        if decay and (i+1) % decay_iters == 0:
-            net.decay()
-        net.set_input(training_set[i][0])
-        net.forward_prop(training_set[i][1])
-        if (i+1) % 10 == 0:
-            net.back_prop()
-            net.rmse = np.append(net.rmse, np.sqrt(np.dot(net.e.T, net.e)))
-            net.e = 0
-    random.shuffle(training_set)
-    net.learn_rate = learn_rate
-
-
-
-
-'''
 for i in range(len(training_set)):
     if (i+1) % 10000 == 0 and show_imnums:
         print ("Training Image {}".format(i+1))
@@ -145,12 +128,9 @@ for i in range(len(training_set)):
     net.set_input(training_set[i][0])
     net.forward_prop(training_set[i][1])
     net.back_prop()
-'''
 
 net.plot_rmse()
-net.clear_rmse()
 net.plot_lr_decay()
-
 
 ################################ Test network #########################################
 
@@ -166,7 +146,6 @@ for i in range(len(test_set)):
     if prediction == tlabel_data[i]:
         correct += 1
 
-#net.plot_rmse()
 accuracy = correct / num_timages
 print ("Learn rate = {}".format(learn_rate))
 print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))

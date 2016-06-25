@@ -24,8 +24,8 @@ class ff_net:
         self.lr_decay = np.array([])  #variable to hold data for plotting learning rate decay
     
         for i in range(len(layers) - 1):
-            #self.W_bar.append(np.random.randn(self.layers[i] + 1, self.layers[i+1]))
-            self.W_bar.append(np.random.normal(0, 0.1, (self.layers[i] + 1, self.layers[i+1])))
+            self.W_bar.append(np.random.randn(self.layers[i] + 1, self.layers[i+1]))
+            #self.W_bar.append(np.random.normal(0, 0.1, (self.layers[i] + 1, self.layers[i+1])))
 
 
     def clear_rmse(self):
@@ -67,7 +67,7 @@ class ff_net:
         plt.plot(ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
         plt.xlabel('Number of examples seen')
         plt.ylabel('RMSE')
-        #plt.title('RMSE During Backprop')
+        plt.title('RMSE During Backprop')
         plt.legend()
         if path is None:
             plt.show()
@@ -119,9 +119,9 @@ class ff_net:
         self.D.append(np.diagflat(self.d_sig(z))) #Exclude bias term in gradients
 
         self.output = self.activations[-1].copy()
-        #self.e = self.output.T - label    # e is supposed to be a column vector
-        self.e += (self.output.T - label)    # e is supposed to be a column vector
-        #self.rmse = np.append(self.rmse, np.sqrt(np.dot(self.e.T, self.e)))
+        self.e = self.output.T - label    # e is supposed to be a column vector
+        #self.e += (self.output.T - label)    # e is supposed to be a column vector
+        self.rmse = np.append(self.rmse, np.sqrt(np.dot(self.e.T, self.e)))
 
 
 
