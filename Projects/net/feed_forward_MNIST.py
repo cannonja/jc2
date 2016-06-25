@@ -76,30 +76,34 @@ if len(timage_data) != len(tlabel_data):
 ############################### Build training data ###################################
 
 images = []
-labels = []    
+onehot_labels = []
+numeric_labels = []
 for i in range(len(image_data)):
     image_data[i] = image_data[i].astype(float)
     image_data[i] /= 255.
     images.append(image_data[i].flatten()[np.newaxis, :])
-    label = np.zeros((10, 1))
-    label[label_data[i]] = 1
-    labels.append(label)
+    onehot_label = np.zeros((10, 1))
+    onehot_label[label_data[i]] = 1
+    onehot_labels.append(onehot_label)
+    numeric_labels.append(label_data[i])
 
-training_data = [(images[i], labels[i]) for i in range(len(images))]
+training_data = [(images[i], onehot_labels[i], numeric_labels[i]) for i in range(len(images))]
 
 ################################ Build test data ########################################
 
 images = []
-labels = []
+onehot_labels = []
+numeric_labels = []
 for i in range(len(timage_data)):
     timage_data[i] = timage_data[i].astype(float)
     timage_data[i] /= 255.
     images.append(timage_data[i].flatten()[np.newaxis, :])
-    label = np.zeros((10, 1))
-    label[tlabel_data[i]] = 1
-    labels.append(label)
+    onehot_label = np.zeros((10, 1))
+    onehot_label[tlabel_data[i]] = 1
+    onehot_labels.append(onehot_label)
+    numeric_labels.append(tlabel_data[i])
 
-test_data = [(images[i], labels[i]) for i in range(len(images))]
+test_data = [(images[i], onehot_labels[i], numeric_labels[i]) for i in range(len(images))]
 
 ########################### Select training and test sets ###############################
 
@@ -107,7 +111,7 @@ test_data = [(images[i], labels[i]) for i in range(len(images))]
 ## selected data is the first num_images/num_timages in the set
 if shuffle_data:
     random.shuffle(training_data)
-    #random.shuffle(test_data)
+    random.shuffle(test_data)
 
 training_set = training_data[:num_images]
 test_set = test_data[:num_timages]
@@ -142,8 +146,8 @@ for i in range(len(test_set)):
     net.set_input(test_set[i][0])
     net.forward_prop(test_set[i][1])
     prediction = np.where(net.output == net.output.max())[1][0]
-    confusion[tlabel_data[i], prediction] += 1
-    if prediction == tlabel_data[i]:
+    confusion[test_set[i][2], prediction] += 1
+    if prediction == test_set[i][2]:
         correct += 1
 
 accuracy = correct / num_timages
