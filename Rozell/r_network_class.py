@@ -70,7 +70,9 @@ class r_network:
         if (self.t_type == 'S'):
             return u - self.lamb
 
-    def generate_sparse(self, train = False):
+
+
+    def generate_sparse(self, plot_udot = False, train = False):
         u = np.zeros(self.b.shape)
         self.a = u.copy()  #Initialize a by setting equal to u
 
@@ -82,35 +84,30 @@ class r_network:
             inhibit = np.dot(np.transpose(self.dictionary), self.dictionary)\
                             - np.eye(self.dictionary.shape[1])
 
+        #Generate vector self.a
         udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
         loop_flag = True
-
-        #Generate vector self.a
-        len_u = len(u)
+        u_length = len(u)
         iterations = 0
-        ulen = []
+        ulen = []  #List to hold u_length over the iterations
         while (loop_flag):
             iterations += 1
-            u = u + (udot * self.delta)
-            #Update a vector
-            for i in range(len(self.a)):
-                self.a[i] = self.thresh(u[i])
+            u += np.multiply(udot, self.delta)
+
+            #Update self.a vector
+            self.a = self.thresh(u).copy()
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
-            #print (udot_length / len_u)
-            ulen.append(udot_length / len_u)
-            if udot_length / len_u < self.u_stop and iterations > 60: #or iterations > 5100:
+            if plot_udot:
+                ulen.append(udot_length / u_length)
+            if udot_length / u_length < self.u_stop and iterations > 60 or iterations > 5100:
                 loop_flag = False
-                #print (iterations)
 
-        '''
-        plt.figure()
-        plt.plot(range(iterations), ulen)
-        plt.show()
-        '''
+        if plot_udot:
+            plt.figure()
+            plt.plot(range(iterations), ulen)
+            plt.show()
 
-
-        return (self.a)   #, iterations, ulen)
 
 
     #This method updates the copy of the dictionary stored in the "trained"
