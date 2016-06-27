@@ -127,43 +127,6 @@ class r_network:
 
 
 
-    #Returns 1-D numpy array containing E(t), the left-hand operand of E(t),
-    #and the right-hand operand of E(t).
-    #That is the operands of the right-hand side of the error equation
-    def return_error(self):
-        stim = self.s
-        recon = np.dot(self.dictionary, self.a)
-        resid = stim - recon
-        a = 0.5 * math.sqrt(np.dot(resid, resid))
-        b = None
-        #sparsity = len(self.a[self.a > 0]) / len(self.a)
-        sparsity = np.count_nonzero(self.a)
-        norm1 = sum(abs(self.a))
-        cost = 0
-
-        if (self.t_type == 'S'):
-            cost = norm1
-        elif (norm1 > self.lamb):
-            cost = self.lamb / 2.
-
-        b = self.lamb * cost
-        #error = np.array([[self.lamb, (a + b), a, b, sparsity]])
-        error = np.array([[(a + b), a, b, sparsity]])
-
-        return error
-
-    #This method returns two arrays:
-    #coefficients consists of the active coefficients
-    #rfields consists of the respective dictionary elements
-    def get_rfields(self):
-        indices = np.where(self.a > 0)
-        rfields = self.dictionary[:, indices]
-        coefficients = self.a[indices]
-
-        return (coefficients, rfields)
-
-
-
     #This method takes a single lambda (as a list) or an array
     #of lambdas, then returns an error table (as a pandas dataframe)
     #and the data for two images (as lists).
