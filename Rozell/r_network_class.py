@@ -273,21 +273,14 @@ class r_network:
 
         dict_data = grid.copy() * 255.
         grid = self.add_gridlines(grid, num_rows, num_cols, line_color, line_pix)
+
+        ## Save grid
         plt.figure()
-        #grid *= 255.
         if len(self.im_dim) == 2:
             plt.imshow(grid, cmap=plt.get_cmap('gray'))
         else:
             plt.imshow(grid)
         plt.savefig(path)
-        #plt.show()
 
         return dict_data
-        '''
-        if (len(self.im_dim) == 2):
-            im_grid = Image.fromarray(grid, mode='L')
-        else:
-            im_grid = Image.fromarray(grid, mode='RGB')
-        #im_grid = im_grid.convert('L')
-        im_grid.save(path, 'PNG')
-        '''
+
