@@ -112,21 +112,16 @@ class r_network:
 
     #This method updates the copy of the dictionary stored in the "trained"
     #data member, then returns the residual
-    def update_trained(self, alpha):
+    def update_trained(self, alpha, clamp = True):
         stim = self.s
         recon = np.dot(self.a, np.transpose(self.trained))
         resid = stim - recon
-
-        wdot = resid * ((self.a * alpha)[:, np.newaxis])
-        #wdot = np.asmatrix(resid).T * (np.asmatrix(self.a) * alpha)
-        #print("resid {}, a {}".format(resid.__class__, self.a.__class__))
-        #self.trained = (self.trained + np.transpose(wdot)).copy()
-        #before = self.trained.copy()
+        wdot = np.multiply(resid, ((self.a * alpha)[:, np.newaxis]))
         self.trained += np.transpose(wdot)
+
         #Clamp to [0,1]
-        self.trained = np.minimum(1., np.maximum(0, self.trained))
-        #after = self.trained.copy()
-        #print ("Sum of changes = {}".format(np.sum(after - before)))
+        if clamp:
+            self.trained = np.minimum(1., np.maximum(0., self.trained))
 
         return resid
 
