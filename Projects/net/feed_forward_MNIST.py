@@ -47,11 +47,11 @@ from feed_forward import ff_net
 
 ################################## Set model params ####################################################
 
-layers = [784, 50, 10]   #Specify number of neurons per layer
+layers = [784, 30, 10]   #Specify number of neurons per layer
 learn_rate = 1.5         #Set learning rate
 shuffle_data = 1         #Randomize data? (1 = yes, 0 = no)
-show_imnums = 1          #Print image numbers during training and testing? (1 = yes, 0 = no)
-decay = 1                #Flag to decay learning rate (1 = yes, 0 = no) 
+show_imnums = 0          #Print image numbers during training and testing? (1 = yes, 0 = no)
+decay = 1                #Flag to decay learning rate (1 = yes, 0 = no)
 decay_rate = 0.99        #Set learning rate decay
 decay_iters = 500        #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
@@ -122,7 +122,7 @@ net = ff_net(layers)
 if decay:
     net.set_lr_stats(learn_rate, decay_rate)
 else:
-    net.set_lr_stats(learn_rate)    
+    net.set_lr_stats(learn_rate)
 
 for i in range(len(training_set)):
     if (i+1) % 10000 == 0 and show_imnums:
@@ -146,13 +146,16 @@ for i in range(len(test_set)):
     net.set_input(test_set[i][0])
     net.forward_prop(test_set[i][1])
     prediction = np.where(net.output == net.output.max())[1][0]
-    confusion[test_set[i][2], prediction] += 1
+    confusion[test_set[i][2], prediction] += 1   #rows = actual, cols = predictions
     if prediction == test_set[i][2]:
         correct += 1
 
+digit_accuracy = pandas.DataFrame(np.diag(confusion) / np.sum(confusion, axis=1),\
+                                    columns=['Digit Accuracies'])
 accuracy = correct / num_timages
-print ("Learn rate = {}".format(learn_rate))
-print ("Accuracy = {}\nConfusion:\n{}".format(accuracy, confusion))
+#print ("Learn rate = {}".format(learn_rate))
+print ("Confusion:\n\n{}".format(confusion))
+print ("Accuracy = {}\n\n{}".format(accuracy, digit_accuracy))
 
 
 
