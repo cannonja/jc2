@@ -39,8 +39,8 @@ else:
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
     dict_path = file_path + '/trained_data.csv'
-    sparse_path_in = file_path + '/sparse_codes.csv'
-    sparse_path_out = file_path + '/sparse_codes.csv'
+    sparse_path_train = file_path + '/sparse_codes.csv'
+    sparse_path_test = file_path + '/sparse_codes_test.csv'
 
 import mnist_load as mnist
 import sparse_algo as sp
@@ -51,11 +51,11 @@ from feed_forward import ff_net
 ###################################### Set NN params ####################################################
 
 layers = [50, 10]   #Specify number of neurons per layer
-learn_rate = 1.5         #Set learning rate
+learn_rate = 2.0         #Set learning rate
 shuffle_data = 0         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 0          #Print image numbers during training and testing? (1 = yes, 0 = no)
-decay = 1                #Flag to decay learning rate (1 = yes, 0 = no)
-decay_rate = 0.97        #Set learning rate decay
+decay = 0                #Flag to decay learning rate (1 = yes, 0 = no)
+decay_rate = 0.9        #Set learning rate decay
 decay_iters = 100        #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
@@ -126,27 +126,41 @@ if shuffle_data:
 
 training_set = training_data[:num_images]
 test_set = test_data[:num_timages]
-'''
 ########################## Initialze Lca and load dictionary ############################
 dict_data = pandas.read_csv(dict_path, header=None)
 Lca = r_network(dict_data.values)
 Lca.set_parameters(lamb, tau, delta, u_stop, t_type)
 Lca.set_dim(image_data[0].shape)
 
-# Generate sparse codes for all images, then run through NN
-sparse_data = np.zeros((Lca.dictionary.shape[1], len(training_set)))
+# Generate sparse codes for training and testing images, then run through NN
+sparse_train = np.zeros((Lca.dictionary.shape[1], len(training_set)))
+sparse_test = np.zeros((Lca.dictionary.shape[1], len(test_set)))
+'''
+# Generate training set
 for i in range(len(training_set)):
     if (i + 1) % 100 == 0:
-        print ('Image #: ', i)
+        print ('Sparse Train#: ', i+1)
     Lca.set_stimulus(training_set[i][0].T)  #Need to remember that Rojas uses row vecotrs.  Transpose before passing to Rozell
     Lca.generate_sparse()
-    sparse_data[:,i] = Lca.a.flatten().copy()
-
+    sparse_train[:,i] = Lca.a.flatten().copy()
 # Save sparse codes for later use
-df = pandas.DataFrame(sparse_data.T)  #Transpose so data can fit on a sheet
-df.to_csv(sparse_path_out, index = False, header = False)
+df = pandas.DataFrame(sparse_data)
+df.to_csv(sparse_path_train, index = False, header = False)
 '''
-sparse_data = pandas.read_csv(sparse_path_in, header=None).values
+sparse_train = pandas.read_csv(sparse_path_train, header=None).values
+'''
+# Generate test set
+for i in range(len(test_set)):
+    if (i + 1) % 100 == 0:
+        print ('Sparse Test#: ', i+1)
+    Lca.set_stimulus(test_set[i][0].T)  #Need to remember that Rojas uses row vecotrs.  Transpose before passing to Rozell
+    Lca.generate_sparse()
+    sparse_test[:,i] = Lca.a.flatten().copy()
+# Save sparse codes for later use
+df2 = pandas.DataFrame(sparse_test)
+df2.to_csv(sparse_path_test, index = False, header = False)
+'''
+sparse_test = pandas.read_csv(sparse_path_test, header=None).values
 
 
 ############################### Train network ###########################################
@@ -163,7 +177,7 @@ for i in range(len(training_set)):
         print ("Training Image {}".format(i+1))
     if decay and (i+1) % decay_iters == 0:
         net.decay()
-    net.set_input(sparse_data[:, i][:, np.newaxis])
+    net.set_input(sparse_train[:, i][:, np.newaxis])
     net.forward_prop(training_set[i][1])
     net.back_prop()
 
@@ -171,13 +185,12 @@ net.plot_rmse()
 net.plot_lr_decay()
 
 ################################ Test network #########################################
-pdb.set_trace()
 confusion = np.zeros((10, 10), dtype='int32')
 correct = 0
 for i in range(len(test_set)):
     if (i+1) % 1000 == 0 and show_imnums:
         print ("Test Image {}".format(i+1))
-    net.set_input(test_set[i][0])
+    net.set_input(sparse_test[:, i][:, np.newaxis])
     net.forward_prop(test_set[i][1])
     prediction = np.where(net.output == net.output.max())[1][0]
     confusion[test_set[i][2], prediction] += 1   #rows = actual, cols = predictions

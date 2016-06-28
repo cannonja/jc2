@@ -111,7 +111,6 @@ class r_network:
             for i in range(u_length):
                 self.a[i] = self.thresh(u[i])
 
-
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot.T,udot))
             if plot_udot:
