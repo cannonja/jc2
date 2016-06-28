@@ -4,6 +4,8 @@ import pandas
 from PIL import Image
 import matplotlib.pyplot as plt
 import pdb
+import time
+import datetime
 
 class r_network:
     'Class to represent Rozell LCA network'
@@ -11,7 +13,11 @@ class r_network:
     def __init__(self, D):
         self.dictionary = D.astype(float)
         self.trained = self.dictionary.copy()
+        self.training_ims = None
         self.im_dim = None
+        self.rmse = None
+        self.alpha = None
+        self.alpha_decay = None
         self.s = None
         self.b = None
         self.a = None
@@ -34,6 +40,12 @@ class r_network:
     #Takes a tuple and sets the dimensions of the images in question
     def set_dim(self, dims):
         self.im_dim = dims
+
+    def load_ims(self, images):
+        self.training_ims = images
+
+    def set_alpha(self, alpha):
+        self.alpha = alpha
 
 
     def set_lambda(self, lamb):
@@ -104,8 +116,9 @@ class r_network:
             udot_length = math.sqrt(np.dot(udot,udot))
             if plot_udot:
                 ulen.append(udot_length / u_length)
-            if udot_length / u_length < self.u_stop and iterations > 60 or iterations > 5100:
+            if udot_length / u_length < self.u_stop and iterations > 60: #or iterations > 5100:
                 loop_flag = False
+                print ("udot length = {}, Num iters = {}".format(udot_length / u_length, iterations))
 
         if plot_udot:
             plt.figure()
@@ -143,13 +156,13 @@ class r_network:
 
 
 
-
+    #This method updates the copy of the dictionary stored in the "trained"
     #data member, then returns the residual
-    def update_trained(self, alpha, clamp = True):
+    def update_trained(self, clamp = True):
         stim = self.s
         recon = np.dot(self.a, np.transpose(self.trained))
         resid = stim - recon
-        wdot = np.multiply(resid, ((self.a * alpha)[:, np.newaxis]))
+        wdot = np.multiply(resid, ((self.a * self.alpha)[:, np.newaxis]))
         self.trained += np.transpose(wdot)
 
         #Clamp to [0,1]
@@ -157,6 +170,84 @@ class r_network:
             self.trained = np.minimum(1., np.maximum(0., self.trained))
 
         return resid
+
+
+
+
+
+    def train(self, a_decay = 0, a_decay_rt = 1.0, a_decay_iters = 1000,\
+            clamp_proc = True, track_resid = True, track_decay = True):
+        #Print out the time and start the training process
+        #Save out the original dictionary
+        num_images = len(self.training_ims)
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        print("Start time: ", st)
+        self.rmse = np.zeros(num_images)
+        if track_decay:
+            self.alpha_decay = np.zeros(num_images)
+
+        for i in range(num_images):
+            if (((i + 1) % 100) == 0):
+                print("Image ",i + 1)
+            stimulus = self.training_ims[i].flatten()
+            network.set_stimulus(stimulus, True)
+            network.generate_sparse(train=True)
+            if (a_decay and (i + 1) % a_decay_iters == 0):
+                self.alpha *= a_decay_rt
+            y = self.update_trained(clamp_proc)
+
+            if track_resid:
+                self.rmse[i] = np.sqrt(np.dot(y,y))
+            if track_decay:
+                self.alpha_decay[i] = self.alpha.copy()
+
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
+        print("End time: ", st)
+
+
+
+
+
+    def plot_rmse(self, win1, win2, plot_path = None, data_path = None):
+        if self.rmse is None:
+            print ("ERROR: No RMSE data")
+            return
+
+        x = range(len(self.training_ims))
+        df = pandas.DataFrame(np.column_stack((x, self.rmse)), columns = ['Image #', "Resid"])
+        ma1 = df.iloc[:,1].rolling(window = win1).mean().values
+        ma2 = df.iloc[:,1].rolling(window = win2).mean().values
+
+        plt.figure()
+        plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
+        plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
+        plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
+        plt.xlabel('Image Number')
+        plt.title('Reconstruction Error')
+        plt.legend()
+        if data_path is not None:
+            df.to_csv(data_path, index = False)
+        if plot_path is not None:
+            plt.savefig(plot_path)
+        else:
+            plt.show()
+
+
+    def plot_decay(self):
+        if self.alpha_decay is None:
+            print ('ERROR: No alpha decay data')
+            return
+
+        plt.figure()
+        plt.plot(self.alpha_decay)
+        plt.title('Learning-rate decay')
+        plt.xlabel('Image Number')
+        plt.ylabel('alpha')
+        plt.show()
+
+
 
 
 
@@ -279,7 +370,8 @@ class r_network:
     #This method takes the number of rows and columns for the resulting image grid
     #It takes a file path to save the dictionary and a boolean (train) to
     #determine whether the original dictionary or trained dictionary data is used
-    def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 1, train = False):
+    def save_dictionary(self, num_rows, num_cols, path, line_color = 0, line_pix = 1,\
+            train = False, data_path = None):
         ## Initialize grid
         line_color /= 255.
         if (len(self.im_dim) == 2):
@@ -315,5 +407,7 @@ class r_network:
             plt.imshow(grid)
         plt.savefig(path)
 
-        return dict_data
+        if data_path is not None:
+            data_out = pandas.DataFrame(dict_data)
+            data_out.to_csv(data_path, index = False, header = False)
 
