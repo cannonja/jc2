@@ -48,102 +48,56 @@ else:
     write_path = file_path + '/resid_data.csv'
     plot_path = file_path + '/resid_plot.png'
 
-
-
 import mnist_load as mnist
 import sparse_algo as sp
 import r_network_class as lca
 
 
-################### Set parameters ##############################################################
+#################################### Set Rozell network parameters ##############################################################
 lamb = 1.0
 tau = 10.0
 delta = 0.01
-u_stop = 0.0001
+u_stop = 0.001
 t_type = 'S'
 alpha = 0.85
+alpha_decay = 1
+alpha_decay_rate = 0.95
+alpha_decay_iters = 1000
+num_rfields = 50
+num_images =  10      #60000 - num_rfields
+image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 
 #Plotting parameters
 win1 = 100  #Window for mov avg 1
 win2 = 500 #Window for mov avg 2
 
-################### Load dictionary from first 50 MNIST images ##################################
-################### Load training set from last 59950 MNIST images ##############################
-num_rfields = 50
-num_images =  5000      #60000 - num_rfields
-image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
+
+######################## Preprocess data - dictionary gets loaded with first num_rfields MNIST images ############################
+#################################### Training data starts loading after dictionary images ########################################
 dict_data = mnist.load_images(image_file, num_rfields)
 training_data = mnist.load_images(image_file, num_images, num_rfields)
+dict_data = [np.array(i, dtype=float) / 255 for i in dict_data]
+training_data = [np.array(i, dtype=float) / 255 for i in training_data]
 
-for i in range(len(dict_data)):
-    dict_data[i] = dict_data[i].astype(float)
-    dict_data[i] /= 255.
 
-for i in range(len(training_data)):
-    training_data[i] = training_data[i].astype(float)
-    training_data[i] /= 255.
 
-#Initialize network dictionary and parameters
+
+######################################### Initialize network dictionary and parameters ###########################################
 D = sp.build_dictionary(dict_data)
 network = lca.r_network(D)
 network.set_parameters(lamb, tau, delta, u_stop, t_type)
 network.set_dim(dict_data[0].shape)
-
-
-################### Run each training image through network #######################################
-################### For each image, generate sparse code then update trained ######################
-
-#Print out the time and start the training process
 #Save out the original dictionary
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("Start time: ", st)
 network.save_dictionary(5, 10, dict1_path, line_color = 255)
 
-#Initiate x values and residual array for residual plot
-x = range(num_images)
-resid_plot = np.zeros((num_images))
 
-#Train dictionary as each image is run through network
-#Store length of residual vector in resid_plot array
-for i in range(num_images):
-    if (((i + 1) % 100) == 0):
-        print("Image ",i + 1)
-    stimulus = training_data[i].flatten()
-    network.set_stimulus(stimulus, True)
-    network.generate_sparse(True)
-    if ((i + 1) % 1000 == 0):
-        alpha *= 0.92
-        print (alpha)
-    y = network.update_trained(alpha)
-    resid_plot[i] = np.sqrt(np.dot(y,y))
 
-#Save out trained dictionary as image and csv, then print out time
+
+#################################################### Train dictionary ############################################################
+network.set_alpha(alpha)
+network.train(alpha_decay, alpha_decay_rate, alpha_decay_iters)
+network.plot_rmse(win1, win2)
+network.plot_decay()
+#Save out trained dictionary
 network.save_dictionary(5, 10, dict2_path, line_color = 255, train=True)
-data = pandas.DataFrame(network.trained * 255.)
-data.to_csv(dict3_path, index = False, header = False)
-ts = time.time()
-st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
-print("End time: ", st)
-
-#Write residual data to csv file and plot
-df = pandas.DataFrame(np.column_stack((x, resid_plot)), columns = ['Image #', "Resid"])
-df.to_csv(write_path, index = False)
-
-
-
-#Plot and save out both raw and smoothed residuals
-ma1 = df.iloc[:,1].rolling(window = win1).mean().values
-ma2 = df.iloc[:,1].rolling(window = win2).mean().values
-
-plt.figure()
-plt.plot(x, df.values[:,1],  color = 'gray', alpha = 0.6, label = 'Raw')
-plt.plot(x, ma1,  color = 'red', label = 'MA - ' + str(win1) + ' periods')
-plt.plot(x, ma2,  color = 'blue', label = 'MA - ' + str(win2) + ' periods')
-plt.xlabel('Image Number')
-plt.title('Reconstruction Error')
-plt.legend()
-plt.savefig(plot_path)
-###plt.show()
-
 
