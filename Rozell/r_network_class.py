@@ -95,7 +95,8 @@ class r_network:
             u += np.multiply(udot, self.delta)
 
             #Update self.a vector
-            self.a = self.thresh(u).copy()
+            threshold = np.vectorize(self.thresh)
+            self.a = threshold(u).copy()
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
             if plot_udot:
@@ -110,7 +111,35 @@ class r_network:
 
 
 
-    #This method updates the copy of the dictionary stored in the "trained"
+    #Returns 1-D numpy array containing E(t), the left-hand operand of E(t),
+    #and the right-hand operand of E(t).
+    #That is the operands of the right-hand side of the error equation
+    def return_error(self):
+        stim = self.s
+        recon = np.dot(self.dictionary, self.a)
+        resid = stim - recon
+        a = 0.5 * math.sqrt(np.dot(resid, resid))
+        b = None
+        #sparsity = len(self.a[self.a > 0]) / len(self.a)
+        sparsity = np.count_nonzero(self.a)
+        norm1 = sum(abs(self.a))
+        cost = 0
+
+        if (self.t_type == 'S'):
+            cost = norm1
+        elif (norm1 > self.lamb):
+            cost = self.lamb / 2.
+
+        b = self.lamb * cost
+        #error = np.array([[self.lamb, (a + b), a, b, sparsity]])
+        error = np.array([[(a + b), a, b, sparsity]])
+
+        return error
+
+
+
+
+
     #data member, then returns the residual
     def update_trained(self, alpha, clamp = True):
         stim = self.s
