@@ -54,17 +54,17 @@ import r_network_class as lca
 
 
 #################################### Set Rozell network parameters ##############################################################
-lamb = 1.0
+lamb = 0.0
 tau = 10.0
 delta = 0.01
 u_stop = 0.001
 t_type = 'S'
 alpha = 0.85
 alpha_decay = 1
-alpha_decay_rate = 0.95
-alpha_decay_iters = 1000
+alpha_decay_rate = 0.999
+alpha_decay_iters = 1
 num_rfields = 50
-num_images =  10      #60000 - num_rfields
+num_images =  5000      #60000 - num_rfields
 image_file = 'train-images.idx3-ubyte'    #'t10k-images.idx3-ubyte'
 
 #Plotting parameters
@@ -95,9 +95,11 @@ network.save_dictionary(5, 10, dict1_path, line_color = 255)
 
 #################################################### Train dictionary ############################################################
 network.set_alpha(alpha)
+network.load_ims(training_data)
 network.train(alpha_decay, alpha_decay_rate, alpha_decay_iters)
 network.plot_rmse(win1, win2)
 network.plot_decay()
 #Save out trained dictionary
-network.save_dictionary(5, 10, dict2_path, line_color = 255, train=True)
+network.save_dictionary(5, 10, dict2_path, line_color = 255, train=True,\
+        data_path = dict3_path)
 

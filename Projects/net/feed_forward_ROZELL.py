@@ -39,7 +39,7 @@ else:
     os.chdir(os.path.join(base1, 'MNIST_Load'))
     file_path = base1 + '/Test/DB Classifier/Overnight run'
     dict_path = file_path + '/trained_data.csv'
-    sparse_path_train = file_path + '/sparse_codes.csv'
+    sparse_path_train = file_path + '/sparse_codes_train.csv'
     sparse_path_test = file_path + '/sparse_codes_test.csv'
 
 import mnist_load as mnist
@@ -66,7 +66,7 @@ num_timages = 5000  #Number of test images
 
 
 #################################### Set Rozell params ################################################
-lamb = 1.0
+lamb = 0.0
 tau = 10.0
 delta = 0.01
 u_stop = 0.001
@@ -126,6 +126,8 @@ if shuffle_data:
 
 training_set = training_data[:num_images]
 test_set = test_data[:num_timages]
+
+
 ########################## Initialze Lca and load dictionary ############################
 dict_data = pandas.read_csv(dict_path, header=None)
 Lca = r_network(dict_data.values)
@@ -135,7 +137,7 @@ Lca.set_dim(image_data[0].shape)
 # Generate sparse codes for training and testing images, then run through NN
 sparse_train = np.zeros((Lca.dictionary.shape[1], len(training_set)))
 sparse_test = np.zeros((Lca.dictionary.shape[1], len(test_set)))
-'''
+
 # Generate training set
 for i in range(len(training_set)):
     if (i + 1) % 100 == 0:
@@ -146,9 +148,9 @@ for i in range(len(training_set)):
 # Save sparse codes for later use
 df = pandas.DataFrame(sparse_data)
 df.to_csv(sparse_path_train, index = False, header = False)
-'''
-sparse_train = pandas.read_csv(sparse_path_train, header=None).values
-'''
+#sparse_train = pandas.read_csv(sparse_path_train, header=None).values
+
+
 # Generate test set
 for i in range(len(test_set)):
     if (i + 1) % 100 == 0:
@@ -159,8 +161,7 @@ for i in range(len(test_set)):
 # Save sparse codes for later use
 df2 = pandas.DataFrame(sparse_test)
 df2.to_csv(sparse_path_test, index = False, header = False)
-'''
-sparse_test = pandas.read_csv(sparse_path_test, header=None).values
+#sparse_test = pandas.read_csv(sparse_path_test, header=None).values
 
 
 ############################### Train network ###########################################
