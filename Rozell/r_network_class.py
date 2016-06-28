@@ -13,7 +13,7 @@ class r_network:
     def __init__(self, D):
         self.dictionary = D.astype(float)
         self.trained = self.dictionary.copy()
-        self.training_ims = None
+        self.images = None
         self.im_dim = None
         self.rmse = None
         self.alpha = None
@@ -42,7 +42,7 @@ class r_network:
         self.im_dim = dims
 
     def load_ims(self, images):
-        self.training_ims = images
+        self.images = images
 
     def set_alpha(self, alpha):
         self.alpha = alpha
@@ -118,7 +118,7 @@ class r_network:
                 ulen.append(udot_length / u_length)
             if udot_length / u_length < self.u_stop and iterations > 60: #or iterations > 5100:
                 loop_flag = False
-                print ("udot length = {}, Num iters = {}".format(udot_length / u_length, iterations))
+                #print ("udot length = {}, Num iters = {}".format(udot_length / u_length, iterations))
 
         if plot_udot:
             plt.figure()
@@ -179,7 +179,7 @@ class r_network:
             clamp_proc = True, track_resid = True, track_decay = True):
         #Print out the time and start the training process
         #Save out the original dictionary
-        num_images = len(self.training_ims)
+        num_images = len(self.images)
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
         print("Start time: ", st)
@@ -190,9 +190,9 @@ class r_network:
         for i in range(num_images):
             if (((i + 1) % 100) == 0):
                 print("Image ",i + 1)
-            stimulus = self.training_ims[i].flatten()
-            network.set_stimulus(stimulus, True)
-            network.generate_sparse(train=True)
+            stimulus = self.images[i].flatten()
+            self.set_stimulus(stimulus, True)
+            self.generate_sparse(train=True)
             if (a_decay and (i + 1) % a_decay_iters == 0):
                 self.alpha *= a_decay_rt
             y = self.update_trained(clamp_proc)
@@ -200,7 +200,7 @@ class r_network:
             if track_resid:
                 self.rmse[i] = np.sqrt(np.dot(y,y))
             if track_decay:
-                self.alpha_decay[i] = self.alpha.copy()
+                self.alpha_decay[i] = self.alpha
 
         ts = time.time()
         st = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S')
@@ -215,7 +215,7 @@ class r_network:
             print ("ERROR: No RMSE data")
             return
 
-        x = range(len(self.training_ims))
+        x = range(len(self.images))
         df = pandas.DataFrame(np.column_stack((x, self.rmse)), columns = ['Image #', "Resid"])
         ma1 = df.iloc[:,1].rolling(window = win1).mean().values
         ma2 = df.iloc[:,1].rolling(window = win2).mean().values
@@ -408,6 +408,11 @@ class r_network:
         plt.savefig(path)
 
         if data_path is not None:
-            data_out = pandas.DataFrame(dict_data)
-            data_out.to_csv(data_path, index = False, header = False)
+            if train:
+                data_out = pandas.DataFrame(self.dictionary)
+                data_out.to_csv(data_path, index = False, header = False)
+            else:
+                data_out = pandas.DataFrame(self.trained)
+                data_out.to_csv(data_path, index = False, header = False)
+
 
