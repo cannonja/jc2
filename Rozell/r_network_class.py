@@ -113,7 +113,7 @@ class r_network:
 
 
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
-            udot_length = math.sqrt(np.dot(udot,udot))
+            udot_length = math.sqrt(np.dot(udot.T,udot))
             if plot_udot:
                 ulen.append(udot_length / u_length)
             if udot_length / u_length < self.u_stop and iterations > 60: #or iterations > 5100:
