@@ -90,13 +90,16 @@ class r_network:
         u_length = len(u)
         iterations = 0
         ulen = []  #List to hold u_length over the iterations
+
         while (loop_flag):
             iterations += 1
             u += np.multiply(udot, self.delta)
 
             #Update self.a vector
-            threshold = np.vectorize(self.thresh)
-            self.a = threshold(u).copy()
+            for i in range(u_length):
+                self.a[i] = self.thresh(u[i])
+
+
             udot = (1/self.tau) * (self.b - u - np.dot(inhibit, self.a))
             udot_length = math.sqrt(np.dot(udot,udot))
             if plot_udot:
@@ -107,6 +110,7 @@ class r_network:
         if plot_udot:
             plt.figure()
             plt.plot(range(iterations), ulen)
+            plt.title('Length of udot vector')
             plt.show()
 
 
@@ -175,7 +179,7 @@ class r_network:
 
     #It's important to understand that this method uses the values set by the current
     #network previously!!!!
-    def reconstruct(self, lambdas):
+    def reconstruct(self, lambdas, plt_udot=False):
         df = pandas.DataFrame() #DataFrame used for error table
         display = []  #List to hold rows of image data for grid (rfields scaled)
         display2 = [] #Unscaled rfields
@@ -185,7 +189,7 @@ class r_network:
             display_row = []   #List to hold one row of image data (for display)
             display_row2 = []  #For display2
             self.set_lambda(j)
-            catch = self.generate_sparse() #Calculate sparse code
+            self.generate_sparse(plot_udot=plt_udot) #Calculate sparse code
             ##Add row of error data to error table
             row = pandas.DataFrame(self.return_error())
             df = df.append(row)

@@ -53,16 +53,12 @@ signal_data = mnist.load_images(image_file, num_images, 9014)
 #Scale stimulus and dictionary before running Rozell
 signal_data[0] = signal_data[0].astype(float)
 signal_data[0] /= 255.
-#dict_data = mnist.load_images(image_file, 50)
-dict_data = pandas.read_csv('trained_data.csv', header=None, names=None).values
-#dict_data = [ np.asarray(r, dtype=float) / 255. for r in dict_data ]
-for i in range(len(dict_data)):
-    dict_data[i] = dict_data[i].astype(float)
-    dict_data[i] /= 255.
+dict_data = mnist.load_images(image_file, 50)
+#dict_data = pandas.read_csv('trained_data.csv', header=None, names=None).values
+dict_data = [ np.asarray(r, dtype=float) / 255. for r in dict_data ]
 
-
-#D = sp.build_dictionary(dict_data)
-D = dict_data
+D = sp.build_dictionary(dict_data)
+#D = dict_data
 
 
 
@@ -75,7 +71,6 @@ error_names = ['E(t)', 'Resid', 'Cost', 'Sparsity']
 lambdas = np.arange(0.1, 15.1, 1)
 #lambdas = [3.]
 
-#pdb.set_trace()
 #For each image, run Rozell then generate error table and image grid
 for i in range(num_images):
     #Get number of rows for error table and image grid
