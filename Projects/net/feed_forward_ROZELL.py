@@ -146,7 +146,7 @@ for i in range(len(training_set)):
     Lca.generate_sparse()
     sparse_train[:,i] = Lca.a.flatten().copy()
 # Save sparse codes for later use
-df = pandas.DataFrame(sparse_data)
+df = pandas.DataFrame(sparse_train)
 df.to_csv(sparse_path_train, index = False, header = False)
 #sparse_train = pandas.read_csv(sparse_path_train, header=None).values
 
