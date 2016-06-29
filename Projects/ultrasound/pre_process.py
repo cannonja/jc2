@@ -15,8 +15,9 @@ machine = socket.gethostname()
 if (machine == 'Jack-PC'):
     #Big laptop
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Projects\\net')
-    os.chdir('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\MNIST_Load')
     file_path = 'C:\\Users\\Jack2\\Desktop'
+    train_path = file_path + '\\Data Science Projects\\Kaggle Projects\\Ultrasound  Nerve Segmentation\\train'
+    os.chdir(train_path)
 elif (machine == 'Tab'):
     #Little laptop
     file_path = 'C:\\Users\\Jack\\Desktop'
