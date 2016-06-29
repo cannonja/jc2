@@ -44,7 +44,7 @@ class r_network:
     def load_ims(self, images):
         self.images = images
 
-    def set_alpha(self, alpha):
+    def set_alpha(self, alpha):Build CNN and run on MNIST - see how I can get best performance.
         self.alpha = alpha
 
 
@@ -176,7 +176,13 @@ class r_network:
 
     def train(self, a_decay = 0, a_decay_rt = 1.0, a_decay_iters = 1000,\
             clamp_proc = True, track_resid = True, track_decay = True):
-        #Print out the time and start the training process
+        #Print out the time and start The second convolutional layer takes as input the (response-normalized
+and pooled) output of the first convolutional layer and filters it with 256 kernels of size 5 × 5 × 48.
+The third, fourth, and fifth convolutional layers are connected to one another without any intervening
+pooling or normalization layers. The third convolutional layer has 384 kernels of size 3 × 3 ×
+256 connected to the (normalized, pooled) outputs of the second convolutional layer. The fourth
+convolutional layer has 384 kernels of size 3 × 3 × 192 , and the fifth convolutional layer has 256
+kernels of size 3 × 3 × 192. The fully-connected layers have 4096 neurons each. the training process
         #Save out the original dictionary
         num_images = len(self.images)
         ts = time.time()
