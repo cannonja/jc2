@@ -51,11 +51,11 @@ from feed_forward import ff_net
 ###################################### Set NN params ####################################################
 
 layers = [50, 10]   #Specify number of neurons per layer
-learn_rate = 2.0         #Set learning rate
+learn_rate = 1.0         #Set learning rate
 shuffle_data = 0         #Randomize data? (1 = yes, 0 = no)
 show_imnums = 0          #Print image numbers during training and testing? (1 = yes, 0 = no)
-decay = 0                #Flag to decay learning rate (1 = yes, 0 = no)
-decay_rate = 0.9        #Set learning rate decay
+decay = 1                #Flag to decay learning rate (1 = yes, 0 = no)
+decay_rate = 0.95        #Set learning rate decay
 decay_iters = 100        #Set learning rate to decay every number of specified iterations
 image_file = 'train-images.idx3-ubyte'    #Training images
 timage_file = 't10k-images.idx3-ubyte'    #Test images
@@ -137,7 +137,7 @@ Lca.set_dim(image_data[0].shape)
 # Generate sparse codes for training and testing images, then run through NN
 sparse_train = np.zeros((Lca.dictionary.shape[1], len(training_set)))
 sparse_test = np.zeros((Lca.dictionary.shape[1], len(test_set)))
-
+'''
 # Generate training set
 for i in range(len(training_set)):
     if (i + 1) % 100 == 0:
@@ -148,9 +148,10 @@ for i in range(len(training_set)):
 # Save sparse codes for later use
 df = pandas.DataFrame(sparse_train)
 df.to_csv(sparse_path_train, index = False, header = False)
-#sparse_train = pandas.read_csv(sparse_path_train, header=None).values
+'''
+sparse_train = pandas.read_csv(sparse_path_train, header=None).values
 
-
+'''
 # Generate test set
 for i in range(len(test_set)):
     if (i + 1) % 100 == 0:
@@ -161,7 +162,8 @@ for i in range(len(test_set)):
 # Save sparse codes for later use
 df2 = pandas.DataFrame(sparse_test)
 df2.to_csv(sparse_path_test, index = False, header = False)
-#sparse_test = pandas.read_csv(sparse_path_test, header=None).values
+'''
+sparse_test = pandas.read_csv(sparse_path_test, header=None).values
 
 
 ############################### Train network ###########################################
