@@ -1,7 +1,7 @@
 import imp
 import os
 import sys
-from scipy import ndimage
+from scipy import misc
 import numpy as np
 import socket
 import pandas
@@ -16,8 +16,9 @@ if (machine == 'Jack-PC'):
     #Big laptop
     sys.path.append('C:\\Users\\Jack2\\Desktop\\Git_Repos\\jc2\\Projects\\net')
     file_path = 'C:\\Users\\Jack2\\Desktop'
-    train_path = file_path + '\\Data Science Projects\\Kaggle Projects\\Ultrasound  Nerve Segmentation\\train'
+    train_path = file_path + '\\Data Science Projects\\Kaggle Projects\\Ultrasound  Nerve Segmentation\\data\\train'
     os.chdir(train_path)
+    train_all = natsort.natsorted(os.listdir())
 elif (machine == 'Tab'):
     #Little laptop
     file_path = 'C:\\Users\\Jack\\Desktop'
@@ -29,21 +30,26 @@ else:
     file_path = base2 + '/kaggle/ultrasound'
     train_path = file_path + '/data/train'
     os.chdir(train_path)
+    train_all = natsort(os.listdir())
 
 from feed_forward import ff_net
 
 ################################## Read training images and masks ####################################################
 
 '''Image 19_8.tif appears to not have a mask and 19_9 seems to be missing'''
-train_all = natsort(os.listdir())
 train_im = train_all[slice(0,len(train_all),2)]
 train_mask = train_all[slice(1,len(train_all),2)]
-'''
-print (len(train_all), train_all[:10], train_all[-10:])
-print (len(train_im), len(train_mask), len(train_im) + len(train_mask))
-print (train_im[:10], train_mask[:10])
-print (train_im[-10:], train_mask[-10:])
-'''
+
+im_data = [misc.imread(i) for i in train_im]
+ims = np.zeros((np.prod(im_data[0].shape), len(im_data)))
+for i in range(len(im_data)):
+    ims[:, i] = im_data[i].flatten()
+
+
+mask_data = [misc.imread(i) for i in train_mask]
+masks = np.zeros((np.prod(mask_data[0].shape), len(mask_data)))
+
+
 
 
 
