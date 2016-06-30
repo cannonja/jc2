@@ -19,8 +19,7 @@ if (machine == 'Jack-PC'):
     train_path = file_path + '\\Data Science Projects\\Kaggle Projects\\Ultrasound  Nerve Segmentation\\data\\train'
     im_path = train_path + '.csv'
     mask_path = file_path + '\\Data Science Projects\\Kaggle Projects\\Ultrasound  Nerve Segmentation\\data\\train_mask.csv'    
-    os.chdir(train_path)
-    train_all = natsort.natsorted(os.listdir())
+
 elif (machine == 'Tab'):
     #Little laptop
     file_path = 'C:\\Users\\Jack\\Desktop'
@@ -33,28 +32,28 @@ else:
     train_path = file_path + '/data/train'
     im_path = train_path + '.csv' 
     mask_path = file_path + '/data/train_mask.csv'
-    os.chdir(train_path)
-    train_all = natsort(os.listdir())
 
 from feed_forward import ff_net
 
 ################################## Read training images and masks ####################################################
 
 '''Image 19_8.tif appears to not have a mask and 19_9 seems to be missing'''
+os.chdir(train_path)
+train_all = natsort.natsorted(os.listdir())
 train_im = train_all[slice(0,len(train_all),2)]
 train_mask = train_all[slice(1,len(train_all),2)]
 
 im_dim = misc.imread(train_im[0]).shape
 ims = np.zeros((np.prod(im_dim), len(train_im)))
 for i in range(len(train_im)):
-    ims[:, i] = misc.read(train_im[i]).flatten()
-numpy.savetxt(im_path, ims, delimiter=',')
+    ims[:, i] = misc.imread(train_im[i]).flatten()
+np.savetxt(im_path, ims, delimiter=',')
 
 
 masks = np.zeros((np.prod(im_dim), len(train_mask)))
 for i in range(len(im_data)):
-    masks[:, i] = misc.read(train_mask[i]).flatten()
-numpy.savetxt(mask_path, masks, delimiter=',')
+    masks[:, i] = misc.imread(train_mask[i]).flatten()
+np.savetxt(mask_path, masks, delimiter=',')
 
 
 
