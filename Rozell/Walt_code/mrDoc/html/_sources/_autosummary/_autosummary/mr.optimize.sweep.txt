@@ -1,0 +1,4 @@
+mr.optimize.sweep
+=================
+
+.. automodule:: mr.optimize.sweep

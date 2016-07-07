@@ -1,0 +1,37 @@
+mr.datasets.imageDataset.ImageDataset
+=====================================
+
+.. currentmodule:: mr.datasets.imageDataset
+
+.. autoclass:: ImageDataset
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ImageDataset.__init__
+      ~ImageDataset.grayscale
+      ~ImageDataset.split
+      ~ImageDataset.splitPatches
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ImageDataset.imChannels
+      ~ImageDataset.imHeight
+      ~ImageDataset.imWidth
+      ~ImageDataset.images
+      ~ImageDataset.labels
+      ~ImageDataset.nImages
+      ~ImageDataset.nLabels
+   
+   

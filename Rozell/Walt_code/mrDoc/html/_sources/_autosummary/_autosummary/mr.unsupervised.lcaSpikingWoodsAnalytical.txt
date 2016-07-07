@@ -1,0 +1,4 @@
+mr.unsupervised.lcaSpikingWoodsAnalytical
+=========================================
+
+.. automodule:: mr.unsupervised.lcaSpikingWoodsAnalytical

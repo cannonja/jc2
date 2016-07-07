@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mr.electrical.spiceLibrary &mdash; Walt Woods&#39; Thesis Work 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Walt Woods&#39; Thesis Work 1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="mr.electrical" href="../mr.electrical.html"/>
+        <link rel="next" title="mr.electrical.spiceNetwork" href="mr.electrical.spiceNetwork.html"/>
+        <link rel="prev" title="mr.electrical.odeCircuit" href="mr.electrical.odeCircuit.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Walt Woods' Thesis Work
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mr.datasets.html">mr.datasets</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mr.electrical.html">mr.electrical</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../mr.electrical.html#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../mr.electrical.html#examples">Examples</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../mr.electrical.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mr.electrical.circuit.html">mr.electrical.circuit</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mr.electrical.odeCircuit.html">mr.electrical.odeCircuit</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">mr.electrical.spiceLibrary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mr.electrical.spiceNetwork.html">mr.electrical.spiceNetwork</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../mr.electrical.html#members">Members</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.figureMaker.html">mr.figureMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.optimize.html">mr.optimize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.supervised.html">mr.supervised</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.unsupervised.html">mr.unsupervised</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Walt Woods' Thesis Work</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../mr.electrical.html">mr.electrical</a> &raquo;</li>
+      
+    <li>mr.electrical.spiceLibrary</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/_autosummary/_autosummary/mr.electrical.spiceLibrary.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mr.electrical.spiceLibrary">
+<span id="mr-electrical-spicelibrary"></span><h1>mr.electrical.spiceLibrary<a class="headerlink" href="#module-mr.electrical.spiceLibrary" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mr.electrical.spiceLibrary.SpiceLibrary">
+<em class="property">class </em><code class="descclassname">mr.electrical.spiceLibrary.</code><code class="descname">SpiceLibrary</code><span class="sig-paren">(</span><em>spiceNetwork</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mr/electrical/spiceLibrary.html#SpiceLibrary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mr.electrical.spiceLibrary.SpiceLibrary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>This class manages snippets of SPICE code and lets you write some that
+integrates everything else.</p>
+<dl class="method">
+<dt id="mr.electrical.spiceLibrary.SpiceLibrary._fixMosfet">
+<code class="descname">_fixMosfet</code><span class="sig-paren">(</span><em>cir</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mr/electrical/spiceLibrary.html#SpiceLibrary._fixMosfet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mr.electrical.spiceLibrary.SpiceLibrary._fixMosfet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces all beta0 = ... since Xyce does not support that parameter.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.electrical.spiceLibrary.SpiceLibrary._includeRecursive">
+<code class="descname">_includeRecursive</code><span class="sig-paren">(</span><em>cir</em>, <em>relativeTo='.'</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mr/electrical/spiceLibrary.html#SpiceLibrary._includeRecursive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mr.electrical.spiceLibrary.SpiceLibrary._includeRecursive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes cir, a SPICE circuit, and splices in .include directives
+recursively and with proper relative pathing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.electrical.spiceLibrary.SpiceLibrary.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mr/electrical/spiceLibrary.html#SpiceLibrary.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mr.electrical.spiceLibrary.SpiceLibrary.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a separate copy of this library.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.electrical.spiceLibrary.SpiceLibrary.simulate">
+<code class="descname">simulate</code><span class="sig-paren">(</span><em>measures</em>, <em>tsMax</em>, <em>measureSteps</em>, <em>reqs</em>, <em>cir</em>, <em>drawCircuitTo=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/mr/electrical/spiceLibrary.html#SpiceLibrary.simulate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mr.electrical.spiceLibrary.SpiceLibrary.simulate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulates the given circuit and returns the results for the
+requested measures.  If reqs is None, attempt auto-detect.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mr.electrical.spiceNetwork.html" class="btn btn-neutral float-right" title="mr.electrical.spiceNetwork" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="mr.electrical.odeCircuit.html" class="btn btn-neutral" title="mr.electrical.odeCircuit" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Walt Woods.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

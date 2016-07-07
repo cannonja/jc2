@@ -1,0 +1,4 @@
+mr.datasets
+===========
+
+.. automodule:: mr.datasets

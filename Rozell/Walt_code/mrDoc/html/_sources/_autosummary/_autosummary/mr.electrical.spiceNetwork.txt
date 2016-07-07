@@ -1,0 +1,4 @@
+mr.electrical.spiceNetwork
+==========================
+
+.. automodule:: mr.electrical.spiceNetwork

@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mr.datasets.cifar10.Cifar10Dataset &mdash; Walt Woods&#39; Thesis Work 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Walt Woods&#39; Thesis Work 1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="mr.datasets" href="../mr.datasets.html"/>
+        <link rel="next" title="mr.datasets.cifar100.Cifar100Dataset" href="mr.datasets.cifar100.Cifar100Dataset.html"/>
+        <link rel="prev" title="mr.datasets" href="../mr.datasets.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Walt Woods' Thesis Work
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../mr.datasets.html">mr.datasets</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">mr.datasets.cifar10.Cifar10Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mr.datasets.cifar100.Cifar100Dataset.html">mr.datasets.cifar100.Cifar100Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mr.datasets.imageDataset.ImageDataset.html">mr.datasets.imageDataset.ImageDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mr.datasets.mnist.MnistDataset.html">mr.datasets.mnist.MnistDataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mr.datasets.scanline.ScanlineDataset.html">mr.datasets.scanline.ScanlineDataset</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.electrical.html">mr.electrical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.figureMaker.html">mr.figureMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.optimize.html">mr.optimize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.supervised.html">mr.supervised</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.unsupervised.html">mr.unsupervised</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Walt Woods' Thesis Work</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../mr.datasets.html">mr.datasets</a> &raquo;</li>
+      
+    <li>mr.datasets.cifar10.Cifar10Dataset</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/_autosummary/_autosummary/mr.datasets.cifar10.Cifar10Dataset.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="mr-datasets-cifar10-cifar10dataset">
+<h1>mr.datasets.cifar10.Cifar10Dataset<a class="headerlink" href="#mr-datasets-cifar10-cifar10dataset" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mr.datasets.cifar10.Cifar10Dataset">
+<em class="property">class </em><code class="descclassname">mr.datasets.cifar10.</code><code class="descname">Cifar10Dataset</code><span class="sig-paren">(</span><em>self</em>, <em>path</em>, <em>nLoad=10000000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mr.datasets.common.ImageSet</span></code></p>
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>self</em>, <em>path</em>, <em>nLoad=10000000000.0</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#mr.datasets.cifar10.Cifar10Dataset.__init__" title="mr.datasets.cifar10.Cifar10Dataset.__init__"><code class="xref py py-obj docutils literal"><span class="pre">__init__</span></code></a>(self,&nbsp;path[,&nbsp;nLoad])</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#mr.datasets.cifar10.Cifar10Dataset.grayscale" title="mr.datasets.cifar10.Cifar10Dataset.grayscale"><code class="xref py py-obj docutils literal"><span class="pre">grayscale</span></code></a>(self)</td>
+<td>Returns a single-channel version of this ImageSet (can be self).</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#mr.datasets.cifar10.Cifar10Dataset.split" title="mr.datasets.cifar10.Cifar10Dataset.split"><code class="xref py py-obj docutils literal"><span class="pre">split</span></code></a>(self,&nbsp;int&nbsp;nTest[,&nbsp;noLabels,&nbsp;shuffle])</td>
+<td>Splits the loaded images into to categories: (nImages - nTest, nTest).</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#mr.datasets.cifar10.Cifar10Dataset.splitPatches" title="mr.datasets.cifar10.Cifar10Dataset.splitPatches"><code class="xref py py-obj docutils literal"><span class="pre">splitPatches</span></code></a>(self,&nbsp;int&nbsp;nTest,&nbsp;int&nbsp;patchW,&nbsp;...)</td>
+<td>Lazy splitting of patches.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">imChannels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">imHeight</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">imWidth</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">images</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">labels</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">nImages</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">nLabels</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset._getBatchFile">
+<code class="descname">_getBatchFile</code><span class="sig-paren">(</span><em>self</em>, <em>n</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset._getBatchFile" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset._getNext">
+<code class="descname">_getNext</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span> &rarr; tuple<a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset._getNext" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset._reset">
+<code class="descname">_reset</code><span class="sig-paren">(</span><em>self</em>, <em>int nImages</em>, <em>int w</em>, <em>int h</em>, <em>int c</em>, <em>int nLabels</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset._reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset.grayscale">
+<code class="descname">grayscale</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset.grayscale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a single-channel version of this ImageSet (can be self).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset.split">
+<code class="descname">split</code><span class="sig-paren">(</span><em>self</em>, <em>int nTest</em>, <em>noLabels=False</em>, <em>shuffle=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset.split" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits the loaded images into to categories: (nImages - nTest,
+nTest).</p>
+<p>Returns (trainArgs, testArgs, visualParams).  Usage like
+model.fit(<a href="#id1"><span class="problematic" id="id2">*</span></a>trainArgs) followed by model.score(<a href="#id3"><span class="problematic" id="id4">*</span></a>testArgs) and
+model.visualize(visualParams)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.datasets.cifar10.Cifar10Dataset.splitPatches">
+<code class="descname">splitPatches</code><span class="sig-paren">(</span><em>self</em>, <em>int nTest</em>, <em>int patchW</em>, <em>int patchH</em>, <em>int stride</em>, <em>noLabels=False</em>, <em>shuffle=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.datasets.cifar10.Cifar10Dataset.splitPatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lazy splitting of patches.  Optionally, shuffle the patches.</p>
+<p>Returns (trainArgs, testArgs, visualParams), just like split().</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="mr.datasets.cifar100.Cifar100Dataset.html" class="btn btn-neutral float-right" title="mr.datasets.cifar100.Cifar100Dataset" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../mr.datasets.html" class="btn btn-neutral" title="mr.datasets" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Walt Woods.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

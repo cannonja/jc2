@@ -1,0 +1,755 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mr.electrical.circuit &mdash; Walt Woods&#39; Thesis Work 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Walt Woods&#39; Thesis Work 1.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Walt Woods' Thesis Work
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.datasets.html">mr.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.electrical.html">mr.electrical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.figureMaker.html">mr.figureMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.optimize.html">mr.optimize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.supervised.html">mr.supervised</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.unsupervised.html">mr.unsupervised</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Walt Woods' Thesis Work</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>mr.electrical.circuit</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mr.electrical.circuit</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+
+<span class="k">class</span> <span class="nc">_SubCircuitModels</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modelLines</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Models&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src</span> <span class="o">=</span> <span class="n">modelLines</span>
+
+
+    <span class="k">def</span> <span class="nf">getSpice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src</span>
+
+
+<span class="k">class</span> <span class="nc">SubCircuit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="n">_SHELL_NAME</span> <span class="o">=</span> <span class="s1">&#39;__CIRCUIT__&#39;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ports</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Properly creates a subcircuit that encapsulates the content from the</span>
+<span class="sd">        given file.</span>
+
+<span class="sd">        This primarily means taking .MODEL statements at the top level of the</span>
+<span class="sd">        file and distributing them into the (now) nested .SUBCKTs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sc</span> <span class="o">=</span> <span class="n">SubCircuit</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_includeRecursive</span><span class="p">(</span><span class="s2">&quot;.include &quot;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+
+        <span class="c1"># Since SPICE has really weird hierarchical behavior, .MODEL statements</span>
+        <span class="c1"># at the global level in the original file</span>
+
+        <span class="c1"># First, collapse any multi-line statements</span>
+        <span class="n">srcn</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;* Encapsulated version of {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="p">]</span>
+        <span class="c1"># Index to collapse back to when a &#39;+&#39; line is found</span>
+        <span class="n">collapseTo</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>
+            <span class="n">srcn</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="c1"># Comment / blank line</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">):</span>
+                <span class="c1"># Extension line</span>
+                <span class="n">srcn</span><span class="p">[</span><span class="n">collapseTo</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">srcn</span><span class="p">[</span><span class="n">collapseTo</span><span class="p">:])</span>
+                <span class="n">srcn</span> <span class="o">=</span> <span class="n">srcn</span><span class="p">[:</span><span class="n">collapseTo</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">collapseTo</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">srcn</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="c1"># Now, find any .MODEL statements that are top level</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">srcn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.model &quot;</span><span class="p">):</span>
+                <span class="n">models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.subckt &quot;</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;.SUBCKT (\S+)&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SUBCKT invalid? {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                <span class="n">levels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">l</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;.ends&quot;</span><span class="p">):</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s2">r&quot;.ENDS (\S+)&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;.ENDS MUST have subcircuit name: {}&quot;</span>
+                            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                            <span class="s2">&quot;.ENDS does not match last level? {} != {}.  {}&quot;</span>
+                                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+                                    <span class="n">l</span><span class="p">))</span>
+                <span class="n">levels</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+        <span class="c1"># Add global models after any .SUBCKT</span>
+        <span class="n">models</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">models</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">srcn</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="n">srcn</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.subckt &#39;</span><span class="p">):</span>
+                <span class="n">srcn</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">models</span><span class="p">)</span>
+
+        <span class="c1"># Insert the updated source</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">srcn</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">sc</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">modelsFromFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Imports the given file (fname) as a set of MODEL statements, meaning</span>
+<span class="sd">        they will be added to any SubCircuit with this SubCircuit in its</span>
+<span class="sd">        depends list.&quot;&quot;&quot;</span>
+        <span class="n">src</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_includeRecursive</span><span class="p">(</span><span class="s2">&quot;.include &quot;</span> <span class="o">+</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_SubCircuitModels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fixMosfet</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ports</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="p">{},</span> <span class="n">depends</span><span class="o">=</span><span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;Defines a .SUBCKT block, with dependencies and parameters.</span>
+
+<span class="sd">        name - (string) Name of subcircuit.  Same as in spice, but may be</span>
+<span class="sd">                suffixed to get rid of ambiguity.</span>
+
+<span class="sd">        ports - ([string,]) - The names of ports that this SubCircuit interacts</span>
+<span class="sd">                with.</span>
+
+<span class="sd">        params - { name: default } - The PARAMS elements of the SUBCKT block.</span>
+
+<span class="sd">        depends - ([object,]) - SubCircuits or Models that this SubCircuit</span>
+<span class="sd">                depends on IN TEXT FORM.  These will be embedded in this</span>
+<span class="sd">                SubCircuit specifically, and cannot be shared (since we don&#39;t</span>
+<span class="sd">                parse the names out).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ports</span> <span class="o">=</span> <span class="n">ports</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depends</span> <span class="o">=</span> <span class="n">depends</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_source</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_localNameCounts</span> <span class="o">=</span> <span class="p">{}</span>
+
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ports</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SubCircuitInstance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ports</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Adds to this SUBCKT&#39;s netlist.  Behavior depends on type of obj:</span>
+
+<span class="sd">        string - SPICE code added directly to netlist</span>
+
+<span class="sd">        SubCircuit - Sets a dependency for SPICE code specified by string; that</span>
+<span class="sd">                is, the name of this SubCircuit within this context must</span>
+<span class="sd">                exactly match.</span>
+
+<span class="sd">        SubCircuitInstance - Adds the SPICE code for the given instance of the</span>
+<span class="sd">                given SubCircuit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">dedent</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SubCircuit</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_depends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">SubCircuitInstance</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getLocalName</span><span class="p">(</span><span class="s1">&#39;X{}_inst&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">obj</span><span class="o">.</span><span class="n">subcircuit</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_SubCircuitModels</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_depends</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+
+
+    <span class="k">def</span> <span class="nf">getSpice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gets the SPICE code for this subcircuit with the given name.&quot;&quot;&quot;</span>
+        <span class="c1"># Resolve body</span>
+        <span class="k">if</span> <span class="n">recursive</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">subs</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="n">recursive</span>
+            <span class="n">parentSubs</span> <span class="o">=</span> <span class="n">subs</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="n">subs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="n">names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">parentSubs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">names</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">recursive</span> <span class="o">=</span> <span class="p">(</span><span class="n">subs</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* Circuit&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_source</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">SubCircuitInstance</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">:</span>
+                    <span class="c1"># Not already available at this level.</span>
+                    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;{} in names?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span><span class="p">))</span>
+                    <span class="n">subs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span><span class="p">)</span>
+                    <span class="n">names</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span><span class="p">]</span> <span class="o">=</span> <span class="n">scName</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">scName</span> <span class="o">=</span> <span class="n">names</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">subcircuit</span><span class="p">]</span>
+                <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getSpice</span><span class="p">(</span><span class="n">scName</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* Dependencies&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">parentSubs</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getSpice</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="n">s</span><span class="p">],</span> <span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">))</span>
+
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;* Hard-coded dependencies&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">*</span> <span class="mi">79</span><span class="p">)</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depends</span><span class="p">:</span>
+            <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">getSpice</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">body</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="n">SubCircuit</span><span class="o">.</span><span class="n">_SHELL_NAME</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="n">parms</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="p">:</span>
+            <span class="n">parms</span> <span class="o">=</span> <span class="s1">&#39;PARAMS: &#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;{}={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">&quot;.SUBCKT {} {} {}</span><span class="se">\n</span><span class="s2">{}</span><span class="se">\n</span><span class="s2">.ENDS {}</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">),</span> <span class="n">parms</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">body</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_fixMosfet</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">cir</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replaces all beta0 = ... since Xyce does not support that parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ncir</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">inModel</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">cir</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">l</span>
+            <span class="k">if</span> <span class="n">inModel</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                    <span class="n">inModel</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Remove beta0 assignment</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">r&#39;beta0\s*=\s*\d+(.\d+)?\s+&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">,</span>
+                            <span class="n">flags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">I</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">inModel</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.model&#39;</span><span class="p">):</span>
+                    <span class="n">inModel</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">ncir</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ncir</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_getLocalName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">baseName</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a unique local name based on the given baseName.&quot;&quot;&quot;</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">baseName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_localNameCounts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_localNameCounts</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_localNameCounts</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_localNameCounts</span><span class="p">[</span><span class="n">baseName</span><span class="p">]</span>
+        <span class="k">return</span> <span class="s1">&#39;{}_{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">baseName</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">baseName</span>
+
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_includeRecursive</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">cir</span><span class="p">,</span> <span class="n">relativeTo</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Takes cir, a SPICE circuit, and splices in .include directives</span>
+<span class="sd">        recursively and with proper relative pathing.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">doReplace</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">relativeTo</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path not found: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">cls</span><span class="o">.</span><span class="n">_includeRecursive</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">r&quot;^\.inc(lude)? (.*)&quot;</span><span class="p">,</span> <span class="n">doReplace</span><span class="p">,</span> <span class="n">cir</span><span class="p">,</span> <span class="n">flags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
+
+
+
+
+<div class="viewcode-block" id="SubCircuitInstance"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.electrical.circuit.html#mr.electrical.circuit.SubCircuitInstance">[docs]</a><span class="k">class</span> <span class="nc">SubCircuitInstance</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A particular realization of a subcircuit.  When added to a SubCircuit,</span>
+<span class="sd">    is given a locally-unique name (SUBCKT name + _inst).&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SubCircuitInstance has not yet been added to &quot;</span>
+                    <span class="s2">&quot;a circuit!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+
+    <span class="nd">@name.setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;SubCircuitInstance cannot have name changed.  &quot;</span>
+                    <span class="s2">&quot;Already added to another circuit?&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">value</span>
+
+
+<div class="viewcode-block" id="SubCircuitInstance.NameConcat"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.electrical.circuit.html#mr.electrical.circuit.SubCircuitInstance.NameConcat">[docs]</a>    <span class="k">class</span> <span class="nc">NameConcat</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Class that generates hierarchical names for parts of a Circuit.&quot;&quot;&quot;</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s1">&#39;{}.{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">internal</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;internal is used to generate hierarchical names for internal parts</span>
+<span class="sd">        of the circuit.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">NameConcat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcircuit</span><span class="p">,</span> <span class="n">ports</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subcircuit</span> <span class="o">=</span> <span class="n">subcircuit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="n">ports</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subcircuit</span><span class="o">.</span><span class="n">ports</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad number of ports: {} != {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">subcircuit</span><span class="o">.</span><span class="n">ports</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">iterkeys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcircuit</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized parameter: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="SubCircuitInstance.getSpice"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.electrical.circuit.html#mr.electrical.circuit.SubCircuitInstance.getSpice">[docs]</a>    <span class="k">def</span> <span class="nf">getSpice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcircuitName</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the SPICE for this instance.&quot;&quot;&quot;</span>
+        <span class="n">parms</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="n">parms</span> <span class="o">=</span> <span class="s1">&#39;PARAMS: &#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="s1">&#39;{}={}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="s2">&quot;{} {} {} {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">),</span>
+                <span class="n">subcircuitName</span><span class="p">,</span> <span class="n">parms</span><span class="p">)</span></div></div>
+
+
+
+<span class="k">class</span> <span class="nc">Circuit</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Measure</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;A value that will be sampled from the SPICE simulation.&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">valueType</span> <span class="o">=</span> <span class="s2">&quot;voltage&quot;</span><span class="p">,</span>
+                <span class="n">method</span> <span class="o">=</span> <span class="s2">&quot;sample&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">method</span> <span class="o">=</span> <span class="n">method</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valueType</span> <span class="o">=</span> <span class="n">valueType</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">node</span> <span class="o">=</span> <span class="n">node</span>
+    <span class="k">class</span> <span class="nc">MeasureMethod</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The method used to process the sampled values for a</span>
+<span class="sd">        :class:`Measure`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">AVERAGE</span> <span class="o">=</span> <span class="s2">&quot;avg&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Returns a single value, which is the average across the whole</span>
+<span class="sd">        simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">SAMPLE</span> <span class="o">=</span> <span class="s2">&quot;sample&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Returns a list of values, evenly spaced throughout the simulation.</span>
+<span class="sd">        The number of samples is determined by the value of tsStep relative</span>
+<span class="sd">        to tsMax.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="k">class</span> <span class="nc">MeasureType</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">VOLTAGE</span> <span class="o">=</span> <span class="s2">&quot;voltage&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Default :class:`MeasureType`, measures the voltage of a single node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">POWER</span> <span class="o">=</span> <span class="s2">&quot;power&quot;</span>
+        <span class="sd">&quot;&quot;&quot;If POWER is being measured, then node must be comma-separated:</span>
+<span class="sd">        &quot;voltage-source,positiveTerminal&quot;.  Note that the measured power is</span>
+<span class="sd">        negative for using power, positive for absorbing it.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spiceNetwork</span><span class="p">,</span> <span class="n">tsMax</span><span class="p">,</span> <span class="n">steps</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circuit</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;* Circuit from mr.electrical</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="p">]</span>
+        <span class="c1"># Supporting subcircuits / etc.  Put in file after the non-dependent</span>
+        <span class="c1"># stuff.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_spice</span> <span class="o">=</span> <span class="n">spiceNetwork</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_tsMax</span> <span class="o">=</span> <span class="n">tsMax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span> <span class="o">=</span> <span class="n">steps</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span> <span class="o">=</span> <span class="n">SubCircuit</span><span class="p">(</span><span class="n">SubCircuit</span><span class="o">.</span><span class="n">_SHELL_NAME</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span><span class="o">.</span><span class="n">add</span>
+
+
+    <span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Draws (using dot) a graph that represents this circuit.&quot;&quot;&quot;</span>
+        <span class="n">spice</span> <span class="o">=</span> <span class="s2">&quot;Circuit</span><span class="se">\n</span><span class="s2">{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span><span class="o">.</span><span class="n">getSpice</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">_graphSpice</span><span class="p">(</span><span class="n">spice</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Bad spice file at /tmp/bad.spice</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/tmp/bad.spice&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spice</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">measArgs</span><span class="p">,</span> <span class="n">writeSpiceTo</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">meas</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">measArgs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">meas</span> <span class="o">=</span> <span class="n">measArgs</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">measArgs</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">measArgs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="s1">&#39;,&#39;</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                        <span class="n">device</span><span class="p">,</span> <span class="n">node</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                        <span class="n">meas</span><span class="p">[</span><span class="s1">&#39;pwr_{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">device</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spice</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span>
+                                <span class="n">a</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spice</span><span class="o">.</span><span class="n">MeasureType</span><span class="o">.</span><span class="n">POWER</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">meas</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spice</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">measArgs</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spice</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">meas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tsMax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_steps</span><span class="p">,</span>
+                <span class="s1">&#39;Circuit</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span><span class="o">.</span><span class="n">getSpice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subcircuit</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                <span class="n">writeSpiceTo</span><span class="o">=</span><span class="n">writeSpiceTo</span><span class="p">)</span>
+
+
+
+<div class="viewcode-block" id="_graphSpice"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.electrical.circuit.html#mr.electrical.circuit._graphSpice">[docs]</a><span class="k">def</span> <span class="nf">_graphSpice</span><span class="p">(</span><span class="n">spice</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Utility function to draw a picture of the given spice source.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.pdf&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Filename must end with .pdf: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="p">[</span> <span class="s2">&quot;graph blah {</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rankdir=LR;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;splines=true;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s1">&#39;sep=&quot;1.0&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;esep=&quot;0.3&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;overlap=&quot;200:compress&quot;;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="c1">#&quot;maxiter=100000;\n&quot;,</span>
+            <span class="s2">&quot;concentrate=true;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+    <span class="n">seenDev</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;&#39;</span> <span class="p">]</span>
+    <span class="n">subToNodes</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">def</span> <span class="nf">n</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">subs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span>
+    <span class="k">def</span> <span class="nf">subStart</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">nodes</span><span class="p">):</span>
+        <span class="n">subs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;subgraph cluster{} {{</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;label=&quot;{}&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;style=&quot;filled&quot;</span><span class="se">\n</span><span class="s1">color=lightgray;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">nodes</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;params:&#39;</span><span class="p">:</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="n">nodes</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="n">subToNodes</span><span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">nodes</span>
+    <span class="k">def</span> <span class="nf">subEnd</span><span class="p">():</span>
+        <span class="n">subs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">addDevice</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">n</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">seenDev</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;{} already defined&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">seenDev</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">specArgs</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="s1">&#39;{}=&quot;{}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">])</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;{} [{}];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">specArgs</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">addEdge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">**</span><span class="n">spec</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">n</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">n</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+        <span class="n">specArgs</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span> <span class="s1">&#39;{}=&quot;{}&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="p">])</span>
+        <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;{} -- {} [{}];</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">specArgs</span><span class="p">))</span>
+
+    <span class="n">thisSkipped</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spice</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()):</span>
+        <span class="c1"># Keep track of if next line should be logged if it starts with &#39;+&#39;</span>
+        <span class="n">lastSkipped</span> <span class="o">=</span> <span class="n">thisSkipped</span>
+        <span class="n">thisSkipped</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># First line is comment line</span>
+            <span class="n">thisSkipped</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">or</span> <span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+            <span class="c1"># Comment line</span>
+            <span class="c1"># Does not play well with &quot;+&quot; lines (meaning a &quot;+&quot; line resumes the</span>
+            <span class="c1"># previous non-comment line)</span>
+            <span class="n">thisSkipped</span> <span class="o">=</span> <span class="n">lastSkipped</span>
+            <span class="k">continue</span>
+
+        <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;r&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+            <span class="n">addDevice</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;{} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span>
+            <span class="n">addDevice</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;{{&lt;p&gt;+|{} ({})|&lt;m&gt;-}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                    <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;Mrecord&quot;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:p&quot;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;:m&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;c&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">4</span>
+            <span class="n">addDevice</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;{} ({})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;rect&quot;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
+            <span class="c1"># MOSFET</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">6</span>
+            <span class="n">addDevice</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;{{&lt;d&gt;D|{{&lt;g&gt;G|{} {}|&lt;b&gt;B}}|&lt;s&gt;S}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">n</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">5</span><span class="p">:])),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;Mrecord&quot;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:d:w&#39;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:g:n&#39;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:s:e&#39;</span><span class="p">)</span>
+            <span class="n">addEdge</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:b:s&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;x&#39;</span><span class="p">:</span>
+            <span class="c1"># X - arbitrary subcircuit / device</span>
+            <span class="k">for</span> <span class="n">li</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="n">li</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;params:&#39;</span><span class="p">:</span>
+                    <span class="n">l</span> <span class="o">=</span> <span class="n">l</span><span class="p">[:</span><span class="n">li</span><span class="p">]</span>
+                    <span class="k">break</span>
+            <span class="n">subName</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">subName</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subToNodes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown SUBCKT: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subName</span><span class="p">))</span>
+            <span class="n">connNames</span> <span class="o">=</span> <span class="n">subToNodes</span><span class="p">[</span><span class="n">subName</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
+            <span class="n">conns</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">connNames</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Bad SUBCKT? {} requires {}, found {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">subName</span><span class="p">,</span> <span class="n">connNames</span><span class="p">,</span> <span class="n">conns</span><span class="p">))</span>
+            <span class="n">addDevice</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;{}|{{{}}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+                    <span class="s2">&quot;&lt;n{}&gt;{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ci</span><span class="p">,</span> <span class="n">cn</span><span class="p">)</span> <span class="k">for</span> <span class="n">ci</span><span class="p">,</span> <span class="n">cn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">connNames</span><span class="p">)</span>
+                    <span class="p">])),</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;Mrecord&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">ci</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">conns</span><span class="p">):</span>
+                <span class="n">addEdge</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;:n{}:s&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ci</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.subckt&#39;</span><span class="p">:</span>
+            <span class="n">subStart</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">l</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;.ends&#39;</span><span class="p">:</span>
+            <span class="n">subEnd</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;+&#39;</span> <span class="ow">and</span> <span class="n">lastSkipped</span><span class="p">:</span>
+            <span class="c1"># Keep on skipping</span>
+            <span class="n">thisSkipped</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;**** Skipping: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+            <span class="n">thisSkipped</span> <span class="o">=</span> <span class="bp">True</span>
+
+    <span class="n">dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
+    <span class="n">dot</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dot</span><span class="p">)</span>
+    <span class="c1"># print(&quot;Graphing via dot:\n{}\n\n-&gt;\n\n{}&quot;.format(spice, dot))</span>
+
+    <span class="c1"># fdp</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span> <span class="s1">&#39;-Kfdp&#39;</span><span class="p">,</span> <span class="s1">&#39;-Tpdf&#39;</span><span class="p">,</span> <span class="s1">&#39;-o{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fname</span><span class="p">)],</span>
+            <span class="n">stdin</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+    <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">dot</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;------ dot output ------</span><span class="se">\n</span><span class="s2">{}</span><span class="se">\n</span><span class="s2">------ dot error ------</span><span class="se">\n</span><span class="s2">{}&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;dot returned {}: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">err</span><span class="p">))</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Walt Woods.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

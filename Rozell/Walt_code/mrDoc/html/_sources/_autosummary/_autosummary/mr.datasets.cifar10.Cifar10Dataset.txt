@@ -1,0 +1,37 @@
+mr.datasets.cifar10.Cifar10Dataset
+==================================
+
+.. currentmodule:: mr.datasets.cifar10
+
+.. autoclass:: Cifar10Dataset
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~Cifar10Dataset.__init__
+      ~Cifar10Dataset.grayscale
+      ~Cifar10Dataset.split
+      ~Cifar10Dataset.splitPatches
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~Cifar10Dataset.imChannels
+      ~Cifar10Dataset.imHeight
+      ~Cifar10Dataset.imWidth
+      ~Cifar10Dataset.images
+      ~Cifar10Dataset.labels
+      ~Cifar10Dataset.nImages
+      ~Cifar10Dataset.nLabels
+   
+   

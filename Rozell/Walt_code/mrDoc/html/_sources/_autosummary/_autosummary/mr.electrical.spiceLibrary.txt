@@ -1,0 +1,4 @@
+mr.electrical.spiceLibrary
+==========================
+
+.. automodule:: mr.electrical.spiceLibrary

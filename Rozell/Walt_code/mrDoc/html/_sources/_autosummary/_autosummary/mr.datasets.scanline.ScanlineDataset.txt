@@ -1,0 +1,37 @@
+mr.datasets.scanline.ScanlineDataset
+====================================
+
+.. currentmodule:: mr.datasets.scanline
+
+.. autoclass:: ScanlineDataset
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ScanlineDataset.__init__
+      ~ScanlineDataset.grayscale
+      ~ScanlineDataset.split
+      ~ScanlineDataset.splitPatches
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ScanlineDataset.imChannels
+      ~ScanlineDataset.imHeight
+      ~ScanlineDataset.imWidth
+      ~ScanlineDataset.images
+      ~ScanlineDataset.labels
+      ~ScanlineDataset.nImages
+      ~ScanlineDataset.nLabels
+   
+   

@@ -1,0 +1,955 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mr.optimize.maximize &mdash; Walt Woods&#39; Thesis Work 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Walt Woods&#39; Thesis Work 1.0 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Walt Woods' Thesis Work
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.datasets.html">mr.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.electrical.html">mr.electrical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.figureMaker.html">mr.figureMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.optimize.html">mr.optimize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.supervised.html">mr.supervised</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../_autosummary/mr.unsupervised.html">mr.unsupervised</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">Walt Woods' Thesis Work</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>mr.optimize.maximize</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mr.optimize.maximize</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">from</span> <span class="nn">mr.figureMaker</span> <span class="kn">import</span> <span class="n">FigureMaker</span>
+
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">job_stream.inline</span> <span class="kn">import</span> <span class="n">Work</span><span class="p">,</span> <span class="n">Multiple</span>
+
+<span class="k">class</span> <span class="nc">MetaRunner</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="c1"># 1.0 means the capacity to move across a single axis&#39; full range</span>
+    <span class="n">VITALITY_START</span> <span class="o">=</span> <span class="mf">0.2</span>
+    <span class="n">VITALITY_MIN</span> <span class="o">=</span> <span class="mf">0.01</span>
+    <span class="n">VITALITY_STEPS</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="c1"># VITALITY_START * VITALITY_LOSS ^ VITALITY_STEPS = VITALITY_MIN</span>
+    <span class="n">VITALITY_LOSS</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">VITALITY_MIN</span> <span class="o">/</span> <span class="n">VITALITY_START</span><span class="p">)</span>
+            <span class="o">/</span> <span class="n">VITALITY_STEPS</span><span class="p">)</span>
+
+    <span class="k">class</span> <span class="nc">AXES_TYPES</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">SCALAR</span> <span class="o">=</span> <span class="s2">&quot;scalar&quot;</span>
+        <span class="n">LINEAR_RANGE</span> <span class="o">=</span> <span class="s2">&quot;linear_range&quot;</span>
+        <span class="n">LOGARITHMIC_RANGE</span> <span class="o">=</span> <span class="s2">&quot;logarithmic_range&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">,</span> <span class="n">nRunners</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nRunners</span> <span class="o">=</span> <span class="n">nRunners</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vrange</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">validator</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># This bug is because multiprocessing doesn&#39;t request a</span>
+                    <span class="c1"># single process for e.g. frames.</span>
+                    <span class="kn">import</span> <span class="nn">cPickle</span>
+                    <span class="n">cPickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cPickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                <span class="n">validator</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized tuple length: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vrange</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vrange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">,</span>
+                            <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                            <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">vrange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">,</span>
+                                <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                                    <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized length: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vrange</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vrange</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">None</span><span class="p">))):</span>
+                <span class="c1"># Scalar</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">,</span>
+                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">vrange</span> <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized param range: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vrange</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;validator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+    <span class="k">def</span> <span class="nf">getNextTrial</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lastResult</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">scoreMinStart</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">lastResult</span> <span class="ow">is</span> <span class="bp">None</span>
+                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_life</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VITALITY_MIN</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_score</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">lastResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">scoreMinStart</span><span class="p">)):</span>
+            <span class="c1"># Initialize!</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_score</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_life</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VITALITY_START</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="p">}</span>
+            <span class="c1"># Every _id should be unique, plus this lets us keep track of</span>
+            <span class="c1"># how much work we&#39;ve done</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nRunners</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">generation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nRunners</span>
+                <span class="k">if</span> <span class="n">generation</span> <span class="o">%</span> <span class="mi">1</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  (training generation {})</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">generation</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_id</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nRunners</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_randomDirection</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># lastResult is tuple: (params, score, score_dev)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">lastResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score</span><span class="p">:</span>
+                <span class="c1"># Keep the new state, and keep heading in the same direction</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_score</span> <span class="o">=</span> <span class="n">lastResult</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Head orthogonal</span>
+                <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">k</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+                <span class="k">elif</span> <span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">k1</span><span class="p">,</span> <span class="n">k2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k1</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k2</span><span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+                    <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                        <span class="c1"># Take the other direction (flip it)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k1</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k2</span><span class="p">]</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Generate an arbitrary vector that is orthogonal to our</span>
+                    <span class="c1"># current self._direction</span>
+                    <span class="n">dirLen</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="n">dotLen</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="n">newDir</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                    <span class="n">basis</span> <span class="o">=</span> <span class="bp">None</span>
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mf">1e-300</span><span class="p">:</span>
+                            <span class="n">basis</span> <span class="o">=</span> <span class="n">k</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">basis</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Non-normalized direction?&quot;</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">basis</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">newDir</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                        <span class="n">dirLen</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span>
+                        <span class="n">dotLen</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+                    <span class="n">newDir</span><span class="p">[</span><span class="n">basis</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">=</span> <span class="o">-</span><span class="n">dotLen</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="p">[</span><span class="n">basis</span><span class="p">]</span>
+                    <span class="n">dirLen</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span>
+                    <span class="n">dirLen</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dirLen</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">newDir</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="n">dirLen</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span> <span class="o">=</span> <span class="n">newDir</span>
+
+            <span class="c1"># Move along!</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_life</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">VITALITY_LOSS</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="p">)</span>
+            <span class="c1"># Only update elements in _direction</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_direction</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                            <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_life</span> <span class="o">*</span> <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">])</span>
+
+                    <span class="c1"># Limit result to axis</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">],</span> <span class="nb">max</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">:</span>
+                    <span class="n">nlog</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_life</span> <span class="o">*</span> <span class="n">ax</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span>
+                    <span class="c1"># Limit in log domain and apply to axis</span>
+                    <span class="n">nlog</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">],</span> <span class="nb">max</span><span class="p">(</span><span class="n">ax</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">],</span> <span class="n">nlog</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">nlog</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Scalar ended up in self._direction?  &quot;</span>
+                            <span class="o">+</span> <span class="n">k</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="c1"># For the actual next state, validate each member</span>
+        <span class="n">nextState</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">validator</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;validator&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">nextState</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nextState</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">nextState</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">nextState</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validators must take 1 or 2 args&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nextState</span>
+
+
+    <span class="k">def</span> <span class="nf">_randomDirection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns a random, normalized direction vector.</span>
+
+<span class="sd">        Note that normalization is without respect to the range and type of</span>
+<span class="sd">        each variable.  That is, each axis&#39; direction will be on (-1, 1).&quot;&quot;&quot;</span>
+        <span class="nb">dir</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">dirLen</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">:</span>
+                <span class="nb">dir</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">dirLen</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">:</span>
+                <span class="nb">dir</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">p</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">dirLen</span> <span class="o">+=</span> <span class="n">p</span> <span class="o">*</span> <span class="n">p</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">dirLen</span> <span class="o">&gt;</span> <span class="mf">1e-300</span><span class="p">:</span>
+            <span class="n">dirLen</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dirLen</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dir</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">dir</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span> <span class="o">*</span> <span class="n">dirLen</span>
+
+        <span class="k">return</span> <span class="nb">dir</span>
+
+
+<span class="k">class</span> <span class="nc">ParamRanges</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">AXES_TYPES</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+        <span class="n">SCALAR</span> <span class="o">=</span> <span class="s2">&quot;scalar&quot;</span>
+        <span class="n">LINEAR_RANGE</span> <span class="o">=</span> <span class="s2">&quot;linear_range&quot;</span>
+        <span class="n">LOGARITHMIC_RANGE</span> <span class="o">=</span> <span class="s2">&quot;logarithmic_range&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ndim</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The dimension of non-scalar components in this ParamRanges&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span>
+
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paramRanges</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ranges</span> <span class="o">=</span> <span class="n">paramRanges</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">paramRanges</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">vrange</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">validator</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># This bug is because multiprocessing doesn&#39;t request a</span>
+                    <span class="c1"># single process for e.g. frames</span>
+                    <span class="kn">import</span> <span class="nn">cPickle</span>
+                    <span class="n">cPickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">cPickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                <span class="n">validator</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized tuple length: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)))</span>
+
+            <span class="c1"># Set up this range&#39;s parameters</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vrange</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vrange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">,</span>
+                            <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                            <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">}</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">vrange</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">vrange</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">,</span>
+                                <span class="s1">&#39;scale&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                                    <span class="o">-</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="s1">&#39;min&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                <span class="s1">&#39;max&#39;</span><span class="p">:</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vrange</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized length: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vrange</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vrange</span><span class="p">,</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">None</span><span class="p">))):</span>
+                <span class="c1"># Scalar</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">,</span>
+                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">vrange</span> <span class="p">}</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unrecognized param range: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vrange</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;validator&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;order&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_ndim</span> <span class="o">+=</span> <span class="mi">1</span>
+
+
+    <span class="k">def</span> <span class="nf">mapLocal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a coordinate dictionary in local space, return the uniform</span>
+<span class="sd">        point corresponding to it.&quot;&quot;&quot;</span>
+        <span class="n">npt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">:</span>
+                <span class="n">npt</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">:</span>
+                <span class="n">npt</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pt</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="o">-</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">npt</span>
+
+
+    <span class="k">def</span> <span class="nf">mapUniform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Given a coordinate of dimension self.ndim, where each component is</span>
+<span class="sd">        on the [0, 1] range, return a coordinate in the native space of this</span>
+<span class="sd">        point.</span>
+
+<span class="sd">        Note that the input point pt is an array without labels; the result is</span>
+<span class="sd">        a dictionary.&quot;&quot;&quot;</span>
+        <span class="n">npt</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">SCALAR</span><span class="p">:</span>
+                <span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LINEAR_RANGE</span><span class="p">:</span>
+                <span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pt</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]]</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">AXES_TYPES</span><span class="o">.</span><span class="n">LOGARITHMIC_RANGE</span><span class="p">:</span>
+                <span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;min&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;scale&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">pt</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;order&#39;</span><span class="p">]])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+        <span class="c1"># Apply validators</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_axes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">validator</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;validator&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="n">nargs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inpsect</span><span class="o">.</span><span class="n">getargspec</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">npt</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="n">nargs</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">validator</span><span class="p">(</span><span class="n">npt</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Validators must take 1 or 2 args&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">npt</span>
+
+
+<div class="viewcode-block" id="Maximize"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.optimize.maximize.html#mr.optimize.maximize.Maximize">[docs]</a><span class="k">class</span> <span class="nc">Maximize</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Provides a number of ways for solving a maximization problem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nRunners</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">nRandomSamples</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param nRunners: The number of independent samples of the objective</span>
+<span class="sd">                function to take in parallel.</span>
+<span class="sd">        :param nRandomSamples: The number of completely random samples of the</span>
+<span class="sd">                search space before doing anything intelligent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nRunners</span> <span class="o">=</span> <span class="n">nRunners</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nRandomSamples</span> <span class="o">=</span> <span class="n">nRandomSamples</span>
+
+
+<div class="viewcode-block" id="Maximize.maximizeMoe"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.optimize.maximize.html#mr.optimize.maximize.Maximize.maximizeMoe">[docs]</a>    <span class="k">def</span> <span class="nf">maximizeMoe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paramRanges</span><span class="p">,</span> <span class="n">evalJobs</span><span class="p">,</span> <span class="n">solveTime</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;TEST!!!&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;This should work, but broken right now&quot;</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">moe.easy_interface.experiment</span> <span class="kn">import</span> <span class="n">Experiment</span>
+        <span class="kn">from</span> <span class="nn">moe.easy_interface.simple_endpoint</span> <span class="kn">import</span> <span class="n">gp_next_points</span>
+        <span class="kn">from</span> <span class="nn">moe.optimal_learning.python.data_containers</span> <span class="kn">import</span> <span class="n">SamplePoint</span>
+        <span class="n">moeExp</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">([</span> <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paramRanges</span><span class="p">))</span> <span class="p">])</span>
+        <span class="n">nRandom</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">pts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bval</span> <span class="o">=</span> <span class="o">-</span><span class="mf">10.</span>
+        <span class="k">class</span> <span class="nc">FakeW</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inner</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_inner</span> <span class="o">=</span> <span class="n">inner</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call</span>
+            <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inner</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">FakeW</span><span class="p">()</span>
+        <span class="n">evalJobs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="n">simEnd</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">solveTime</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
+            <span class="n">simEnd</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">solveTime</span><span class="o">*</span><span class="mf">4.</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">while</span> <span class="n">simEnd</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">simEnd</span><span class="p">:</span>
+            <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">nRandom</span><span class="p">:</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">paramRanges</span><span class="p">),))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pt</span> <span class="o">=</span> <span class="n">gp_next_points</span><span class="p">(</span><span class="n">moeExp</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dPt</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">dPt</span><span class="p">[</span><span class="s1">&#39;d{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pt</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">w</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">dPt</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+            <span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="n">moeExp</span><span class="o">.</span><span class="n">historical_data</span><span class="o">.</span><span class="n">append_sample_points</span><span class="p">([</span><span class="n">SamplePoint</span><span class="p">(</span><span class="n">pt</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span>
+                    <span class="mf">0.0</span><span class="p">)])</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="n">bval</span><span class="p">:</span>
+                <span class="n">bval</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Best: {} at {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">bval</span><span class="p">,</span> <span class="n">pt</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;EVALUATED {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">n</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Maximize.maximizeRbf"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.optimize.maximize.html#mr.optimize.maximize.Maximize.maximizeRbf">[docs]</a>    <span class="k">def</span> <span class="nf">maximizeRbf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paramRanges</span><span class="p">,</span> <span class="n">evalJobs</span><span class="p">,</span> <span class="n">solveTime</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;This maximization routine is almost always superior to maximize...</span>
+<span class="sd">        It utilizes radial basis function interpolation to predict the next</span>
+<span class="sd">        best guess for interpolating.</span>
+
+<span class="sd">        Runs a job_stream and never returns (unless solveTime is specified).</span>
+<span class="sd">        Prints out the best params as it finds them.</span>
+
+<span class="sd">        paramRanges - List of (name, range[, validator]) parameters.</span>
+
+<span class="sd">                range can be any of (a, b) for a standard bound, (a, b, &#39;log&#39;)</span>
+<span class="sd">                to indicate that the distribution between a and b should be</span>
+<span class="sd">                treated as logarithmic instead of linear, or a scalar value to</span>
+<span class="sd">                indicate something that may be parametrized in the future but</span>
+<span class="sd">                isn&#39;t now.</span>
+
+<span class="sd">                validator is a lambda with either 1 argument, the evolved</span>
+<span class="sd">                value, or 2 arguments, the evolved value and all other (indexed</span>
+<span class="sd">                lower than this) parameters.  The result returned from</span>
+<span class="sd">                validator will be the actual value used.</span>
+
+<span class="sd">        evalJobs(w) - Takes a job_stream.inline.Work instance, and decorates it</span>
+<span class="sd">        with jobs that take a parameter dict and score the desired dataset,</span>
+<span class="sd">        returning (params, avg score, std deviation).</span>
+
+<span class="sd">        If configured to ever return (solveTime &gt; 0.0), returns a</span>
+<span class="sd">        pandas.DataFrame representing all results and data.  Otherwise,</span>
+<span class="sd">        prints out the data as it goes.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">Rbf</span>
+        <span class="c1"># Meta-parameter: Number of random point samples to take to initialize</span>
+        <span class="c1"># the Rbf.</span>
+        <span class="n">nRandom</span> <span class="o">=</span> <span class="mi">10</span>
+
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Work</span><span class="p">([</span> <span class="bp">None</span> <span class="p">])</span>
+        <span class="n">resultColumns</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;id&#39;</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paramRanges</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;score_dev&#39;</span> <span class="p">]</span>
+
+        <span class="n">simEnd</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">solveTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">simEnd</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">solveTime</span>
+
+        <span class="n">pRanges</span> <span class="o">=</span> <span class="n">ParamRanges</span><span class="p">(</span><span class="n">paramRanges</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">getNextRunner</span><span class="p">(</span><span class="n">store</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Given a store from the frame, return the next point to sample as</span>
+<span class="sd">            a uniform array.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="p">)</span>
+
+            <span class="c1"># First guesses are random</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="n">nRandom</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pRanges</span><span class="o">.</span><span class="n">mapUniform</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">,)))</span>
+
+            <span class="c1"># Build the RBF interpolator based on prior data.  Note that</span>
+            <span class="c1"># building is O(N^3), evaluating is O(N)</span>
+            <span class="n">pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="p">)</span>
+            <span class="n">rbfArgs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">pts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="p">]</span>
+            <span class="n">rbfArgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">vals</span><span class="p">))</span>
+            <span class="n">rbfi</span> <span class="o">=</span> <span class="n">Rbf</span><span class="p">(</span><span class="o">*</span><span class="n">rbfArgs</span><span class="p">,</span> <span class="n">function</span><span class="o">=</span><span class="s1">&#39;thin_plate&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Initial guesses</span>
+            <span class="n">bpts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">nn</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+                <span class="n">bpts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">,)))</span>
+            <span class="n">bpts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bpts</span><span class="p">)</span>
+
+            <span class="c1"># Iterate X times following the gradient</span>
+            <span class="k">for</span> <span class="n">gradI</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">):</span>
+                <span class="c1"># Current values</span>
+                <span class="n">bbArgs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bpts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="p">]</span>
+                <span class="n">bvals</span> <span class="o">=</span> <span class="n">rbfi</span><span class="p">(</span><span class="o">*</span><span class="n">bbArgs</span><span class="p">)</span>
+
+                <span class="n">d</span> <span class="o">=</span> <span class="mf">1e-5</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="mf">5.</span> <span class="o">/</span> <span class="p">(</span><span class="n">gradI</span> <span class="o">+</span> <span class="mf">5.</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">dvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">bpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bpts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">):</span>
+                    <span class="n">bbArgs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bpts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">d</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span> <span class="k">else</span> <span class="mf">0.</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="p">]</span>
+                    <span class="n">dvals</span><span class="p">[:,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">rbfi</span><span class="p">(</span><span class="o">*</span><span class="n">bbArgs</span><span class="p">)</span> <span class="o">-</span> <span class="n">bvals</span>
+                <span class="n">dvals</span> <span class="o">/=</span> <span class="p">((</span><span class="n">dvals</span><span class="o">*</span><span class="n">dvals</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">dvals</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">))</span>
+                <span class="n">bpts</span> <span class="o">+=</span> <span class="n">dvals</span> <span class="o">*</span> <span class="n">u</span>
+
+            <span class="c1"># Final evaluation, and use the best point</span>
+            <span class="n">bbArgs</span> <span class="o">=</span> <span class="p">[</span> <span class="n">bpts</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pRanges</span><span class="o">.</span><span class="n">ndim</span><span class="p">)</span> <span class="p">]</span>
+            <span class="n">bvals</span> <span class="o">=</span> <span class="n">rbfi</span><span class="p">(</span><span class="o">*</span><span class="n">bbArgs</span><span class="p">)</span>
+            <span class="n">bvals</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bvals</span><span class="p">),))</span> <span class="o">*</span> <span class="p">(</span><span class="mf">10.</span> <span class="o">/</span> <span class="p">(</span><span class="mf">10.</span> <span class="o">+</span> <span class="n">n</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="n">bpts</span><span class="p">[</span><span class="n">bvals</span><span class="o">.</span><span class="n">argmax</span><span class="p">()]</span>
+
+            <span class="k">return</span> <span class="n">pRanges</span><span class="o">.</span><span class="n">mapUniform</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+
+        <span class="nd">@w.init</span>
+        <span class="k">def</span> <span class="nf">printHeader</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resultColumns</span><span class="p">))</span>
+
+        <span class="nd">@w.frame</span><span class="p">(</span><span class="n">emit</span><span class="o">=</span><span class="k">lambda</span> <span class="n">store</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">frameStart</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">first</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">pts</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">vals</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">resultColumns</span><span class="p">)</span>
+
+                <span class="c1"># Emit initial runners</span>
+                <span class="n">runners</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nRunners</span><span class="p">):</span>
+                    <span class="n">runners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">getNextRunner</span><span class="p">(</span><span class="n">store</span><span class="p">))</span>
+                <span class="k">return</span> <span class="n">Multiple</span><span class="p">(</span><span class="n">runners</span><span class="p">)</span>
+
+        <span class="n">evalJobs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="nd">@w.frameEnd</span>
+        <span class="k">def</span> <span class="nf">frameEnd</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="nb">next</span><span class="p">):</span>
+            <span class="c1"># Log the result</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">next</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;score&#39;</span> <span class="ow">in</span> <span class="n">q</span> <span class="ow">or</span> <span class="s1">&#39;score_dev&#39;</span> <span class="ow">in</span> <span class="n">q</span> <span class="ow">or</span> <span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">q</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Your dimensions must not include &#39;score&#39; &quot;</span>
+                        <span class="s2">&quot;or &#39;score_dev&#39; or &#39;id&#39;&quot;</span><span class="p">)</span>
+            <span class="n">q</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="p">)</span>
+            <span class="n">q</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">q</span><span class="p">[</span><span class="s1">&#39;score_dev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">nextRow</span> <span class="o">=</span> <span class="p">[</span> <span class="n">q</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">resultColumns</span> <span class="p">]</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="p">)]</span> <span class="o">=</span> <span class="n">nextRow</span>
+
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">store</span><span class="o">.</span><span class="n">best</span><span class="p">:</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="p">)])</span>
+
+            <span class="c1"># Log this point to aid in the selection of future points</span>
+            <span class="n">pt</span> <span class="o">=</span> <span class="n">pRanges</span><span class="o">.</span><span class="n">mapLocal</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">pts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">])</span>
+
+            <span class="c1"># Emit another?</span>
+            <span class="k">if</span> <span class="n">simEnd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="n">simEnd</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">simEnd</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="c1"># Wipe data, don&#39;t want to save it</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">resultColumns</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">getNextRunner</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">w</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Maximize.maximizeHillSwarm"><a class="viewcode-back" href="../../../_autosummary/_autosummary/mr.optimize.maximize.html#mr.optimize.maximize.Maximize.maximizeHillSwarm">[docs]</a>    <span class="k">def</span> <span class="nf">maximizeHillSwarm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">paramRanges</span><span class="p">,</span> <span class="n">evalJobs</span><span class="p">,</span> <span class="n">solveTime</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generic maximizer.  Runs a job_stream and never returns.  Prints out</span>
+<span class="sd">        the best params as it finds them.</span>
+
+<span class="sd">        paramRanges - List of (name, range[, validator]) parameters.</span>
+
+<span class="sd">                range can be any of (a, b) for a standard bound, (a, b, &#39;log&#39;)</span>
+<span class="sd">                to indicate that the distribution between a and b should be</span>
+<span class="sd">                treated as logarithmic instead of linear, or a scalar value to</span>
+<span class="sd">                indicate something that may be parametrized in the future but</span>
+<span class="sd">                isn&#39;t now.</span>
+
+<span class="sd">                validator is a lambda with either 1 argument, the evolved</span>
+<span class="sd">                value, or 2 arguments, the evolved value and all other (indexed</span>
+<span class="sd">                lower than this) parameters.  The result returned from</span>
+<span class="sd">                validator will be the actual value used.</span>
+
+<span class="sd">        evalJobs(w) - Takes a job_stream.inline.Work instance, and decorates it</span>
+<span class="sd">        with jobs that take a parameter dict and score the desired dataset,</span>
+<span class="sd">        returning (params, avg score, std deviation).</span>
+
+<span class="sd">        If configured to ever return (solveTime &gt; 0.0), returns a</span>
+<span class="sd">        pandas.DataFrame representing all results and data.  Otherwise,</span>
+<span class="sd">        prints out the data as it goes.&quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">Work</span><span class="p">([</span> <span class="bp">None</span> <span class="p">])</span>
+
+        <span class="n">resultColumns</span> <span class="o">=</span> <span class="p">[</span> <span class="s1">&#39;id&#39;</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paramRanges</span> <span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="s1">&#39;score&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;score_dev&#39;</span> <span class="p">]</span>
+
+        <span class="n">simEnd</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">solveTime</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">simEnd</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">solveTime</span>
+
+        <span class="nd">@w.init</span>
+        <span class="k">def</span> <span class="nf">printHeader</span><span class="p">():</span>
+            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resultColumns</span><span class="p">))</span>
+
+        <span class="nd">@w.frame</span><span class="p">(</span><span class="n">emit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">store</span><span class="p">:</span> <span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">frameStart</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">first</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="bp">None</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">sampleSum</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">sampleDev</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">runners</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="n">resultColumns</span><span class="p">)</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nRunners</span><span class="p">):</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">runners</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MetaRunner</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nRunners</span><span class="p">,</span>
+                            <span class="n">paramRanges</span><span class="p">))</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">runners</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">getNextTrial</span><span class="p">())</span>
+
+                <span class="k">return</span> <span class="n">Multiple</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">evalJobs</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+
+        <span class="nd">@w.frameEnd</span>
+        <span class="k">def</span> <span class="nf">frameEnd</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="nb">next</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">next</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">q</span><span class="p">[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">q</span><span class="p">[</span><span class="s1">&#39;score_dev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">nextRow</span> <span class="o">=</span> <span class="p">[</span> <span class="n">q</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">resultColumns</span> <span class="p">]</span>
+
+            <span class="n">store</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Integrate into our random sample floor</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nRandomSamples</span> <span class="o">*</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">sampleDev</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="o">-</span> <span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">sampleSum</span> <span class="o">/</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">sampleSum</span> <span class="o">+=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">storeAvg</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleSum</span> <span class="o">/</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span>
+            <span class="n">storeDev</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">storeDev</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">sampleDev</span> <span class="o">/</span> <span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">-</span> <span class="mi">3</span><span class="p">))</span>
+
+            <span class="c1"># Log if we have a new best score</span>
+            <span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">nextRow</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">store</span><span class="o">.</span><span class="n">best</span><span class="p">:</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">best</span> <span class="o">=</span> <span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]])</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;  (random floor: {} / {})</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">storeAvg</span><span class="p">,</span> <span class="n">storeDev</span><span class="p">))</span>
+
+            <span class="c1"># Record score, exit if simulation has gone on long enough</span>
+            <span class="k">if</span> <span class="n">simEnd</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">simEnd</span><span class="p">:</span>
+                    <span class="k">return</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Wipe data, we don&#39;t want to save it</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span> <span class="o">=</span> <span class="n">resultColumns</span><span class="p">)</span>
+
+            <span class="c1"># Determine the next step for this runner</span>
+            <span class="n">runner</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">runners</span><span class="p">[</span><span class="nb">next</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">runners</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">store</span><span class="o">.</span><span class="n">sampleCount</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">nRandomSamples</span><span class="p">:</span>
+                <span class="c1"># Force a restart</span>
+                <span class="k">return</span> <span class="n">runner</span><span class="o">.</span><span class="n">getNextTrial</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">runner</span><span class="o">.</span><span class="n">getNextTrial</span><span class="p">(</span><span class="nb">next</span><span class="p">,</span>
+                    <span class="c1"># Required performance to start exploring an area</span>
+                    <span class="n">storeAvg</span> <span class="o">+</span> <span class="mf">1.5</span> <span class="o">*</span> <span class="n">storeDev</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">w</span><span class="o">.</span><span class="n">run</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span> <span class="nf">maximizeFit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">learner</span><span class="p">,</span> <span class="n">paramRanges</span><span class="p">,</span> <span class="n">trainSet</span><span class="p">,</span> <span class="n">testSet</span><span class="p">,</span>
+            <span class="n">maxIters</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">nSamples</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">visualParams</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
+            <span class="n">imageDestFolder</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trainSet</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;trainSet must be a tuple: (inputs, expected), or &quot;</span>
+                    <span class="s2">&quot;(inputs,) for unsuperved&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">testSet</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;testSet must be a tuple: (inputs, expected), or &quot;</span>
+                    <span class="s2">&quot;(inputs,) for unsuperved&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Clear out images in imageDestFolder</span>
+        <span class="k">if</span> <span class="n">visualParams</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">imageDestFolder</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;If visualParams is set, imageDestFolder must &quot;</span>
+                        <span class="s2">&quot;be set&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Re-use our folder cleaning code</span>
+            <span class="n">fm</span> <span class="o">=</span> <span class="n">FigureMaker</span><span class="p">([],</span> <span class="n">imageDestFolder</span> <span class="o">=</span> <span class="n">imageDestFolder</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imageDestFolder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;imageDestFolder requires visualParams&quot;</span><span class="p">)</span>
+
+        <span class="n">unsupervisedInst</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
+        <span class="n">unsupervisedInst</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">trainSet</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">trainSet</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainSet</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span>
+                    <span class="k">else</span> <span class="n">unsupervisedInst</span><span class="o">.</span><span class="n">nOutputs</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">scorePipe</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+            <span class="nd">@w.frame</span><span class="p">(</span><span class="n">emit</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">store</span><span class="p">:</span> <span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">store</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">score_dev</span><span class="p">))</span>
+            <span class="k">def</span> <span class="nf">startParamScore</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">first</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="s1">&#39;init&#39;</span><span class="p">):</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">init</span> <span class="o">=</span> <span class="bp">True</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">first</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">trainedEstimators</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">return</span> <span class="n">Multiple</span><span class="p">([</span><span class="n">first</span><span class="p">]</span> <span class="o">*</span> <span class="n">nSamples</span><span class="p">)</span>
+
+                <span class="c1"># We&#39;re done if we reach here</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">)</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">score_dev</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">:</span>
+                        <span class="n">store</span><span class="o">.</span><span class="n">score_dev</span> <span class="o">+=</span> <span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">store</span><span class="o">.</span><span class="n">score</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="c1"># We&#39;re sampling from an infinite population of samples, so</span>
+                    <span class="c1"># use unbiased estimator of deviation</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">score_dev</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">score_dev</span>
+                            <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+                <span class="c1"># Visualize the network?</span>
+                <span class="k">if</span> <span class="n">visualParams</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="c1"># Find an average (representative) network</span>
+                    <span class="n">closeR</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">store</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+                    <span class="n">closeI</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">)):</span>
+                        <span class="n">d</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">store</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">d</span> <span class="o">&lt;</span> <span class="n">closeR</span><span class="p">:</span>
+                            <span class="n">closeI</span> <span class="o">=</span> <span class="n">i</span>
+                            <span class="n">closeR</span> <span class="o">=</span> <span class="n">d</span>
+
+                    <span class="n">avgInfo</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">trainedEstimators</span><span class="p">[</span><span class="n">closeI</span><span class="p">]</span>
+                    <span class="n">avgTrainer</span><span class="p">,</span> <span class="o">=</span> <span class="n">avgInfo</span>
+
+                    <span class="c1"># Round store.r[closeI] so that we don&#39;t save too many</span>
+                    <span class="c1"># estimators</span>
+                    <span class="k">if</span> <span class="n">avgTrainer</span><span class="o">.</span><span class="n">UNSUPERVISED</span><span class="p">:</span>
+                        <span class="c1"># Bucketized... this is MSE, so determine a piecewise</span>
+                        <span class="c1"># granularity function</span>
+                        <span class="n">v</span> <span class="o">=</span> <span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">closeI</span><span class="p">]</span>
+                        <span class="n">gran</span> <span class="o">=</span> <span class="mf">10.0</span> <span class="o">**</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">/</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span>
+                        <span class="n">rounded</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="p">[</span><span class="n">closeI</span><span class="p">]</span> <span class="o">/</span> <span class="n">gran</span><span class="p">)</span> <span class="o">*</span> <span class="n">gran</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+                    <span class="n">imgPathBase</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">imageDestFolder</span><span class="p">,</span>
+                            <span class="s2">&quot;{:f}_{}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">,</span> <span class="n">store</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+                    <span class="n">found</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="k">for</span> <span class="n">saved</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">imageDestFolder</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">saved</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{:f}_&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rounded</span><span class="p">)):</span>
+                            <span class="n">found</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                        <span class="c1"># Write some images!</span>
+                        <span class="n">avgTrainer</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">visualParams</span><span class="p">,</span>
+                                <span class="n">path</span> <span class="o">=</span> <span class="n">imgPathBase</span> <span class="o">+</span> <span class="s2">&quot;.png&quot;</span><span class="p">)</span>
+                        <span class="n">avgTrainer</span><span class="o">.</span><span class="n">visualize</span><span class="p">(</span><span class="n">visualParams</span><span class="p">,</span>
+                                <span class="n">path</span> <span class="o">=</span> <span class="n">imgPathBase</span> <span class="o">+</span> <span class="s2">&quot;_example.png&quot;</span><span class="p">,</span>
+                                <span class="n">inputs</span> <span class="o">=</span> <span class="n">testSet</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="c1"># Since we&#39;re maximizing here, negate score if we&#39;re</span>
+                <span class="c1"># reconstructing</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">store</span><span class="o">.</span><span class="n">score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span>
+                        <span class="ow">and</span> <span class="n">unsupervisedInst</span><span class="o">.</span><span class="n">UNSUPERVISED</span><span class="p">):</span>
+                    <span class="n">store</span><span class="o">.</span><span class="n">score</span> <span class="o">*=</span> <span class="o">-</span><span class="mf">1.0</span>
+
+            <span class="nd">@w.job</span>
+            <span class="k">def</span> <span class="nf">scoreL</span><span class="p">(</span><span class="n">parms</span><span class="p">):</span>
+                <span class="n">e</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">clone</span><span class="p">(</span><span class="n">learner</span><span class="p">)</span>
+                <span class="n">pp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">parms</span><span class="p">)</span>
+                <span class="n">pp</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">)</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">set_params</span><span class="p">(</span><span class="o">**</span><span class="n">pp</span><span class="p">)</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="o">*</span><span class="n">trainSet</span><span class="p">,</span> <span class="n">maxIters</span> <span class="o">=</span> <span class="n">maxIters</span><span class="p">)</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="o">*</span><span class="n">testSet</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">visualParams</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="p">(</span><span class="n">score</span><span class="p">,)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+            <span class="nd">@w.frameEnd</span>
+            <span class="k">def</span> <span class="nf">endParamScore</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="nb">next</span><span class="p">):</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">store</span><span class="o">.</span><span class="n">trainedEstimators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">next</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximize</span><span class="p">(</span><span class="n">paramRanges</span><span class="p">,</span> <span class="n">scorePipe</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Walt Woods.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

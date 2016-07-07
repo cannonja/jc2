@@ -1,0 +1,4 @@
+mr.unsupervised
+===============
+
+.. automodule:: mr.unsupervised

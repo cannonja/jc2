@@ -1,0 +1,4 @@
+mr.electrical.circuit
+=====================
+
+.. automodule:: mr.electrical.circuit

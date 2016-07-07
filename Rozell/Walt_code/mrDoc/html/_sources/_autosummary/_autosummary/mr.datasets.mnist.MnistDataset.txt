@@ -1,0 +1,37 @@
+mr.datasets.mnist.MnistDataset
+==============================
+
+.. currentmodule:: mr.datasets.mnist
+
+.. autoclass:: MnistDataset
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MnistDataset.__init__
+      ~MnistDataset.grayscale
+      ~MnistDataset.split
+      ~MnistDataset.splitPatches
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MnistDataset.imChannels
+      ~MnistDataset.imHeight
+      ~MnistDataset.imWidth
+      ~MnistDataset.images
+      ~MnistDataset.labels
+      ~MnistDataset.nImages
+      ~MnistDataset.nLabels
+   
+   

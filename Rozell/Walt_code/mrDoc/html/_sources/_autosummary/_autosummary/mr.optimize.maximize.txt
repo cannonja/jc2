@@ -1,0 +1,4 @@
+mr.optimize.maximize
+====================
+
+.. automodule:: mr.optimize.maximize

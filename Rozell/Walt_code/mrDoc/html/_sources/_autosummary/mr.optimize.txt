@@ -1,0 +1,4 @@
+mr.optimize
+===========
+
+.. automodule:: mr.optimize

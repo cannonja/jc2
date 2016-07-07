@@ -1,0 +1,1118 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mr.unsupervised.lcaSpikingWoodsAnalytical &mdash; Walt Woods&#39; Thesis Work 1.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="Walt Woods&#39; Thesis Work 1.0 documentation" href="../../index.html"/>
+        <link rel="up" title="mr.unsupervised" href="../mr.unsupervised.html"/>
+        <link rel="prev" title="mr.unsupervised.lcaSpikingWoods" href="mr.unsupervised.lcaSpikingWoods.html"/> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Walt Woods' Thesis Work
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../mr.datasets.html">mr.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.electrical.html">mr.electrical</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.figureMaker.html">mr.figureMaker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.optimize.html">mr.optimize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../mr.supervised.html">mr.supervised</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../mr.unsupervised.html">mr.unsupervised</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../mr.unsupervised.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="mr.unsupervised.lca.html">mr.unsupervised.lca</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mr.unsupervised.lcaSpikingWoods.html">mr.unsupervised.lcaSpikingWoods</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">mr.unsupervised.lcaSpikingWoodsAnalytical</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#non-inhibiting-version">Non-Inhibiting Version</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inhibiting-version">Inhibiting Version</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#members">Members</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">Walt Woods' Thesis Work</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../mr.unsupervised.html">mr.unsupervised</a> &raquo;</li>
+      
+    <li>mr.unsupervised.lcaSpikingWoodsAnalytical</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/_autosummary/_autosummary/mr.unsupervised.lcaSpikingWoodsAnalytical.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-mr.unsupervised.lcaSpikingWoodsAnalytical">
+<span id="mr-unsupervised-lcaspikingwoodsanalytical"></span><h1>mr.unsupervised.lcaSpikingWoodsAnalytical<a class="headerlink" href="#module-mr.unsupervised.lcaSpikingWoodsAnalytical" title="Permalink to this headline">¶</a></h1>
+<p><code class="xref py py-mod docutils literal"><span class="pre">lcaSpikingWoodsAnalytical</span></code> provides an analytical (non-SPICE) implementation of the simple spiking architecture.</p>
+<img src="../../_images/lcaWoodsUninhibited.svg" /><p>The <em>Simple, Spiking, Locally Competitive Algorithm</em> (SSLCA) consists of rows with a set voltage (either <img class="math" src="../../_images/math/2b96e63e9bfd04dbd928d315c31f879eef4e6135.png" alt="V_{high}"/> or <img class="math" src="../../_images/math/8dc6fd07baff00109bb5c7d782bae0c5a0de75de.png" alt="V_{low}"/> depending on input spike activity) and columns that contain a capacitor which is directly connected to the crossbar.</p>
+<p>The design can be broken down into two versions:</p>
+<ul class="simple">
+<li><a class="reference internal" href="#sec-non-inhibit"><span class="std std-ref">Non-Inhibiting Version</span></a></li>
+<li><a class="reference internal" href="#sec-inhibit"><span class="std std-ref">Inhibiting Version</span></a></li>
+</ul>
+<div class="section" id="non-inhibiting-version">
+<span id="sec-non-inhibit"></span><h2>Non-Inhibiting Version<a class="headerlink" href="#non-inhibiting-version" title="Permalink to this headline">¶</a></h2>
+<p>When inhibition is not a factor, the behavior is exactly as described above: a capacitor directly on the crossbar either charges or discharges through the rows.  When that capacitor reaches a threshold voltage, all capacitors are reset, and the process continues.  Mathematically, this can be viewed as the sum of each row&#8217;s current into the node:</p>
+<div class="math">
+<p><img src="../../_images/math/682b509c907e196a0aff57da43c26efb3cf588b2.png" alt="C\frac{\partial V_{neuron}}{\partial t} &amp;= \sum_i{(V_i - V_{neuron})G_i}."/></p>
+</div><p>Then, assuming an input row <img class="math" src="../../_images/math/1859521434e24c62c0a5fff157d755b786c925b9.png" alt="i"/> spikes to voltage <img class="math" src="../../_images/math/42c6f111db9b917cd0a5f1daadf0133c0069ac66.png" alt="V_{set}"/> with a mean of <img class="math" src="../../_images/math/ae9864b74268730f5e909c3ae233a629bdb11c20.png" alt="K_i"/> activity (on for <img class="math" src="../../_images/math/ae9864b74268730f5e909c3ae233a629bdb11c20.png" alt="K_i"/>, off for <img class="math" src="../../_images/math/2193d39dafda6020e4303188da439fdb86c86982.png" alt="1 - K_i"/>), and is grounded the rest of the time, this becomes:</p>
+<div class="math">
+<p><img src="../../_images/math/28de079c02de280ef95118b96cf482f432d2a836.png" alt="C\frac{\partial V_{neuron}}{\partial t} &amp;= \sum_i \biggl( K_i(V_{set} - V_{neuron})G_i\\
+        &amp;\hspace{5em}+ (1 - K_i)(0 - V_{neuron})G_i \biggr),\\
+&amp;= \sum_i{(K_iV_{set} - V_{neuron})G_i}, \\
+&amp;= V_{set}\sum_i{K_iG_i} - V_{neuron}\sum_i{G_i}, \\
+Q_1 &amp;= \sum_i{G_i}, \\
+Q_2 &amp;= V_{set}\sum_i{K_iG_i}, \\
+\mathcal{L}\{V_{neuron}\}s(Cs + Q_1) &amp;= CsV_{neuron, t=0} + Q_2, \\
+V_{neuron}(t) &amp;= \frac{Q_2}{Q_1}(1 - e^\frac{-tQ_1}{C}) + V_{neuron, t=0} e^\frac{-tQ_1}{C}."/></p>
+</div><p>Solving that equation for <img class="math" src="../../_images/math/3366d14586e0e83a3a086a8a164d6d9bf06f633f.png" alt="t"/>, letting <img class="math" src="../../_images/math/cbb89ae872e056967f30d7845be1309149eea6ee.png" alt="G_i = G_{max}g_i, K_i = K_{max}k_i"/>, assuming the network has <img class="math" src="../../_images/math/2482cc90b8e4f04212bfeb83aa6826910f98e34a.png" alt="M"/> inputs, and that there is a distribution <img class="math" src="../../_images/math/d71b687bf5d3bd0f83bc121bc6d88124ba12463f.png" alt="\chi"/> that matches the empirical data set that the network is exposed to, then the network may be specified by assuming that the network is fully trained with a matching element for each input:</p>
+<div class="math">
+<p><img src="../../_images/math/a730051024dfc8ec75811e57a614ee4a92160c4d.png" alt="Q_1 &amp;= MG_{max}\overline{\chi}, \\
+Q_2 &amp;= MV_{set}K_{max}G_{max}\overline{\chi^2}, \\
+t &amp;= \frac{-C}{Q_1}ln\left(\frac{\frac{Q_2}{Q_1} - V_{neuron}(t)}{\frac{Q_2}{Q_1} - V_{neuron,t=0}}\right)."/></p>
+</div><p>Thus, the anticipated fire time (desired spikes per second) can be calibrated based on the desired capacitance and threshold voltage.  Alternatively, by using the product of two different distributions instead of the square of a single for <img class="math" src="../../_images/math/a4cf7e8f309bd6814e79b2918b22d2858fdef988.png" alt="Q2"/>, <img class="math" src="../../_images/math/032a6d85afd06d1c328a12da49f1a1a31d87f856.png" alt="\overline{\chi\chi}"/>, a ratio of firing times may be calibrated based on <img class="math" src="../../_images/math/b0fba37bf7d409623d825e85adf8bd294d1eb0b2.png" alt="V_{neuron}"/>.</p>
+</div>
+<div class="section" id="inhibiting-version">
+<span id="sec-inhibit"></span><h2>Inhibiting Version<a class="headerlink" href="#inhibiting-version" title="Permalink to this headline">¶</a></h2>
+<p>The inhibiting version has an identical layout to the non-inhibiting version.  However, it has more complicated row and column headers.  The CMOS layout is as follows:</p>
+<img src="../../_images/lcaWoodsInhibited.svg" /><p>If, in the <em>Inhibition Logic Module</em> (ILM), <img class="math" src="../../_images/math/e30515319ba295f40fd22851493d5350faad9a68.png" alt="CBLOW = \overline{SPIKE}"/>, then the non-inhibiting architecture is realized.  However, if the ILM is implemented as above, then:</p>
+<div class="section" id="derivation">
+<h3>Derivation<a class="headerlink" href="#derivation" title="Permalink to this headline">¶</a></h3>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Later derivation shows that the below math is only useful through <img class="math" src="../../_images/math/aac12b780fc75877befb096f8177ead3d47c778f.png" alt="V_{i,0} = ..."/>.</p>
+</div>
+<div class="math">
+<p><img src="../../_images/math/d07be05adefbfcc0e1fa6d45dca2b8409140212c.png" alt="\text{As with uninhibited, a row has $K_i$ spike activity.} \span\\
+\text{Tracking the inhibition voltage $V_{i}$ (pre/post is relative to spike):} \span\\
+A &amp;= \frac{1}{R_{cb}C}, \\
+B &amp;= \frac{1}{RC}, \\
+V_{i,max} &amp;= V_{cc}\frac{R}{R + R_{cb}}, \\
+V_{i,pre} &amp;= V_{i,0} e^{-TB}, \\
+V_{i,post} &amp;= V_{i,max} + (V_{i,pre} - V_{i,max})e^{-T_{spike}A}. \\
+\text{Making the assumption that spike activity is nullified when:} \span\\
+V_i &amp;&gt; V_{i,thresh}, \\
+\text{Then the time that spike activity is nullified is:} \span\\
+V_{i,thresh} &amp;= V_{i,0} e^{-T_{run}B}, \\
+T_{inhib} &amp;= \frac{-ln(\frac{V_{i,thresh}}{V_{i,0}})}{B}\text{, bounded on $[0, \infty)$}. \\
+\text{Since $V_{i,post}$ can be calculated, the effective block time added by } \span\\
+\text{a spiking event can be calculated by taking the difference of $T$ values.} \span\\
+\text{If we want constant inhibition, then $V_{post}$ after $V_{pre}$ needs to be $V_{i,0}$:} \span\\
+V_{i,0} &amp;= V_{i,max} + (V_{i,0}e^{-T_{run}B} - V_{i,max})e^{-T_{spike}A}, \\
+T_{run} &amp;= \frac{-ln\left( \frac{V_{i,0} - V_{i,max} + V_{i,max}e^{-T_{spike}A}}{V_{i,0}e^{-T_{spike}A}} \right)}{B}. \\
+\text{Back to the $K_i$ business, an inhibited network will have $K_i = 0$ for $T &lt; T_{inhib}$.} \span\\
+\text{In a $1\times 1$ network, this means that the fire time will be delayed by $T_{inhib}$:} \span\\
+T_{run} &amp;= \frac{-C}{Q_1}ln\left( 1 - V_{neuron}(t)\frac{Q_1}{Q_2} \right) + max\left(0, \frac{-ln(\frac{V_{i,thresh}}{V_{i,0}})}{B}\right), \\
+\text{Subsituting in the original design parameters: } \span\\
+T_{run} &amp;= T_{planned} + max\left( 0, \frac{-ln(\frac{V_{i,thresh}}{V_{i,0}})}{B} \right). \\
+\text{$T_{run}$ is now the actual time between spikes; the frequency is thus $\frac{1}{T_{run} + T_{spike}}$.} \span\\
+\text{Substituting the $V_{i,0}$ stability equation into the $1\times 1$ equation yields: }\span\\
+\frac{V_{i,0} - V_{i,max} + V_{i,max}e^{-T_{spike}A}}{V_{i,0}e^{-T_{spike}A}} &amp;= e^{-B\left[ ln(e^{T_{planned}}) + min\left(0, ln\left( \frac{V_{i,thresh}}{V_{i,0}} \right) \right) \right]} \\
+        &amp;= \begin{cases}
+            e^{-BT_{planned}} &amp; \text{if } V_{i,thresh} \ge V_{i,0} \\
+            \left(\frac{V_{i,thresh}}{V_{i,0}}\right)^{-B}e^{-BT_{planned}} &amp; \text{otherwise}
+            \end{cases}"/></p>
+</div><div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><strong>This is old, and probably bad</strong></p>
+<p>Consider now a niche problem for investigating this architecture:</p>
+<ul class="simple">
+<li>There are two dictionary elements with M inputs</li>
+<li>The first element has M-1 elements at max weight (other at K_{min})</li>
+<li>The second element has only the last element at K_B weight (others at K_{min})</li>
+<li>The input is a solid bar of K_{in} weight</li>
+</ul>
+<p>Thus the ratio of firing should work out to 1:K/B between the two elements if inhibition is doing its job.  Essentially, we will run the analytical algorithm to determine the actual firing ratio.</p>
+<div class="last math" id="equation-eq-inhib-cap">
+<p><span class="eqno">(1)</span><img src="../../_images/math/2eab7636a2b449ee00ca512ea771260002c90d02.png" alt="\text{Column parameters denoted as $A\{Q_1\}$ and $B\{Q_1\}$, for instance.} \span\\
+A\{Q_1\} &amp;= G_{max}(M - 1 + K_{min}), \\
+A\{Q_2\} &amp;= V_{set}K_{max}G_{max}K_{in}(M - 1 + K_{min}), \\
+B\{Q_1\} &amp;= G_{max}((M - 1)K_{min} + K_B), \\
+B\{Q_2\} &amp;= V_{set}K_{max}G_{max}K_{in}((M - 1)K_{min} + K_B), \\
+\text{For sensitivity, $V_{fire} = 0.9\frac{B\{Q_1\}}{B\{Q_2\}}$}, \span\\
+Q_1 &amp;= MG_{max}K_{in}, \\
+Q_2 &amp;= MV_{set}K_{max}G_{max}K_{in}^2, \\
+C &amp;= \frac{-T_{planned}MG_{max}K_{in}}{ln\left(1 - V_{fire}\frac{Q_1}{Q_2}\right)}. \\
+\text{We have two distinct input inhibition states: $V_{i,A}$ and $V_{i,B}$.} \span\\
+\text{At each step, re-compute all $Q_2$ according to inhibition terms.} \span\\
+\text{Measure times: $T_{inhib,A}$, $T_{inhib,B}$, $t_{fire,A}$, $t_{fire,B}$.} \span\\
+\text{Take the smallest time, re-up $V_{i,A}$, $V_{i,B}$, $V_A$, $V_B$.} \span\\
+\text{Rinse and repeat to 20 spike events.} \span"/></p>
+</div></div>
+<p>Now, inhibition works best when it&#8217;s linear: the charge through the crossbar is exponential between the current inhibition and VCC.  The drain is from a max value of VCC down to ground.  Therefore, the optimal inhibition threshold is <img class="math" src="../../_images/math/cf7f194be723de655881a5b78cf8fca66b7f6f30.png" alt="\frac{Vcc}{2}"/>, as the midpoint is the most linear range of an exponential for both towards VCC and towards ground.</p>
+<p>The most important design decisions for inhibition are R and C.  Too large of an R produces good results, but makes the network run for far too long.  Too large of a C can cause performance issues as well.  The goal is to balance these for accuracy against speed; it is imperative that the network still process quickly.</p>
+<p>Thus, design for uninhibited network:</p>
+<ol class="arabic simple">
+<li>Choose the minimal RF of interest, calculate <img class="math" src="../../_images/math/85e0be4039a3568d3f4653127d34cf4a8ca3663c.png" alt="Q_{1L}\text{ and }Q_{2L}"/>.</li>
+<li>Choose the average RF of interest, calculate <img class="math" src="../../_images/math/72daacd85721e68fd947ce707609f908c855e32f.png" alt="Q_{1M}\text{ and }Q_{2M}"/>.</li>
+<li>Calculate <img class="math" src="../../_images/math/b674aacba62046c9daa49a1fe31822cc9c05bf1a.png" alt="V_{fire}"/> based on <img class="math" src="../../_images/math/e17f3d6fae5c34aea3a8ba05eac4d041e917b515.png" alt="Q_{1L}\and Q_{2L}"/>.</li>
+<li>Choose the desired run-time length of algorithm, spike density, and spike resolution.</li>
+<li>Calculate <img class="math" src="../../_images/math/17f35fcaa8a24d40237c84f919a00c6bfcbe97ff.png" alt="C"/> based on these parameters and <img class="math" src="../../_images/math/bdcd173c9fe122a0de9ccdc69803fa3b7f57a65f.png" alt="Q_{1M}\and Q_{2M}"/>.</li>
+</ol>
+<p>For an inhibited network (implemented as <a class="reference internal" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init" title="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init"><code class="xref py py-meth docutils literal"><span class="pre">LcaSpikingWoodsAnalyticalInhibition._init()</span></code></a>):</p>
+<ol class="arabic">
+<li><p class="first">Choose the minimal RF of interest, calculate <img class="math" src="../../_images/math/85e0be4039a3568d3f4653127d34cf4a8ca3663c.png" alt="Q_{1L}\text{ and }Q_{2L}"/>.</p>
+</li>
+<li><p class="first">Choose the average RF of interest, calculate <img class="math" src="../../_images/math/72daacd85721e68fd947ce707609f908c855e32f.png" alt="Q_{1M}\text{ and }Q_{2M}"/>.</p>
+</li>
+<li><p class="first">Calculate <img class="math" src="../../_images/math/b674aacba62046c9daa49a1fe31822cc9c05bf1a.png" alt="V_{fire}"/> based on <img class="math" src="../../_images/math/e17f3d6fae5c34aea3a8ba05eac4d041e917b515.png" alt="Q_{1L}\and Q_{2L}"/> (<img class="math" src="../../_images/math/68c4cfb6bf5d66e747c96eadb76165faa72a44aa.png" alt="V_{fire} = \alpha\frac{Q_{2L}}{Q_{1L}}"/>, where <img class="math" src="../../_images/math/3907cb4e1f5cd130f6cc8cd1af9f62b822aac003.png" alt="\alpha"/> is a scaling factor.  Currently <img class="math" src="../../_images/math/524ef7d2a8f653decc33d7f7365d4e5b014af129.png" alt="0.9"/>).</p>
+</li>
+<li><p class="first">Choose the desired input spike maximum density, input spike period, output spike maximum density, and output spike period; <img class="math" src="../../_images/math/3dc866e842d0eccea682e1796fc4b30701dc5a85.png" alt="K_{maxIn}, T_{spikePeriodIn}, K_{maxOut}, \and T_{spikePeriodOut}"/>, respectively.</p>
+</li>
+<li><p class="first">Calculate <img class="math" src="../../_images/math/efda99c69fb4013f72e8111dc6e6a18ea6c75215.png" alt="C_{max}"/>, the maximum neuron capacitance (not accounting for inhibition) based on <img class="math" src="../../_images/math/bdcd173c9fe122a0de9ccdc69803fa3b7f57a65f.png" alt="Q_{1M}\and Q_{2M}"/> and the time between output spikes <img class="math" src="../../_images/math/aa2fd79e81f3a551f3b0205ce9e88844a5d0d6e6.png" alt="T_{spikePeriodOut}(1 - K_{maxOut})"/>.  This will use <a href="#equation-eq-inhib-cap">(1)</a>.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Modify that <img class="math" src="../../_images/math/efda99c69fb4013f72e8111dc6e6a18ea6c75215.png" alt="C_{max}"/> to make room for inhibition effects, and manipulate <img class="math" src="../../_images/math/dd14d75ec9cda555a427d6bd18758296d8acdc26.png" alt="R_{inhib}\and C_{inhib}"/> such that the average RF will fire at the correct interval.  This is accomplished as follows:</dt>
+<dd><ol class="first last arabic">
+<li><p class="first">Want asymptotic, stable fire time; the reconstruction is accurate for an input <img class="math" src="../../_images/math/1859521434e24c62c0a5fff157d755b786c925b9.png" alt="i"/> when <img class="math" src="../../_images/math/a1077cedebe50e6962bd48a77cb88d3ef2bc93ca.png" alt="F(g_i, k_i)"/>, the time it takes for an output neuron to charge and begin to fire, is balanced with the inhibitory forces created during the firing event:</p>
+<blockquote>
+<div><div class="math">
+<p><img src="../../_images/math/eab90ff0186d03c586c101c6fea767f63c051b40.png" alt="F(g_i, k_i) &amp;= T_{spikeGapOut} = \frac{g_iT_{spikePeriodOut}}{k_i} - T_{spikeOut}, \\
+T_{spikeOut} &amp;= T_{spikePeriodOut}K_{maxOut}, \\
+T_{spikeGapOutInhib} &amp;= \text{Portion of $T_{spikeGapOut}$ where inhibition is in play}, \\
+        &amp;= T_{spikeGapOut} - T_{fire}, \\
+T_{fire} &amp;= \text{From uninhibited version:} \\
+        &amp;= \frac{-C}{Q_{1M}}ln\left( \frac{\frac{Q_{2M}}{Q_{1M}} - V_{fire}}{\frac{Q_{2M}}{Q_{1M}} - 0} \right)."/></p>
+</div><p>From <a href="#equation-eq-inhib-cap">(1)</a>, can solve for <img class="math" src="../../_images/math/c3b20b0a5f84b5eed7102be9acc9138074d25562.png" alt="V_{i,0}"/> with <img class="math" src="../../_images/math/6f5cdf7b03c9a03605cbde5a2926ed049250daf8.png" alt="V_{i,max} = V_{cc}"/>:</p>
+<div class="math">
+<p><img src="../../_images/math/516c57b204b4507c59726b117fc759d439474d21.png" alt="K_i &amp;= K_{maxIn}k_i, \\
+A &amp;= \frac{1}{R_{cb}C_{inhib}}, \\
+R_{cb} &amp;= \text{Memristive device resistance}, \\
+B &amp;= \frac{1}{R_{inhib}C_{inhib}}, \\
+V_{i,0} &amp;= \frac{V_{cc}\left( 1 - e^{-T_{spikeOut}A} \right)}{1 - e^{-K_iT_{spikeOutGap}B - T_{spikeOut}A}}, \\
+V_{i,thresh} &amp;= V_{i,0}e^{-K_iT_{spikeGapOutInhib}B}, \\
+V_{i,thresh} &amp;= \frac{V_{cc}}{2} \text{(to try to stay linear)}, \\
+V_{i,0} &amp;= \frac{V_{cc}}{2e^{-K_iT_{spikeGapOutInhib}B}}, \\
+\frac{V_{cc}}{2e^{-K_iT_{spikeGapOutInhib}B}}
+        &amp;= \frac{V_{cc}\left( 1 - e^{-T_{spikeOut}A} \right)}{1 - e^{-K_iT_{spikeGapOut}B - T_{spikeOut}A}}."/></p>
+</div><p>Since all parameters except for <img class="math" src="../../_images/math/dd14d75ec9cda555a427d6bd18758296d8acdc26.png" alt="R_{inhib}\and C_{inhib}"/> are known, the above non-linear equation can be used to solve for whichever of the two is unspecified.  Empirical testing has shown that since fire time and neuron capacitance have a linear relationship, halving the neuron&#8217;s capacitance and using the same value for <img class="math" src="../../_images/math/c62cff358e1dd9dd79c2d8eced3c80b6500f0498.png" alt="C_{inhib}"/> is reasonable, though there might be a better approach.</p>
+</div></blockquote>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="members">
+<h2>Members<a class="headerlink" href="#members" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical">
+<em class="property">class </em><code class="descclassname">mr.unsupervised.lcaSpikingWoodsAnalytical.</code><code class="descname">LcaSpikingWoodsAnalytical</code><span class="sig-paren">(</span><em>nOutputs=10</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mr.modelBase.SklearnModelBase</span></code></p>
+<p>An analytical (not ODE-simulated) version of LcaSpikingWoods.</p>
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._bufferIn">
+<code class="descname">_bufferIn</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._bufferIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>_bufferIn: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._bufferOut">
+<code class="descname">_bufferOut</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._bufferOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>_bufferOut: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcFireTime">
+<code class="descname">_calcFireTime</code><span class="sig-paren">(</span><em>self</em>, <em>double voltage</em>, <em>double condSum</em>, <em>double condKProduct</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcFireTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fire time:</p>
+<p>t = -C / Q1 * ln(1 - Q1 / Q2 * Vnode)
+Q1 = sum(cond)
+Q2 = Vevent * sum(k*cond)</p>
+<p>Returns (vMax, fireTime), where fireTime is -1 if never fires</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcVFire_error">
+<code class="descname">_calcVFire_error</code><span class="sig-paren">(</span><em>self</em>, <em>vFire</em>, <em>double uQ1</em>, <em>double uQ2</em>, <em>double tQ1</em>, <em>double tQ2</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcVFire_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcVFromC">
+<code class="descname">_calcVFromC</code><span class="sig-paren">(</span><em>self</em>, <em>double C</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._calcVFromC" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._checkDatasets">
+<code class="descname">_checkDatasets</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y</em>, <em>noYIsOk=False</em>, <em>isInit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._checkDatasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks input / output arrays X and y to make sure they have two
+dimensions and can be indexed via [].</p>
+<p>Raises a ValueError if the parameter is invalid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>isInit</strong> &#8211; If True, then self.nInputs and self.nOutputs will be set
+after this method is called, and those checks will be skipped.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._crossbar">
+<code class="descname">_crossbar</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._crossbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>_crossbar: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._debug">
+<code class="descname">_debug</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>_debug: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._eG2">
+<code class="descname">_eG2</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._eG2" title="Permalink to this definition">¶</a></dt>
+<dd><p>_eG2: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._edX">
+<code class="descname">_edX</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._edX" title="Permalink to this definition">¶</a></dt>
+<dd><p>_edX: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._getCond">
+<code class="descname">_getCond</code><span class="sig-paren">(</span><em>self</em>, <em>double weight</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._getCond" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._get_param_names">
+<code class="descname">_get_param_names</code><span class="sig-paren">(</span><em>type cls</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._get_param_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stolen from scipy.base.BaseEstimator.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._homeostasis">
+<code class="descname">_homeostasis</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._homeostasis" title="Permalink to this definition">¶</a></dt>
+<dd><p>_homeostasis: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._init">
+<code class="descname">_init</code><span class="sig-paren">(</span><em>self</em>, <em>int nInputs</em>, <em>int nOutputs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._init" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._isInit">
+<code class="descname">_isInit</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._isInit" title="Permalink to this definition">¶</a></dt>
+<dd><p>_isInit: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._learnMoments">
+<code class="descname">_learnMoments</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._learnMoments" title="Permalink to this definition">¶</a></dt>
+<dd><p>_learnMoments: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._partial_fit">
+<code class="descname">_partial_fit</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice x</em>, <em>__Pyx_memviewslice y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._predict">
+<code class="descname">_predict</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice x</em>, <em>__Pyx_memviewslice y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._reconstruct">
+<code class="descname">_reconstruct</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice y</em>, <em>__Pyx_memviewslice r</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._resetDebug">
+<code class="descname">_resetDebug</code><span class="sig-paren">(</span><em>self</em>, <em>debug</em>, <em>int lenX</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._resetDebug" title="Permalink to this definition">¶</a></dt>
+<dd><p>We&#8217;re about to do some operations on input array X.  Set up the
+<a href="#id1"><span class="problematic" id="id2">debugInfo_</span></a> struct if self.debug is set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._sampleK_test">
+<code class="descname">_sampleK_test</code><span class="sig-paren">(</span><em>self</em>, <em>double k</em>, <em>double tWindow</em>, <em>double tSpike</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical._sampleK_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns _sampleK, in python form</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.adaDeltaRho">
+<code class="descname">adaDeltaRho</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.adaDeltaRho" title="Permalink to this definition">¶</a></dt>
+<dd><p>adaDeltaRho: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.avgInput">
+<code class="descname">avgInput</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.avgInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>avgInput: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.cNeuron_">
+<code class="descname">cNeuron_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.cNeuron_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id3"><span class="problematic" id="id4">cNeuron_</span></a>: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.calcFireTimes">
+<code class="descname">calcFireTimes</code><span class="sig-paren">(</span><em>self</em>, <em>states</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.calcFireTimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates states with normalized fire times.</p>
+<dl class="docutils">
+<dt>states - [ lambda, ... ] where each lambda returns two values: a [0, 1]</dt>
+<dd>weight in the learned dictionary element, and a [0, 1] k value
+for the input.</dd>
+</dl>
+<p>returns a list of dicts with avgWeight, avgInput, avgCond, avgCondK,
+and normalized fireRate, where 1.0 = on target (simTime / nSpikes), 2.0
+is twice as fast, etc.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.circuit_rMax">
+<code class="descname">circuit_rMax</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.circuit_rMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>circuit_rMax: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.circuit_rMin">
+<code class="descname">circuit_rMin</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.circuit_rMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>circuit_rMin: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.convergerProps">
+<code class="descname">convergerProps</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.convergerProps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.debugInfo_">
+<code class="descname">debugInfo_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.debugInfo_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id5"><span class="problematic" id="id6">debugInfo_</span></a>: mr.modelBase.SklearnModelBaseStats</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.drainAll">
+<code class="descname">drainAll</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.drainAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>drainAll: &#8216;bool&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>maxIters=0</em>, <em>solveTime=0.0</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes this predictor&#8217;s learned values so that they fit the
+dimensionality of X, and trains the predictor on X.</p>
+<dl class="docutils">
+<dt>maxIters [int, default 0] - The maximum number of iterations to train</dt>
+<dd>on.</dd>
+<dt>solveTime - For smaller datasets, it probably makes sense to run fit()</dt>
+<dd>across the dataset multiple times by default.  solveTime
+specifies, in seconds, the amount of time that an
+UnsupervisedPredictor is allowed to use on trying to better
+output by multiple partial_fits.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fitIters_">
+<code class="descname">fitIters_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fitIters_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id7"><span class="problematic" id="id8">fitIters_</span></a>: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fit_predict">
+<code class="descname">fit_predict</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.fit_predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>self</em>, <em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.inhib">
+<code class="descname">inhib</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.inhib" title="Permalink to this definition">¶</a></dt>
+<dd><p>inhib: dict</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.init">
+<code class="descname">init</code><span class="sig-paren">(</span><em>self</em>, <em>nInputs</em>, <em>nOutputs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>nInputs and nOutputs comes from data, so init()
+comes after constructor.  Note that nInputs and nOutputs as passed to
+this function do not necessarily override the actual nInputs and
+nOutputs.</p>
+<p>Calls self._init(self.nInputs, self.nOutputs).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.learnMomentum">
+<code class="descname">learnMomentum</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.learnMomentum" title="Permalink to this definition">¶</a></dt>
+<dd><p>learnMomentum: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nHomeo">
+<code class="descname">nHomeo</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nHomeo" title="Permalink to this definition">¶</a></dt>
+<dd><p>nHomeo: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nInputs">
+<code class="descname">nInputs</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nInputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>nInputs: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nOutputs">
+<code class="descname">nOutputs</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nOutputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>nOutputs: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nOutputsConvolved">
+<code class="descname">nOutputsConvolved</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nOutputsConvolved" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of outputs that are convolved; this is used purely for
+visualizing a network.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nSpikes">
+<code class="descname">nSpikes</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.nSpikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>nSpikes: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.partial_fit">
+<code class="descname">partial_fit</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given X, calculate our output values Y (which can be thought of as
+the strengths of different clusters / classification elements)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.reconstruct">
+<code class="descname">reconstruct</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct each member of X and return the reconstructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.reconstructFromPredict">
+<code class="descname">reconstructFromPredict</code><span class="sig-paren">(</span><em>self</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.reconstructFromPredict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct each member of the original X given a result from
+predict().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean-squared-error for the distance from the
+reconstruction of X to X, divided by the number of elements in X.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>self</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.set_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.simTime">
+<code class="descname">simTime</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.simTime" title="Permalink to this definition">¶</a></dt>
+<dd><p>simTime: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.spikeDensity">
+<code class="descname">spikeDensity</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.spikeDensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>spikeDensity: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.t_">
+<code class="descname">t_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.t_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id9"><span class="problematic" id="id10">t_</span></a>: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.tolerance_vFire">
+<code class="descname">tolerance_vFire</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.tolerance_vFire" title="Permalink to this definition">¶</a></dt>
+<dd><p>tolerance_vFire: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.untrainedK">
+<code class="descname">untrainedK</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.untrainedK" title="Permalink to this definition">¶</a></dt>
+<dd><p>untrainedK: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.vEventSet">
+<code class="descname">vEventSet</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.vEventSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>vEventSet: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.vFire_">
+<code class="descname">vFire_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.vFire_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id11"><span class="problematic" id="id12">vFire_</span></a>: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>self</em>, <em>params</em>, <em>path=None</em>, <em>inputs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalytical.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps an image at path, based on the visual params (width, height,
+channels).  Essentially, gives the input map that is the most likely
+estimator to produce a single output.</p>
+<dl class="docutils">
+<dt>inputs [None] - Inputs suitable for self.predict.  Determines the</dt>
+<dd>inputs to visualize</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition">
+<em class="property">class </em><code class="descclassname">mr.unsupervised.lcaSpikingWoodsAnalytical.</code><code class="descname">LcaSpikingWoodsAnalyticalInhibition</code><span class="sig-paren">(</span><em>nOutputs=10</em>, <em>rfLeast=None</em>, <em>rfAvg=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mr.modelBase.SklearnModelBase</span></code></p>
+<p>See the module documentation for the design of this class.  Takes two
+receptive fields, one the &#8220;most receptive&#8221; and another the &#8220;least
+receptive&#8221; and generates a network that does sparse approximation
+correctly.</p>
+<p>Example usage:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">physics</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">phys_rMax</span><span class="o">=</span><span class="mf">183e3</span><span class="p">,</span> <span class="n">phys_rMin</span><span class="o">=</span><span class="mf">53e3</span><span class="p">)</span>
+<span class="n">lca</span> <span class="o">=</span> <span class="n">LcaSpikingWoodsAnalyticalInhibition</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">90</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="p">],</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">r_</span><span class="p">[</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">90</span><span class="p">)</span> <span class="p">],</span>
+        <span class="o">**</span><span class="n">physics</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._bufferIn">
+<code class="descname">_bufferIn</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._bufferIn" title="Permalink to this definition">¶</a></dt>
+<dd><p>_bufferIn: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._bufferOut">
+<code class="descname">_bufferOut</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._bufferOut" title="Permalink to this definition">¶</a></dt>
+<dd><p>_bufferOut: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._checkDatasets">
+<code class="descname">_checkDatasets</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y</em>, <em>noYIsOk=False</em>, <em>isInit=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._checkDatasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks input / output arrays X and y to make sure they have two
+dimensions and can be indexed via [].</p>
+<p>Raises a ValueError if the parameter is invalid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>isInit</strong> &#8211; If True, then self.nInputs and self.nOutputs will be set
+after this method is called, and those checks will be skipped.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._debug">
+<code class="descname">_debug</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._debug" title="Permalink to this definition">¶</a></dt>
+<dd><p>_debug: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._get_param_names">
+<code class="descname">_get_param_names</code><span class="sig-paren">(</span><em>type cls</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._get_param_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stolen from scipy.base.BaseEstimator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init">
+<code class="descname">_init</code><span class="sig-paren">(</span><em>self</em>, <em>int nInputs</em>, <em>int nOutputs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responsible for setting up a new instance of this network.  This
+function performs the design steps for an inhibited network mentioned
+in <a class="reference internal" href="#sec-inhibit"><span class="std std-ref">Inhibiting Version</span></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_getQ">
+<code class="descname">_init_getQ</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice rf</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_getQ" title="Permalink to this definition">¶</a></dt>
+<dd><p>For a given <code class="docutils literal"><span class="pre">rf</span></code>, returns (Q1, Q2).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_solveForR">
+<code class="descname">_init_solveForR</code><span class="sig-paren">(</span><em>self</em>, <em>double C</em>, <em>double k</em>, <em>double g</em>, <em>double Q1</em>, <em>double Q2</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_solveForR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_solveForR_inner">
+<code class="descname">_init_solveForR_inner</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice R0</em>, <em>double C_i</em>, <em>double k</em>, <em>double g</em>, <em>double T_fire</em><span class="sig-paren">)</span> &rarr; double<a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._init_solveForR_inner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Since a viable RC pair is difficult to compute analytically,
+this method&#8217;s roots are the solutions to (<a href="#id13"><span class="problematic" id="id14">self.cInhib_</span></a>, R) that
+optimize the inhibition response in this network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>R0</strong> &#8211; The guess from scipy.optimize.</li>
+<li><strong>C_i</strong> &#8211; The inhibition capacitance to use.</li>
+<li><strong>k</strong> &#8211; The actual input k to use</li>
+<li><strong>g</strong> &#8211; The stored crossbar value to represent k.</li>
+<li><strong>T_fire</strong> &#8211; The time calculation based on Q1 and Q2 for the neuron
+being balanced.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._isInit">
+<code class="descname">_isInit</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._isInit" title="Permalink to this definition">¶</a></dt>
+<dd><p>_isInit: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._lcaInternal_crossbar">
+<code class="descname">_lcaInternal_crossbar</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._lcaInternal_crossbar" title="Permalink to this definition">¶</a></dt>
+<dd><p>_lcaInternal_crossbar: &#8216;__Pyx_memviewslice&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._partial_fit">
+<code class="descname">_partial_fit</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice x</em>, <em>__Pyx_memviewslice y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._predict">
+<code class="descname">_predict</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice x</em>, <em>__Pyx_memviewslice y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._rand">
+<code class="descname">_rand</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._rand" title="Permalink to this definition">¶</a></dt>
+<dd><p>_rand: mr.util.FastRandom</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._reconstruct">
+<code class="descname">_reconstruct</code><span class="sig-paren">(</span><em>self</em>, <em>__Pyx_memviewslice y</em>, <em>__Pyx_memviewslice r</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._resetDebug">
+<code class="descname">_resetDebug</code><span class="sig-paren">(</span><em>self</em>, <em>debug</em>, <em>int lenX</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition._resetDebug" title="Permalink to this definition">¶</a></dt>
+<dd><p>We&#8217;re about to do some operations on input array X.  Set up the
+<a href="#id15"><span class="problematic" id="id16">debugInfo_</span></a> struct if self.debug is set.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.ada_">
+<code class="descname">ada_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.ada_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id17"><span class="problematic" id="id18">ada_</span></a>: mr.adadelta.AdaDelta</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algInputKMax">
+<code class="descname">algInputKMax</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algInputKMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>algInputKMax: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algInputWidth">
+<code class="descname">algInputWidth</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algInputWidth" title="Permalink to this definition">¶</a></dt>
+<dd><p>algInputWidth: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algOutputKMax">
+<code class="descname">algOutputKMax</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algOutputKMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>algOutputKMax: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algSpikes">
+<code class="descname">algSpikes</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algSpikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>algSpikes: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algTimePerSpike">
+<code class="descname">algTimePerSpike</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.algTimePerSpike" title="Permalink to this definition">¶</a></dt>
+<dd><p>algTimePerSpike: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.cInhib_">
+<code class="descname">cInhib_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.cInhib_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id19"><span class="problematic" id="id20">cInhib_</span></a>: &#8216;double&#8217;
+Capacitance of inhibition row (F)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.cNeuron_">
+<code class="descname">cNeuron_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.cNeuron_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id21"><span class="problematic" id="id22">cNeuron_</span></a>: &#8216;double&#8217;
+Capacitance of neuron (F)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.crossbar_">
+<code class="descname">crossbar_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.crossbar_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns or sets the crossbar used for sparse representation.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.debugInfo_">
+<code class="descname">debugInfo_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.debugInfo_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id23"><span class="problematic" id="id24">debugInfo_</span></a>: mr.modelBase.SklearnModelBaseStats</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fit">
+<code class="descname">fit</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>maxIters=0</em>, <em>solveTime=0.0</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes this predictor&#8217;s learned values so that they fit the
+dimensionality of X, and trains the predictor on X.</p>
+<dl class="docutils">
+<dt>maxIters [int, default 0] - The maximum number of iterations to train</dt>
+<dd>on.</dd>
+<dt>solveTime - For smaller datasets, it probably makes sense to run fit()</dt>
+<dd>across the dataset multiple times by default.  solveTime
+specifies, in seconds, the amount of time that an
+UnsupervisedPredictor is allowed to use on trying to better
+output by multiple partial_fits.</dd>
+</dl>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fitIters_">
+<code class="descname">fitIters_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fitIters_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id25"><span class="problematic" id="id26">fitIters_</span></a>: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fit_predict">
+<code class="descname">fit_predict</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.fit_predict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.get_params">
+<code class="descname">get_params</code><span class="sig-paren">(</span><em>self</em>, <em>deep=True</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.get_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.init">
+<code class="descname">init</code><span class="sig-paren">(</span><em>self</em>, <em>nInputs</em>, <em>nOutputs</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.init" title="Permalink to this definition">¶</a></dt>
+<dd><p>nInputs and nOutputs comes from data, so init()
+comes after constructor.  Note that nInputs and nOutputs as passed to
+this function do not necessarily override the actual nInputs and
+nOutputs.</p>
+<p>Calls self._init(self.nInputs, self.nOutputs).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nInputs">
+<code class="descname">nInputs</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nInputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>nInputs: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nOutputs">
+<code class="descname">nOutputs</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nOutputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>nOutputs: &#8216;int&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nOutputsConvolved">
+<code class="descname">nOutputsConvolved</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.nOutputsConvolved" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of outputs that are convolved; this is used purely for
+visualizing a network.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.partial_fit">
+<code class="descname">partial_fit</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.partial_fit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_rMax">
+<code class="descname">phys_rMax</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_rMax" title="Permalink to this definition">¶</a></dt>
+<dd><p>phys_rMax: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_rMin">
+<code class="descname">phys_rMin</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_rMin" title="Permalink to this definition">¶</a></dt>
+<dd><p>phys_rMin: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_vcc">
+<code class="descname">phys_vcc</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.phys_vcc" title="Permalink to this definition">¶</a></dt>
+<dd><p>phys_vcc: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.predict">
+<code class="descname">predict</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given X, calculate our output values Y (which can be thought of as
+the strengths of different clusters / classification elements)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rInhib_">
+<code class="descname">rInhib_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rInhib_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id27"><span class="problematic" id="id28">rInhib_</span></a>: &#8216;double&#8217;
+Resistance of RC circuit for inhibition (Ohms)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.reconstruct">
+<code class="descname">reconstruct</code><span class="sig-paren">(</span><em>self</em>, <em>X</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.reconstruct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct each member of X and return the reconstructions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.reconstructFromPredict">
+<code class="descname">reconstructFromPredict</code><span class="sig-paren">(</span><em>self</em>, <em>y</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.reconstructFromPredict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reconstruct each member of the original X given a result from
+predict().</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rfAvg">
+<code class="descname">rfAvg</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rfAvg" title="Permalink to this definition">¶</a></dt>
+<dd><p>rfAvg: object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rfLeast">
+<code class="descname">rfLeast</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.rfLeast" title="Permalink to this definition">¶</a></dt>
+<dd><p>rfLeast: object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.score">
+<code class="descname">score</code><span class="sig-paren">(</span><em>self</em>, <em>X</em>, <em>y=None</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mean-squared-error for the distance from the
+reconstruction of X to X, divided by the number of elements in X.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>self</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.set_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.t_">
+<code class="descname">t_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.t_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id29"><span class="problematic" id="id30">t_</span></a>: &#8216;double&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.vFire_">
+<code class="descname">vFire_</code><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.vFire_" title="Permalink to this definition">¶</a></dt>
+<dd><p><a href="#id31"><span class="problematic" id="id32">vFire_</span></a>: &#8216;double&#8217;
+Fire threshold (V)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.visualize">
+<code class="descname">visualize</code><span class="sig-paren">(</span><em>self</em>, <em>params</em>, <em>path=None</em>, <em>inputs=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mr.unsupervised.lcaSpikingWoodsAnalytical.LcaSpikingWoodsAnalyticalInhibition.visualize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dumps an image at path, based on the visual params (width, height,
+channels).  Essentially, gives the input map that is the most likely
+estimator to produce a single output.</p>
+<dl class="docutils">
+<dt>inputs [None] - Inputs suitable for self.predict.  Determines the</dt>
+<dd>inputs to visualize</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="mr.unsupervised.lcaSpikingWoods.html" class="btn btn-neutral" title="mr.unsupervised.lcaSpikingWoods" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Walt Woods.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'1.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

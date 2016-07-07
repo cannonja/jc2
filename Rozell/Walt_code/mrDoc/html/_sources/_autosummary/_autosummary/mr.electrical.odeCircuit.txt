@@ -1,0 +1,4 @@
+mr.electrical.odeCircuit
+========================
+
+.. automodule:: mr.electrical.odeCircuit
