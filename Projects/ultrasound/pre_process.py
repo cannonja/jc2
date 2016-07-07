@@ -42,6 +42,7 @@ os.chdir(train_path)
 train_all = natsort.natsorted(os.listdir())
 train_im = train_all[slice(0,len(train_all),2)]
 train_mask = train_all[slice(1,len(train_all),2)]
+train_final = [(i, j) for i, j in zip(train_im, train_mask)]
 
 im_dim = misc.imread(train_im[0]).shape
 ims = np.zeros((np.prod(im_dim), len(train_im)))
