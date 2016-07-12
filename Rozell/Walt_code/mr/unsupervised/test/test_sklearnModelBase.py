@@ -23,21 +23,24 @@ else:
     sys.path.append(os.path.join(base1))
 
 import pyximport
-pyximport.install()    
+pyximport.install()
 import modelBase
 
 
 
 class test_get_params(unittest.TestCase):
-    
-    def test_fail(self):    
+
+    MODELBASE = mr.unsupervised.Lca
+
+    def test_fail(self):
+        model = self.MODELBASE()
         self.failUnless(False)
         
 
 if __name__ == '__main__':
     unittest.main()
-   
-    
+
+
 
 
 #class test_set_params(unittest.TestCase):
