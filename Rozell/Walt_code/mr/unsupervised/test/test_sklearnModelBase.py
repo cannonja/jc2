@@ -30,10 +30,7 @@ import modelBase
 
 class test_get_params(unittest.TestCase):
 
-    MODELBASE = mr.unsupervised.Lca
-
     def test_fail(self):
-        model = self.MODELBASE()
         self.failUnless(False)
         
 
