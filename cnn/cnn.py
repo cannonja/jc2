@@ -5,7 +5,7 @@ from mr.learn.unsupervised.lca import Lca
 from mr.learn.supervised.perceptron import Perceptron
 
 ## Load images
-nload = 7
+nload = 1000
 train, test, vp = MnistDataset(nload).split(nload * 1 // 7)
 
 ## Set up model
