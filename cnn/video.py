@@ -1,5 +1,7 @@
 import skvideo.io
 
-vdata = skvideo.io.vread('Neovision2-Training-Tower-001.mpg')
+video = 'Neovision2-Training-Tower-001.mpg'
 
-print (vdata.shape)
+vdata = skvideo.io.vread(video)
+
+print (type(vdata[0]), vdata[0].shape)
