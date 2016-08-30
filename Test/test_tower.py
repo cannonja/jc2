@@ -8,12 +8,25 @@ import matplotlib.image as img
 import matplotlib.pyplot as plt
 
 
-folder = '/stash/tlab/datasets/Tower/train/dev_test'
+folder = '/stash/tlab/datasets/Tower/dev_test'
 
 ## Initialize class and read annotation file
-t = st()
-df = t.read_file(folder)
+train_csv = os.path.join(folder, 'train')
+test_csv = os.path.join(folder, 'test')
+t = st(30, ['ims'], ['ims'], train_csv, test_csv )
+train, test, vp = t.split()
+#df = t.read_file(folder)
 
+
+
+
+
+
+
+
+
+
+'''
 ## Make sure I understand how to use ImageDataset
 expected = os.listdir(folder + '/ims')
 expected.sort()
@@ -21,8 +34,20 @@ vid = ImageDataset(folder + '/ims', expected)
 imgs = vid.resize(177, 100).split(0, noLabels=True)[0][0]
 img.imsave(folder + '/test000000.png', imgs[0].reshape(100, 177, 3))
 img.imsave(folder + '/test000001.png', imgs[1].reshape(100, 177, 3))
+'''
 
+'''
+## Check masking
+print("Testing assign classes")
+boxes = df[df.Frame == 0].iloc[:, 1:10]
 
+wn, hn, bn = t.resize_boxes(1920, 1088, 177, boxes.iloc[:, :-1])
+boxes2 = pd.DataFrame(boxes).copy()
+boxes2.iloc[:, :-1] = bn
+mask = t.assign_classes(wn, hn, boxes2)
+img.imsave(folder + '/mask0.png', mask, cmap = plt.get_cmap('gray_r'), vmin = 0,
+                                vmax = 255)
+'''
 
 
 
