@@ -50,16 +50,24 @@ img.imsave(folder + '/mask0.png', mask, cmap = plt.get_cmap('gray_r'), vmin = 0,
 '''
 
 
+##Check new masking procedure
+h_new = vp[1]
+df = pd.read_csv(train_csv[0])
+masks = t.get_masks(df, w_new, h_new)[0]
+img.imsave(folder + '/image.png', train[0][0].reshape(vp[1], vp[0], vp[2]))
+for i in range(5):
+    img.imsave(folder + '/mask' + str(i+1) + '.png', masks[i].reshape(vp[1], vp[0])
+                , cmap= plt.get_cmap('gray'))
+## Compare to split() output
+masks2 = []
+for i in range(5):
+    start = i * np.prod(vp[:2])
+    end = start + np.prod(vp[:2])
+    masks2.append(train[1][0][start:end].reshape(vp[1], vp[0]))
 
-
-
-
-
-
-
-
-
-
+for i in range(5):
+    img.imsave(folder + '/mask' + str(i+1) + 'b.png', masks2[i].reshape(vp[1], vp[0])
+                , cmap= plt.get_cmap('gray'))
 
 
 
