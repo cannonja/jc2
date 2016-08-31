@@ -12,6 +12,7 @@ from mr.learn.supervised.perceptron import Perceptron
 import matplotlib.image as img
 import matplotlib.pyplot as plt
 import datetime
+import pickle
 
 
 
@@ -20,15 +21,20 @@ file_pre = 'Neovision2-Training-Tower-'
 w_new = 36
 train_folders = ['1']
 test_folders = ['13']
-pickle_file = open('/u/jc2/dev/jc2/cnn/resources.p', 'rb')
-
 '''
+pickle_file = open('/u/jc2/dev/jc2/cnn/resources.p', 'rb')
+pickle_data = pickle.load(pickle_file)
+pickle_file.close()
+train, test, vp = pickle_data
+'''
+
+
 ## Testing preprocess - fewer images.  Need to find memory error
 videos_to_train = [os.path.join(folder, 'dev_test', 'train', 'ims')]
 videos_to_test = [os.path.join(folder, 'dev_test', 'test', 'ims')]
 train_csv = [os.path.join(folder, 'dev_test', 'train', 'train.csv')]
 test_csv = [os.path.join(folder, 'dev_test', 'test', 'test.csv')]
-'''
+
 
 
 
@@ -47,7 +53,6 @@ test_csv = [os.path.join(folder, 'test', i,
                 file_pre + str(i).zfill(3) + '.csv') for i in test_folders]
 '''
 
-'''
 ## Initialize class and read annotation file
 start = datetime.datetime.now()
 print ("Loading video data")
@@ -55,14 +60,8 @@ t = st(w_new, videos_to_train, videos_to_test, train_csv, test_csv )
 train, test, vp = t.split()
 stop = datetime.datetime.now()
 print ("Total min to load: {}".format((stop-start).total_seconds() / 60))
-'''
 
 
-
-
-pickle_data = pickle.load(pickle_file, 'rb')
-pickle_file.close()
-train, test, vp = pickle_data
 
 
 ## Set up model
