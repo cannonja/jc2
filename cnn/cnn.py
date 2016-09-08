@@ -6,7 +6,7 @@ from mr.learn.unsupervised.lca import Lca
 from mr.learn.supervised.perceptron import Perceptron
 
 ## Load images
-nload = 15000
+nload = 70000
 #train, test, vp = MnistDataset(nload).split(nload * 1 // 7)
 train, test, vp = MnistDataset(nload).split(10000)
 
@@ -17,8 +17,8 @@ c = ConvolveLayer(layer = Lca(15), visualParams = vp, convSize = 7,
             convStride = 3)
 c._init(len(train[0][0]), None)
 model.layer(c)
-p = PoolLayer(visualParams = c.visualParams)
-model.layer(p)
+#p = PoolLayer(visualParams = c.visualParams)
+#model.layer(p)
 model.layer(Perceptron())
 
 ## Train and test model
