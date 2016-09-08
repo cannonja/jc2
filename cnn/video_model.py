@@ -20,7 +20,9 @@ import pickle
 
 folder = '/stash/tlab/datasets/Tower'
 file_pre = 'Neovision2-Training-Tower-'
-w_new = 70
+#w_new = 70
+ws = [28, 70, 120]
+cnn_params = [(4, 2), (10,5), (4, 4)]
 tau = 1
 train_folders = ['1', '2', '3', '4', '5']
 test_folders = ['13', '14']
@@ -55,59 +57,62 @@ test_csv = [os.path.join(folder, 'test', i,
 
 
 
-## Initialize class and read annotation file
-start = datetime.datetime.now()
-print ("Loading video data")
-t = st(w_new, videos_to_train, videos_to_test, train_csv, test_csv, tau)
-train, test, vp = t.split()
-stop = datetime.datetime.now()
-print ("Total min to load: {}".format((stop-start).total_seconds() / 60))
-
-## Set up model
-print ("Building model")
-model = Scaffold()
-c = ConvolveLayer(layer = Lca(15), visualParams = vp, convSize = 10,
-            convStride = 5)
-c.init(len(train[0][0]), None)
-model.layer(c)
-p = PoolLayer(visualParams = c.visualParams)
-model.layer(p)
-model.layer(Perceptron())
-
-## Train and test model
-print ("Training model")
-start = datetime.datetime.now()
-model.fit(*train)
-print (model.layers[0].nOutputs)
-print (model.layers[0].nOutputsConvolved)
-
-'''
-path = 'visualize.png'
-path2 = 'visualize2.png'
-model.visualize(vp, path)
-model.visualize(vp, path2, inputs = test[0][0])
-'''
-
-stop = datetime.datetime.now()
-train_min = (stop - start).total_seconds() / 60
-print ("Total min to train: {}".format(train_min))
-
-print ("Testing model")
-start = datetime.datetime.now()
-model2 = TowerScaffold()
-xP = model.predict(test[0], False)
-xP[xP > 0.5] = 1
-xP[xP <= 0.5] = 0
-y = np.asarray(test[1])
-dice = model2._calc_Dice(xP, y)
-print (dice)
-print ("Average Dice Coefficient = {}".format(np.mean(dice)))
-stop = datetime.datetime.now()
-test_min = (stop - start).total_seconds() / 60
-print ("Total min to test: {}".format(test_min))
+for i, j in zip(ws, cnn_params):
 
 
-pickle_file = open('/u/jc2/dev/jc2/cnn/model.p', 'wb')
-pickle_data = (model, model2, vp, xP, y)
-pickle.dump(pickle_data, pickle_file)
-pickle_file.close()
+    ## Initialize class and read annotation file
+    start = datetime.datetime.now()
+    print ("Loading video data")
+    t = st(i, videos_to_train, videos_to_test, train_csv, test_csv, tau)
+    train, test, vp = t.split()
+    stop = datetime.datetime.now()
+    print ("Total min to load: {}".format((stop-start).total_seconds() / 60))
+
+    ## Set up model
+    print ("Building model")
+    model = Scaffold()
+    c = ConvolveLayer(layer = Lca(15), visualParams = vp, convSize = j[0],
+                convStride = j[1])
+    c.init(len(train[0][0]), None)
+    model.layer(c)
+    p = PoolLayer(visualParams = c.visualParams)
+    model.layer(p)
+    model.layer(Perceptron())
+
+    ## Train and test model
+    print ("Training model")
+    start = datetime.datetime.now()
+    model.fit(*train)
+    print (model.layers[0].nOutputs)
+    print (model.layers[0].nOutputsConvolved)
+
+    '''
+    path = 'visualize.png'
+    path2 = 'visualize2.png'
+    model.visualize(vp, path)
+    model.visualize(vp, path2, inputs = test[0][0])
+    '''
+
+    stop = datetime.datetime.now()
+    train_min = (stop - start).total_seconds() / 60
+    print ("Total min to train: {}".format(train_min))
+
+    print ("Testing model")
+    start = datetime.datetime.now()
+    model2 = TowerScaffold()
+    xP = model.predict(test[0], False)
+    xP[xP > 0.5] = 1
+    xP[xP <= 0.5] = 0
+    y = np.asarray(test[1])
+    dice = model2._calc_Dice(xP, y)
+    print (dice)
+    print ("Average Dice Coefficient = {}".format(np.mean(dice)))
+    stop = datetime.datetime.now()
+    test_min = (stop - start).total_seconds() / 60
+    print ("Total min to test: {}".format(test_min))
+
+
+    pickle_file = open("/u/jc2/dev/jc2/cnn/model_{}.p".format(i), 'wb')
+    pickle_data = (model, model2, vp, xP, y)
+    pickle.dump(pickle_data, pickle_file)
+    pickle_file.close()
