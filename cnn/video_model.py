@@ -59,7 +59,6 @@ test_csv = [os.path.join(folder, 'test', i,
 
 for i, j in zip(ws, cnn_params):
 
-
     ## Initialize class and read annotation file
     start = datetime.datetime.now()
     print ("Loading video data")
