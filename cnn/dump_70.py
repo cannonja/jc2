@@ -42,7 +42,7 @@ pickle_file.close()
 
 print("Dumping visuals")
 orig = [np.asarray(Image.open(i).resize((70, 40))) for i in test_files]
-labels = [y[i].reshape(5, np.prod(vp[:2])) for i in range(y.shape[1])]
+labels = [y[i].reshape(5, np.prod(vp[:2])) for i in range(y.shape[0])]
 predictions = [t.combine_classes(xP[i, :].reshape(5, np.prod(vp[:2])),
                 vp[0], vp[1]) for i in range(xP.shape[0])]
 t.dump_ims(orig, labels, predictions)
