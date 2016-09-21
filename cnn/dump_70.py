@@ -40,11 +40,13 @@ model, model2, vp, xP, y = pickle.load(pickle_file)
 dice = model2._get_Dices(xP, y, len(t.classes))
 pickle_file.close()
 
-print("Dumping visuals")
+print("Constructing lists")
 orig = [np.asarray(Image.open(i).resize((70, 40))) for i in test_files]
 labels = [y[i].reshape(5, np.prod(vp[:2])) for i in range(y.shape[0])]
 predictions = [t.combine_classes(xP[i, :].reshape(5, np.prod(vp[:2])),
                 vp[0], vp[1]) for i in range(xP.shape[0])]
+
+print("Dumping visuals")
 t.dump_ims(orig, labels, predictions)
 fig = model2.plot_Dices(dice, t.classes)
 fig.savefig('dice.png')
