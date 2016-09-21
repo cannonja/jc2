@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+from natsort import natsorted
 from mr.datasets.tower import StanfordTower as st
 from mr.datasets.tower import TowerScaffold
 from mr.datasets.common import ImageSet
@@ -27,8 +28,8 @@ test_csv = [os.path.join(folder, 'dev_test', 'test2', 'train.csv')]
 t = st(6, videos_to_train, videos_to_test, train_csv, test_csv)
 apath1 = os.path.join(folder, 'test', '13', 'Neovision2-Training-Tower-013')
 apath2 = os.path.join(folder, 'test', '14', 'Neovision2-Training-Tower-014')
-test_files1 = [os.path.join(apath1, i) for i in os.listdir(apath1)]
-test_files2 = [os.path.join(apath2, i) for i in os.listdir(apath2)]
+test_files1 = [os.path.join(apath1, i) for i in natsorted(os.listdir(apath1))]
+test_files2 = [os.path.join(apath2, i) for i in natsorted(os.listdir(apath2))]
 test_files = test_files1 + test_files2
 
 
@@ -41,8 +42,12 @@ dice = model2._get_Dices(xP, y, len(t.classes))
 pickle_file.close()
 
 print("Constructing lists")
+print("\torig...........")
 orig = [np.asarray(Image.open(i).resize((70, 40))) for i in test_files]
-labels = [(y[i].reshape(5, np.prod(vp[:2])) * 255.).astype(np.uint8) for i in range(y.shape[0])]
+print("\tlabels.........")
+labels = [t.combine_classes(y[i, :].reshape(5, np.prod(vp[:2])),
+                vp[0], vp[1]) for i in range(y.shape[0])]
+print("\tpredictions....")
 predictions = [t.combine_classes(xP[i, :].reshape(5, np.prod(vp[:2])),
                 vp[0], vp[1]) for i in range(xP.shape[0])]
 
