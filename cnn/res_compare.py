@@ -18,10 +18,7 @@ import pickle
 
 
 
-pickle_file = open("/u/jc2/dev/jc2/cnn/model_{}.p".format(w_new), 'wb')
-pickle_data = (t, test, train, vp, model, model2, xP, y)
-pickle.dump(pickle_data, pickle_file)
-pickle_file.close()
+## pickle_data = (t, test, train, vp, model, model2, xP, y)
 
 res = [28, 35, 50, 70]
 res_names = [str(i) for i in res]
