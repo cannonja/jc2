@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+from collections import OrderedDict
 from mr.datasets.tower import StanfordTower as st
 from mr.datasets.tower import TowerScaffold
 from mr.datasets.common import ImageSet
@@ -23,20 +24,19 @@ import pickle
 res = [28, 35, 50, 70]
 res_names = [str(i) for i in res]
 t2 = TowerScaffold()
-xPs = []
-ys = []
 dices = []
+
+classes = OrderedDict([('car', 1), ('truck', 2), ('bus', 3), ('person', 4),
+                            ('cyclist', 5)])
 
 ## Get data
 for i in res:
     pickle_file = open("/u/jc2/dev/jc2/cnn/model_{}.p".format(i), 'rb')
-    t, _, _, _, _, _, xP, y = pickle.load(pickle_file)
-    xPs.append(xP.copy())
-    ys.append(ys.copy())
+    _, _, _, _, _, _, xP, y = pickle.load(pickle_file)
     pickle_file.close()
     dices.append(t2._get_Dices(xP, y, 5))
 
-fig = t2.plot_Dice_res(dices, res_names, t.classes)
+fig = t2.plot_Dice_res(dices, res_names, classes)
 fig.savefig('dice_res.png')
 
 
