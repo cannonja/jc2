@@ -21,7 +21,8 @@ import pickle
 
 ## pickle_data = (t, test, train, vp, model, model2, xP, y)
 
-res = [28, 35, 50, 70]
+res = [4, 14, 28, 35, 50, 70]
+#res = [28, 35, 50, 70]
 res_names = [str(i) for i in res]
 t2 = TowerScaffold()
 dices = []
@@ -36,7 +37,7 @@ for i in res:
     pickle_file.close()
     dices.append(t2._get_Dices(xP, y, 5))
 
-fig = t2.plot_Dice_res(dices, res_names, classes)
+fig = t2.plot_Dice_res(dices, res, classes)
 fig.savefig('dice_res.png')
 
 
