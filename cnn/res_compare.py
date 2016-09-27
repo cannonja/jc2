@@ -37,7 +37,9 @@ for i in res:
     pickle_file.close()
     dices.append(t2._get_Dices(xP, y, 5))
 
-fig = t2.plot_Dice_res(dices, res, classes)
+ius = [np.divide(i, np.subtract(2, i)) for i in dices]
+#fig = t2.plot_Dice_res(dices, res, classes)
+fig = t2.plot_Dice_res(ius, res, classes)
 fig.savefig('dice_res.png')
 
 
