@@ -5,7 +5,7 @@ import numpy as np
 This function takes the spatial dimensions of the input image, the sqaure width of the filter,
 the stride length, and the amount of zero-padding.
 
-It calculates the spatial dimemsions of the convolved output and returns a 2x4 numpy array where
+It calculates the spatial dimemsions of the convolved output and returns a nx4 numpy array where
 each row represents the index of the output and contains the indices of the corners of the shape
 of the input related to the output index in question.
 
