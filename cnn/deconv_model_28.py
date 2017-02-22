@@ -69,16 +69,12 @@ c = ConvolveLayer(layer = Lca(15), visualParams = vp, convSize = cnn_params[0],
             convStride = cnn_params[1])
 c.init(len(train[0][0]), None)
 model.layer(c)
-'''
-p = PoolLayer(visualParams = c.visualParams)
-model.layer(p)
-'''
-d = DeconvolveLayer(visualParams = c.visualParams + (num_classes,), convSize = c.convSize,
+d = DeconvolveLayer(visualParams = vp[:2] + (c.visualParams[2], num_classes), convSize = c.convSize,
                     convStride = c.convStride, deconvSize = deconv_params[0],
                     deconvStride = deconv_params[1])
 model.layer(d)
-
 model.layer(Perceptron())
+
 
 ## Train and test model
 print ("Training model")
@@ -104,7 +100,6 @@ print ("Average Dice Coefficient = {}".format(np.mean(dice)))
 stop = datetime.datetime.now()
 test_min = (stop - start).total_seconds() / 60
 print ("Total min to test: {}".format(test_min))
-
 '''
 pickle_file = open("/u/jc2/dev/jc2/cnn/model_{}.p".format(w_new), 'wb')
 pickle_data = (t, test, train, vp, model, model2, xP, y)
